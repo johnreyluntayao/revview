@@ -1,8 +1,6 @@
 export interface Users {
     id: number;
-    firstName: string;
-    lastName: string;
-    middleName?: string;
+    name: string;
     userName: string;
     email: string;
     password: string;
@@ -12,14 +10,15 @@ export interface Users {
 }
 
 export interface Question {
-    id: number;
-    text: string; 
-    category: "numerical" | "verbal" | "analytical" | "general";
-    options: string[];        
-    correctAnswer: "A" | "B" | "C" | "D" | "E";
-    explanation: string;
-    dateCreated?: Date;
-    dateUpdated?: Date;
+  id: number;
+  text: string;
+  category: "numerical" | "verbal" | "analytical" | "general";
+  options: string[];
+  correctAnswer: "A" | "B" | "C" | "D" | "E";
+  explanation: string;
+  imageUrl?: string;  
+  dateCreated?: Date;
+  dateUpdated?: Date;
 }
 
 export interface QuizSession {
@@ -82,7 +81,7 @@ export interface QuizCategory {
 export interface DifficultyLevel {
   id: string;                
   label: string;             
-  time_per_question: number;    
+  time_per_question: number;
   description: string | null;
 }
 
