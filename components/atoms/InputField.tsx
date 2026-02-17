@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Eye, EyeOff } from "@/lib/icon";
+import { EyeOff, Eye } from "@/lib/icons";
 import { InputFieldProps } from "@/lib/types";
 
 

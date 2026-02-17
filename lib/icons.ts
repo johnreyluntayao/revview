@@ -38,4 +38,6 @@ export {
     Edit,
     Trash2 as Delete,
     Search,
+    EyeIcon as Eye,
+    EyeClosedIcon as EyeOff
 } from 'lucide-react';
