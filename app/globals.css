@@ -2,7 +2,10 @@
 
 @import "tailwindcss";
 
-/* Move theme vars outside @layer base so Tailwind sees them early */
+/* =============================================
+   Theme variables (used by both light & dark)
+   These are HSL values without the hsl() wrapper
+   ============================================= */
 :root {
   --background: 0 0% 100%;
   --foreground: 210 11% 15%;
@@ -24,6 +27,7 @@
   --input: 210 7% 93%;
   --ring: 221 83% 53%;
   --radius: 0.75rem;
+
   --sidebar-background: 0 0% 98%;
   --sidebar-foreground: 210 11% 15%;
   --sidebar-primary: 221 83% 53%;
@@ -32,11 +36,13 @@
   --sidebar-accent-foreground: 0 0% 100%;
   --sidebar-border: 210 7% 88%;
   --sidebar-ring: 221 83% 53%;
+
   --success: 134 61% 41%;
   --success-foreground: 0 0% 100%;
   --warning: 38 92% 50%;
   --warning-foreground: 0 0% 100%;
 
+  /* Simple hex fallback (used in body) */
   --background-simple: #ffffff;
   --foreground-simple: #171717;
 }
@@ -61,6 +67,7 @@
   --border: 217.2 32.6% 17.5%;
   --input: 217.2 32.6% 17.5%;
   --ring: 212.7 26.8% 83.9%;
+
   --sidebar-background: 240 5.9% 10%;
   --sidebar-foreground: 240 4.8% 95.9%;
   --sidebar-primary: 224.3 76.3% 48%;
@@ -69,29 +76,68 @@
   --sidebar-accent-foreground: 240 4.8% 95.9%;
   --sidebar-border: 240 3.7% 15.9%;
   --sidebar-ring: 217.2 91.2% 59.8%;
+
   --background-simple: #0a0a0a;
   --foreground-simple: #ededed;
 }
 
-@theme inline {
+/* =============================================
+   Register colors + fonts + radius with Tailwind
+   This is what actually creates bg-primary, text-primary, etc.
+   ============================================= */
+@theme {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-  /* Add others if you use them: --color-primary, --color-destructive, etc. */
-  --font-sans: 'Inter', system-ui, sans-serif;
+
+  /* Sidebar variants (optional — only if you use bg-sidebar-primary etc.) */
+  --color-sidebar-background: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  /* Extra semantic colors you defined */
+  --color-success: hsl(var(--success));
+  --color-success-foreground: hsl(var(--success-foreground));
+  --color-warning: hsl(var(--warning));
+  --color-warning-foreground: hsl(var(--warning-foreground));
+
+  /* Fonts & radius */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
   --radius: var(--radius);
 }
 
+/* =============================================
+   Base styles
+   ============================================= */
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    @apply border-border;
   }
 
   body {
-    @apply bg-background text-foreground mx-auto px-4 md:px-6 lg:px-8;
+    @apply bg-background text-foreground antialiased;
     background: hsl(var(--background-simple));
     color: hsl(var(--foreground-simple));
     font-family: var(--font-sans);
@@ -106,5 +152,11 @@
   code {
     overflow-x: auto;
     white-space: pre;
+  }
+
+  /* Optional: better focus ring using the ring variable */
+  :focus-visible {
+    outline: none;
+    @apply ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 }
