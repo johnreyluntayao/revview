@@ -1,12 +1,11 @@
-import Navbar from '@/components/ui/NavBar'
-import React from 'react'
+import { NavBar } from '@/lib/imports'
 
 const page = () => {
 
 
   return (
     <div>
-    <Navbar isLoggedIn/>
+    <NavBar isLoggedIn/>
         
         page</div>
   )
