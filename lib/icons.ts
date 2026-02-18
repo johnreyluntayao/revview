@@ -39,5 +39,6 @@ export {
     Trash2 as Delete,
     Search,
     EyeIcon as Eye,
-    EyeClosedIcon as EyeOff
+    EyeClosedIcon as EyeOff,
+    X as Close,
 } from 'lucide-react';
