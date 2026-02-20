@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { Sidebar } from "@/lib/imports";
 import { Menu } from "@/lib/icons";
+import { Metadata } from "next";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
 
   return (
     <>
