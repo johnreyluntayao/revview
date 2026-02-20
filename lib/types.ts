@@ -18,19 +18,21 @@ export interface InputFieldProps {
   [key: string]: any;
 }
 
+
 export interface ButtonProps {
-  textColor: string;
-  className?: string;
-  backgroundColor: string;
+  textColor?: string;          
+  backgroundColor?: string;   
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
-  text?: ReactNode;
-  onClick?: (e?: React.MouseEvent<HTMLButtonElement>) => void;
-  size?: "lg" | "md" | "sm";
+  text?: ReactNode;            
+  children?: ReactNode;      
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  size?: "sm" | "md" | "lg";
   isDisabled?: boolean;
   type?: "button" | "submit" | "reset";
-  ref?: React.ForwardedRef<HTMLButtonElement>;
+  className?: string;
   isRounded?: boolean;
+  ref?: React.ForwardedRef<HTMLButtonElement>;
 }
 export interface Users {
     id: number;
@@ -107,9 +109,8 @@ export interface QuizCategory {
   id: string;                   
   name: string;               
   description: string | null;
-  icon_name: string | null;     
-  color_gradient: string | null;
-  question_count: number;
+  icon: string | null;     
+  color: string | null;
 }
 
 export interface DifficultyLevel {
