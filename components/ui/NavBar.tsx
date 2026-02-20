@@ -15,10 +15,10 @@ import {
 } from "@/lib/icons";
 
 interface NavbarProps {
-  isLoggedIn?: boolean;
+  State: "LoggedIn" | "Home" | "SignIn" | "SignUp";
 }
 
-export default function Navbar({ isLoggedIn = false }: NavbarProps) {
+export default function Navbar({ State }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();                   
 
@@ -44,7 +44,7 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
         </div>
 
         {/* CENTER DESKTOP NAV – only when logged in */}
-        {isLoggedIn && (
+        {State === "LoggedIn" && (
           <div className="hidden md:flex items-center justify-center gap-1.5 lg:gap-2 absolute left-1/2 -translate-x-1/2">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
@@ -72,7 +72,7 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
 
         {/* RIGHT SIDE */}
         <div className="flex items-center gap-3 sm:gap-4">
-          {isLoggedIn ? (
+          {State === "LoggedIn" ? (
             <>
               {/* Desktop profile indicator */}
               <Link
@@ -99,7 +99,7 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
                 )}
               </button>
             </>
-          ) : (
+          ) : State === "Home" ? (
             <Link
               href="/login"
               className="
@@ -113,12 +113,27 @@ export default function Navbar({ isLoggedIn = false }: NavbarProps) {
             >
               Sign In
             </Link>
-          )}
+          ) : State === "SignIn" ? (
+           <div className="flex text-muted-foreground">
+            <p className="hidden md:block">Don't have an account?</p>
+            <a href="/signup" className="text-primary font-semibold hover:underline ml-1">
+              Sign up
+            </a>
+          </div>
+          ):(
+            <div className="flex text-muted-foreground">
+            <p className=" hidden md:block">Already have an account?</p>
+            <a href="/login" className="text-primary font-semibold hover:underline ml-1">
+              Sign in
+            </a>
+          </div>
+          )
+        }
         </div>
       </div>
 
       {/* MOBILE MENU */}
-      {isLoggedIn && isMobileMenuOpen && (
+      {State === "LoggedIn" && isMobileMenuOpen && (
         <div className="md:hidden fixed inset-0 top-16 bg-background/95 backdrop-blur-sm border-t border-border z-50 animate-in fade-in slide-in-from-top-5 duration-200">
           <div className="max-w-screen-2xl mx-auto px-4 py-6 flex flex-col gap-2 bg-white/90 h-screen">
             {navItems.map((item) => {

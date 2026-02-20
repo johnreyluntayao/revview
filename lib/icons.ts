@@ -3,7 +3,7 @@ export {
     Lock as Password,
     Eye as ShowPassword,
     EyeOff as HidePassword,
-    LogIn as Login,
+    LogIn,
     LogOut as Logout,
     Zap as InstantFeedback,
     BarChart3 as ProgressTracking,
@@ -41,4 +41,5 @@ export {
     EyeIcon as Eye,
     EyeClosedIcon as EyeOff,
     X as Close,
+    AtSign,
 } from 'lucide-react';
