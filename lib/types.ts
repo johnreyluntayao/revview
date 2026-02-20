@@ -128,3 +128,18 @@ export interface AdminStatistics {
   average_score: number;        
   last_updated: Date;
 }
+
+export interface ChipProps {
+  leftIcon?: ReactNode;
+  rightIcon?: ReactNode;
+  text: ReactNode;
+  className?: string;
+  variant?: | 'numerical'
+    | 'verbal'
+    | 'general'
+    | 'analytical'
+    | 'correct'
+    | 'resolved'
+    | 'score'
+    | 'default'
+}
