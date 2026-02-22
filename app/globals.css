@@ -2,10 +2,6 @@
 
 @import "tailwindcss";
 
-/* =============================================
-   Theme variables (used by both light & dark)
-   These are HSL values without the hsl() wrapper
-   ============================================= */
 :root {
   --background: 0 0% 100%;
   --foreground: 210 11% 15%;
@@ -82,45 +78,44 @@
 }
 
 /* =============================================
-   Register colors + fonts + radius with Tailwind
    This is what actually creates bg-primary, text-primary, etc.
    ============================================= */
 @theme {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));  /* Use for the main background whiteColor */
+  --color-foreground: hsl(var(--foreground)); /* Use for text color blackColor */
+  --color-card: hsl(var(--card)); /* Use for the background for cards whiteColor */
+  --color-card-foreground: hsl(var(--card-foreground)); /* Use for text color for cards blackColor */
+  --color-popover: hsl(var(--popover)); /* Use for popup background for cards whiteColor */
+  --color-popover-foreground: hsl(var(--popover-foreground)); /* Use for popup text color blackColor */
+  --color-primary: hsl(var(--primary)); /*(royalBlue: Main call-to-action color: buttons (primary), links (active/hover), selected items, focus rings. */
+  --color-primary-foreground: hsl(var(--primary-foreground)); /* colorWhite: Text/icon color on primary backgrounds → white-on-blue buttons look sharp. */
+  --color-secondary: hsl(var(--secondary)); /* BrightPurple: Secondary buttons, tags, badges, alternate accents. */
+  --color-secondary-foreground: hsl(var(--secondary-foreground)); /* StrongPurple: Hover states, subtle highlights, selected rows in tables, chips. */
+  --color-muted: hsl(var(--muted)); /* paleGray: Subtle backgrounds: secondary nav items, disabled states, table stripes, very light cards. */
+  --color-muted-foreground: hsl(var(--muted-foreground)); /* slateGray: Secondary text: labels, helper text, timestamps, placeholder text. */
+  --color-accent: hsl(var(--accent)); /* strongPurple: Used for: hover states, selected items, subtle highlights, tags/chips, alternate buttons, focus indicators on non-primary elements. */
+  --color-accent-foreground: hsl(var(--accent-foreground)); /* PureWhite:Ensures crisp-white text/icons on the vividpurple accent background */
+  --color-destructive: hsl(var(--destructive)); /* vividRed: Delete buttons, error messages, danger zones, invalid inputs. */
+  --color-destructive-foreground: hsl(var(--destructive-foreground)); /* pureWhite: Text on red-backgrounds (delete buttons, error alerts, "danger zone" confirms) */
+  --color-border: hsl(var(--border)); /*PaleGray: All borders, dividers, input outlines — keeps things soft and not too harsh.*/
+  --color-input: hsl(var(--input)); /* lightGray: Input/textarea backgrounds */
+  --color-ring: hsl(var(--ring)); /* primaryBlue: Focus rings / outline on interactive elements (accessibility + visual feedback). */
 
   /* Sidebar variants (optional — only if you use bg-sidebar-primary etc.) */
-  --color-sidebar-background: hsl(var(--sidebar-background));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-primary: hsl(var(--sidebar-primary));
-  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --color-sidebar-accent: hsl(var(--sidebar-accent));
-  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
-  --color-sidebar-ring: hsl(var(--sidebar-ring));
+  --color-sidebar-background: hsl(var(--sidebar-background)); /* almostWhite: subtle separation from main content */
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground)); /* charcoal: Main text/icons in the sidebar — same as global foreground for consistency. */
+  --color-sidebar-primary: hsl(var(--sidebar-primary)); /*RoyalBlue: Primary interactive elements inside sidebar: active nav items, primary sidebar buttons, selected menu entries. */
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground)); /* pureWhite: Text/icons on sidebar primary-blue — clean and legible. */
+  --color-sidebar-accent: hsl(var(--sidebar-accent)); /* strongPurple: Accent touches in sidebar: hovered nav items (if not using primary), badges, secondary highlights. */
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground)); /* pureWhite: Text on sidebar accent-purple — matches the global accent-foreground. */
+  --color-sidebar-border: hsl(var(--sidebar-border)); /* paleGray:Sidebar dividers, outer border, separators — soft and unobtrusive. */
+  --color-sidebar-ring: hsl(var(--sidebar-ring)); /* royalBlue: Focus rings inside the sidebar (keyboard navigation, active states) — reuses the primary-blue for brand coherence. */
 
   /* Extra semantic colors you defined */
-  --color-success: hsl(var(--success));
-  --color-success-foreground: hsl(var(--success-foreground));
-  --color-warning: hsl(var(--warning));
-  --color-warning-foreground: hsl(var(--warning-foreground));
+  --color-success: hsl(var(--success)); /* deepEmerald: Success toasts, checkmarks, completed states, positive badges. */
+  --color-success-foreground: hsl(var(--success-foreground)); /* pureWhite: Text/icons on success-green backgrounds (success toasts, check badges, "done" buttons). */
+  --color-warning: hsl(var(--warning)); /* DeepOrange: Caution toasts, unsaved changes, alerts */
+  --color-warning-foreground: hsl(var(--warning-foreground)); /* purWhite: Text/icons on warning amber/orange-backgrounds (caution toasts, unsaved indicators). */
 
   /* Fonts & radius */
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -154,7 +149,6 @@
     white-space: pre;
   }
 
-  /* Optional: better focus ring using the ring variable */
   :focus-visible {
     outline: none;
     @apply ring-2 ring-ring ring-offset-2 ring-offset-background;
