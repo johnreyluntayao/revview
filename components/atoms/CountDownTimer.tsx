@@ -6,7 +6,6 @@ interface CountdownTimerProps {
     minutes: number;
     seconds: number;
     className?: string;
-
 }
 
 const CountDownTimer: React.FC<CountdownTimerProps> = ({
@@ -58,10 +57,10 @@ const CountDownTimer: React.FC<CountdownTimerProps> = ({
         ${className}
       `}
         >
-            <div className={` rounded-full p-2 md:p-3 lg:p-4 flex gap-2 items-center text-xl md:text-2xl lg:text-3xl font-mono font-bold tracking-wider
-            ${isFinished ? 'text-red-800 animate-pulse bg-red-200' : 'text-blue-800 bg-blue-200'}
+            <div className={`w-40 rounded-full p-2 md:p-3 lg:p-4 flex gap-2 items-center text-xl md:text-2xl lg:text-3xl font-medium tracking-wider
+            ${isFinished ? 'text-destructive animate-pulse bg-destructive/20' : 'text-primary bg-primary/20'}
             transition-colors duration-300`}>
-                <StudyTime/>
+                <StudyTime className='w-8'/>
                 <div>
                     {formatTime(timeLeft)}
                 </div>
