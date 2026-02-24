@@ -1,13 +1,12 @@
-import { NavBar } from '@/lib/imports'
+import { NavBar, AdminDashboard } from '@/lib/imports'
 
 const page = () => {
 
-
   return (
-    <div>
-    <NavBar isLoggedIn/>
-        
-        page</div>
+    <main className=''>
+    <NavBar State='LoggedIn'/>
+    <AdminDashboard admin="Admin" />
+    </main>
   )
 }
 
