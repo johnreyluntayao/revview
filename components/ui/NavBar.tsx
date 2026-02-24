@@ -24,7 +24,7 @@ export default function Navbar({ State }: NavbarProps) {
 
   const navItems = [
     { href: "/admin",        label: "Dashboard",       icon: ProgressTracking },
-    { href: "/feedback",     label: "Feedback",        icon: ShowFeedback },
+    { href: "/feedbacks",     label: "Feedback",        icon: ShowFeedback },
     { href: "/questions",    label: "Questions",       icon: Questions },
     { href: "/account",      label: "Account Settings", icon: AccountSettings },
   ];

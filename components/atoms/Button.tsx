@@ -22,28 +22,21 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const baseClasses = `
-      flex items-center justify-center 
-      transition-all duration-200 
-      hover:brightness-[0.96] active:brightness-[0.92]
-      ${isDisabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}
-      h-[52px] sm:h-[56px] md:h-[60px] 
-      px-5 sm:px-6 md:px-7 lg:px-8
-    `;
+    const baseClasses = `flex items-center justify-center rounded-[8px] transition-colors duration-200 hover:brightness-90 cursor-pointer ${
+    isDisabled ? "opacity-50 cursor-not-allowed" : ""
+  }`;
 
     const radiusClasses = isRounded ? "rounded-full" : "rounded-xl";
 
-    const sizeClasses = size
-      ? {
-          lg: "text-lg gap-3 font-semibold",
-          md: "text-base gap-2.5 font-medium",
-          sm: "text-sm gap-2 font-medium",
-        }[size]
-      : `
-        text-sm sm:text-base 
-        gap-2 sm:gap-2.5 
-        font-medium
-      `;
+     const sizeClasses = size
+    ? {
+        lg: "text-[16px] gap-2 py-3 px-6",
+        md: "text-[14px] gap-1.5 py-2.5 px-5",
+        sm: "text-[12px] gap-1 py-2 px-4 ",
+      }[size]
+    : "text-[12px] gap-1 py-2 px-4  " +
+      "md:text-[14px] md:gap-1.5 md:py-2.5 md:px-5 " +
+      "lg:text-[16px] lg:gap-2 lg:py-3 lg:px-6 ";
 
     return (
       <button
