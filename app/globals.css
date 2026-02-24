@@ -135,7 +135,7 @@
     @apply bg-background text-foreground antialiased;
     background: hsl(var(--background-simple));
     color: hsl(var(--foreground-simple));
-    font-family: var(--font-sans);
+    font-family: var(--font-sans); 
   }
 
   :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
@@ -148,6 +148,7 @@
     overflow-x: auto;
     white-space: pre;
   }
+
 
   :focus-visible {
     outline: none;
