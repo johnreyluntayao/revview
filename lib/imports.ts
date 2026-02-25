@@ -1,6 +1,7 @@
 //Main Components
 export { default as AdminDashboard } from "@/components/AdminDashboard";
 export { default as ManageFeedback } from "@/components/ManageFeedbacks";
+export { default as QuizResult } from "@/components/QuizResult";
 
 
 //UI Components

@@ -15,10 +15,11 @@ import {
 } from "@/lib/icons";
 
 interface NavbarProps {
-  State: "LoggedIn" | "Home" | "SignIn" | "SignUp";
+  State: "LoggedIn" | "Home" | "SignIn" | "SignUp" | "Default";
+  title?: string;
 }
 
-export default function Navbar({ State }: NavbarProps) {
+export default function Navbar({ State, title }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();                   
 
@@ -120,13 +121,17 @@ export default function Navbar({ State }: NavbarProps) {
               Sign up
             </a>
           </div>
-          ):(
+          ): State === "SignUp" ? (
             <div className="flex text-muted-foreground">
             <p className=" hidden md:block">Already have an account?</p>
             <a href="/login" className="text-primary font-semibold hover:underline ml-1">
               Sign in
             </a>
           </div>
+          ) : (
+            <div className="flex text-muted-foreground">
+              <p className="text-base">{title}</p>
+            </div>
           )
         }
         </div>
