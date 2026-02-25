@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/lib/imports";
-import { RotateCw, ArrowLeft } from "lucide-react"; 
+import { RetakeQuiz, BackToDashboard } from "@/lib/icons"; 
 import { useRouter } from "next/navigation";
 
 interface ScoreCardProps {
@@ -97,7 +97,7 @@ export default function ScoreCard({
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button
             onClick={() => router.push("/quizselection")}
-            leftIcon={<RotateCw className="w-5 h-5" />}
+            leftIcon={<RetakeQuiz className="w-5 h-5" />}
             text="Retake Quiz"
             backgroundColor="bg-primary"
             textColor="text-primary-foreground"
@@ -105,7 +105,7 @@ export default function ScoreCard({
 
           <Button
             onClick={() => router.push("/dashboard")}
-            leftIcon={<ArrowLeft className="w-5 h-5" />}
+            leftIcon={<BackToDashboard className="w-5 h-5" />}
             text="Dashboard"
             backgroundColor="bg-transparent"
             textColor="text-primary"
