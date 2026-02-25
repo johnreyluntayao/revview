@@ -7,28 +7,32 @@ import React from 'react'
     text: '',
   },
   numerical: {
-    background: 'bg-blue-100',
-    text: 'text-blue-800',
+    background: 'bg-primary/10',
+    text: 'text-primary',
   },
   verbal: {
-    background: 'bg-green-100',
-    text: 'text-green-800',
+    background: 'bg-success/10',
+    text: 'text-success',
   },
   general: {
-    background: 'bg-purple-100',
-    text: 'text-purple-800',
+    background: 'bg-secondary/10',
+    text: 'text-secondary',
   },
   analytical: {
-    background: 'bg-amber-100', // or orange-100 / yellow-100
+    background: 'bg-amber-100',
     text: 'text-amber-800',
   },
   correct: {
-    background: 'bg-emerald-100',
-    text: 'text-emerald-800 font-medium',
+    background: 'bg-success/10',
+    text: 'text-success',
+  },
+  incorrect: {
+    background: 'bg-destructive/10',
+    text: 'text-destructive',
   },
   resolved: {
-    background: 'bg-cyan-100',
-    text: 'text-cyan-800 font-medium',
+    background: 'bg-success/10',
+    text: 'text-success',
   },
   score: {
     background: 'bg-indigo-50',
@@ -45,7 +49,7 @@ const Chip: React.FC<ChipProps> = ({
 }) => {
   const style = variantStyles[variant] || variantStyles.default
 
-    const baseClasses = `inline-flex items-center gap-2 px-3 py-1 text-xs md:text-sm lg:text-base ${className} ${style.background} ${style.text} rounded-full`
+    const baseClasses = `inline-flex items-center font-medium gap-2 px-3 py-1 text-xs md:text-sm ${className} ${style.background} ${style.text} rounded-full`
   return (
 
     <div className={baseClasses}>

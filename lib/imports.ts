@@ -10,9 +10,11 @@ export { default as SummaryPanel } from "@/components/ui/SummaryPannel";
 export { default as Login } from "@/components/ui/Login";
 export { default as SignUp } from "@/components/ui/SignUp";
 export { default as Feedback } from "@/components/atoms/Feedback";
+export { default as QuizAccordion } from "@/components/ui/QuizAccordion";
 
 
 //Atom Components
 export { default as Button } from "@/components/atoms/Button";
 export { default as InputField } from "@/components/atoms/InputField";
 export { default as Card } from "@/components/atoms/Card";
+export { default as Chip } from "@/components/atoms/Chip";
