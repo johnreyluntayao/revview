@@ -23,8 +23,8 @@ const Card: React.FC<CardProps> = ({
     subValue = "",
     icon,
     bg = "bg-white",
-    textColor = "text-black",
-    iconColor = "text-blue-600",
+    textColor = "text-foreground",
+    iconColor = "text-primary",
     trend = null,
     className = "",
 }) => {
@@ -81,9 +81,9 @@ const Card: React.FC<CardProps> = ({
         // Variant 3: Overall score with best/lowest (third screenshot style)
         case "overview":
             content = (
-                <div className="p-6 text-left w-full">
-                    {title && <h3 className={`text-sm md:text-base lg:text-lg font-medium text-gray-900 mb-1`}>{title}</h3>}
-                    <p className={`text-3xl md:text-4xl lg:text-5xl font-bold ${textColor}`}>{value}</p>
+                <div className="p-4 md:p-6 lg:p-8 text-left w-full">
+                    {title && <h3 className={`text-xs md:text-sm lg:text-base font-medium text-muted-foreground mb-1`}>{title}</h3>}
+                    <p className={`text-base md:text-lg lg:text-xl font-semibold text-foreground capitalize ${textColor}`}>{value}</p>
                 </div>
             );
             break;

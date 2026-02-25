@@ -71,10 +71,13 @@ export default function QuizAccordion({
                 </p>
               </div>
 
-              <Chip 
-                variant={`${answer?.isCorrect ? "correct" : "incorrect"}`} 
-                text={answer?.isCorrect ? "Correct" : "Incorrect"}
-              />
+              <div className="hidden md:block">
+                <Chip 
+                  variant={`${answer?.isCorrect ? "correct" : "incorrect"}`} 
+                  text={answer?.isCorrect ? "Correct" : "Incorrect"}
+                />
+              </div>
+              
             </button>
 
             <div
