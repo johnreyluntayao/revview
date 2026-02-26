@@ -50,7 +50,7 @@ const InputField: React.FC<InputFieldProps> = ({
   return (
     <div className={`space-y-2 ${className}`}>
       {label && (
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-xs md:text-sm lg:text-base font-medium text-gray-700">
           {label}
         </label>
       )}
@@ -76,8 +76,8 @@ const InputField: React.FC<InputFieldProps> = ({
             w-full px-4 py-3 rounded-xl border transition-all duration-200
             ${icon ? "pl-10" : "pl-4"}
             ${showPasswordToggle ? "pr-12" : "pr-4"}
-            text-sm lg:text-base
-            focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500
+            text-sm md:text-base lg:text-lg
+            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
             ${
               hasError
                 ? "border-red-500 ring-2 ring-red-200"
