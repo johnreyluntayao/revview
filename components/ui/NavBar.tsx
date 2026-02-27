@@ -1,18 +1,48 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname } from "next/navigation";     
+import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { 
-  AllCategories, 
-  ProgressTracking, 
-  ShowFeedback, 
-  Questions, 
-  AccountSettings, 
-  Logout, 
-  Menu, 
-  Close 
+import { createClient } from "@/lib/supabase/client";
+
+import {
+  AllCategories,
+  ProgressTracking,
+  ShowFeedback,
+  Questions,
+  AccountSettings,
+  Logout,
+  Menu,
+  Close,
 } from "@/lib/icons";
+
+function useLogout() {
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const logout = async () => {
+    if (isLoggingOut) return;
+
+    setIsLoggingOut(true);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        console.error("Logout error:", error);
+        alert("Failed to log out. Please try again.");
+        return;
+      }
+      window.location.href = "/login";
+    } catch (err) {
+      console.error("Unexpected logout error:", err);
+      window.location.href = "/login";
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  return { logout, isLoggingOut };
+}
 
 interface NavbarProps {
   State: "LoggedIn" | "Home" | "SignIn" | "SignUp" | "Default";
@@ -21,19 +51,20 @@ interface NavbarProps {
 
 export default function Navbar({ State, title }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname();                   
+  const pathname = usePathname();
+
+  const { logout: handleLogout, isLoggingOut } = useLogout();
 
   const navItems = [
-    { href: "/admin",        label: "Dashboard",       icon: ProgressTracking },
-    { href: "/feedbacks",     label: "Feedback",        icon: ShowFeedback },
-    { href: "/questions",    label: "Questions",       icon: Questions },
-    { href: "/account",      label: "Account Settings", icon: AccountSettings },
+    { href: "/admin", label: "Dashboard", icon: ProgressTracking },
+    { href: "/feedbacks", label: "Feedback", icon: ShowFeedback },
+    { href: "/questions", label: "Questions", icon: Questions },
+    { href: "/account", label: "Account Settings", icon: AccountSettings },
   ];
 
   return (
     <nav className="relative top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-border z-50">
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        
         {/* Logo + Brand */}
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 bg-linear-to-br from-primary to-secondary rounded-md flex items-center justify-center shadow-sm">
@@ -57,9 +88,10 @@ export default function Navbar({ State, title }: NavbarProps) {
                     flex items-center gap-1.5 
                     px-4 py-2 text-sm font-medium 
                     transition-colors duration-150
-                    ${isActive 
-                      ? "text-primary font-bold border-b-2 border-b-primary" 
-                      : "text-muted-foreground hover:text-primary hover:border-b-primary"
+                    ${
+                      isActive
+                        ? "text-primary font-bold border-b-2 border-b-primary"
+                        : "text-muted-foreground hover:text-primary hover:border-b-primary"
                     }
                   `}
                 >
@@ -75,19 +107,21 @@ export default function Navbar({ State, title }: NavbarProps) {
         <div className="flex items-center gap-3 sm:gap-4">
           {State === "LoggedIn" ? (
             <>
-              {/* Desktop profile indicator */}
-              <Link
-                href="/profile"
-                className="hidden sm:flex items-center gap-2.5 px-3 py-1.5"
+              {/* Desktop Logout */}
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className={`
+                  hidden sm:flex items-center gap-2.5 px-3 py-1.5 
+                  text-sm font-medium transition-opacity
+                  ${isLoggingOut ? "opacity-50 cursor-not-allowed" : "text-destructive hover:opacity-80"}
+                `}
               >
-                
-                <span className="text-sm font-medium text-destructive">Logout</span>
-                <div className="flex items-center justify-center">
-                  <Logout className="w-4 h-4 text-destructive" />
-                </div>
-              </Link>
+                <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+                <Logout className="w-4 h-4" />
+              </button>
 
-              {/* Mobile Hamburger – only when logged in */}
+              {/* Mobile Hamburger */}
               <button
                 className="md:hidden p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -115,32 +149,31 @@ export default function Navbar({ State, title }: NavbarProps) {
               Sign In
             </Link>
           ) : State === "SignIn" ? (
-           <div className="flex text-muted-foreground">
-            <p className="hidden md:block">Don't have an account?</p>
-            <a href="/signup" className="text-primary font-semibold hover:underline ml-1">
-              Sign up
-            </a>
-          </div>
-          ): State === "SignUp" ? (
-            <div className="flex text-muted-foreground">
-            <p className=" hidden md:block">Already have an account?</p>
-            <a href="/login" className="text-primary font-semibold hover:underline ml-1">
-              Sign in
-            </a>
-          </div>
+            <div className="flex items-center text-muted-foreground text-sm">
+              <span className="hidden md:inline">Don't have an account?</span>
+              <Link href="/signup" className="text-primary font-semibold hover:underline ml-1.5">
+                Sign up
+              </Link>
+            </div>
+          ) : State === "SignUp" ? (
+            <div className="flex items-center text-muted-foreground text-sm">
+              <span className="hidden md:inline">Already have an account?</span>
+              <Link href="/login" className="text-primary font-semibold hover:underline ml-1.5">
+                Sign in
+              </Link>
+            </div>
           ) : (
             <div className="flex text-muted-foreground">
               <p className="text-base">{title}</p>
             </div>
-          )
-        }
+          )}
         </div>
       </div>
 
       {/* MOBILE MENU */}
       {State === "LoggedIn" && isMobileMenuOpen && (
         <div className="md:hidden fixed inset-0 top-16 bg-background/95 backdrop-blur-sm border-t border-border z-50 animate-in fade-in slide-in-from-top-5 duration-200">
-          <div className="max-w-screen-2xl mx-auto px-4 py-6 flex flex-col gap-2 bg-white/90 h-screen">
+          <div className="max-w-screen-2xl mx-auto px-4 py-6 flex flex-col gap-2 bg-white/90 h-full overflow-y-auto">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -148,12 +181,12 @@ export default function Navbar({ State, title }: NavbarProps) {
                   key={item.href}
                   href={item.href}
                   className={`
-                    flex items-center gap-1.5 
-                    px-4 py-3 text-base font-medium 
-                    transition-colors duration-150 rounded-lg
-                    ${isActive 
-                      ? "text-primary font-bold border-b-2 border-b-primary" 
-                      : "text-muted-foreground hover:text-primary hover:border-b-primary"
+                    flex items-center gap-3 px-5 py-4 text-base font-medium 
+                    rounded-lg transition-colors
+                    ${
+                      isActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-foreground hover:bg-muted"
                     }
                   `}
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -164,18 +197,23 @@ export default function Navbar({ State, title }: NavbarProps) {
               );
             })}
 
-            {/* Extra mobile-only profile link */}
-            <div className="mt-6 pt-5 border-t border-border">
-              <Link
-                href="/profile"
-                className="flex items-center gap-3 px-5 py-3.5 text-base font-medium transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
+            {/* Mobile Logout */}
+            <div className="mt-auto pt-6 border-t border-border">
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setIsMobileMenuOpen(false);
+                }}
+                disabled={isLoggingOut}
+                className={`
+                  w-full flex items-center justify-center gap-3 
+                  px-5 py-4 text-base font-medium rounded-lg
+                  ${isLoggingOut ? "opacity-50 cursor-not-allowed" : "text-destructive hover:bg-destructive/10"}
+                `}
               >
-                <span className="text-sm font-medium text-destructive">Logout</span>
-                <div className="flex items-center justify-center">
-                  <Logout className="w-4 h-4 text-destructive" />
-                </div>
-              </Link>
+                <Logout className="w-5 h-5" />
+                <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+              </button>
             </div>
           </div>
         </div>
