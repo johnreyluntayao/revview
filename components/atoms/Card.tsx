@@ -22,7 +22,7 @@ const Card: React.FC<CardProps> = ({
     value,
     subValue = "",
     icon,
-    bg = "bg-white",
+    bg = "bg-background",
     textColor = "text-foreground",
     iconColor = "text-primary",
     trend = null,
@@ -31,7 +31,6 @@ const Card: React.FC<CardProps> = ({
     // Base styles shared across variants
     const baseClasses = `
     rounded-xl shadow-sm border border-gray-200 overflow-hidden
-    transition-all duration-200 hover:shadow-md
     ${bg} ${className}
   `;
 
