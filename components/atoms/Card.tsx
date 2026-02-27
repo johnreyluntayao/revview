@@ -14,6 +14,7 @@ interface CardProps {
     textColor?: string;
     trend?: "up" | "down" | null;  // optional arrow/trend indicator
     className?: string;
+    iconSize?: number;
 }
 
 const Card: React.FC<CardProps> = ({
@@ -91,9 +92,9 @@ const Card: React.FC<CardProps> = ({
         case "compact":
             content = (
                 <div className="p-4 flex flex-col items-left gap-2 w-full">
-                    {icon && <div className={`text-xl md:text-2xl lg:text-3xl ${iconColor}`}>{icon}</div>}
-                    <p className="text-lg md:text-xl lg:text-2xl font-bold text-gray-900">{value}</p>
-                    {title && <p className="text-xs md:text-sm lg:text-base text-gray-600">{title}</p>}
+                    {icon && (<div className={`${iconColor} text-xl md:text-4xl lg:text-6xl`}>{icon}</div>)}
+                    {title && <p className="text-lg md:text-xl lg:text-xl text-gray-900">{title}</p>}
+                    <p className="text-xs md:text-sm lg:text-base text-gray-600">{value}</p>
                 </div>
             );
             break;
