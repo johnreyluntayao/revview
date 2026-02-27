@@ -168,14 +168,15 @@ export default function SignUp() {
             <Button
               type="submit"
               isDisabled={isLoading}
-              backgroundColor="bg-primary text-primary-foreground"
+              textColor="text-primary-foreground"
+              backgroundColor="bg-primary"
               className="w-full"
-            >
-              {isLoading ? "Creating account..." : "Create Account"}
-            </Button>
+              text={isLoading ? "Creating account..." : "Create Account"}
+            />
+
           </form>
         </div>
-      </div>
+      </div> 
     </div>
   );
 }
