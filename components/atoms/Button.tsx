@@ -8,6 +8,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     {
       textColor = "",
       backgroundColor = "",
+      borderColor = "",
       leftIcon,
       rightIcon,
       text,
@@ -50,6 +51,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           ${sizeClasses}
           ${textColor}
           ${backgroundColor}
+          ${borderColor ? `border ${borderColor}` : ''}
           ${className}
         `}
         {...rest}
