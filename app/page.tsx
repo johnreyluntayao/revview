@@ -1,13 +1,14 @@
 import Colors from "@/components/colors/Colors";
 import Contact from "@/components/ui/Contact";
 import HeroSection from "@/components/ui/HeroSection";
+import HowItWorks from "@/components/ui/HowItWorks";
 
 export default function Home() {
 
 
   return (
     <div className="w-full">
-      <Contact/>
+      <HowItWorks/>
       <Colors/>
     </div>
   );
