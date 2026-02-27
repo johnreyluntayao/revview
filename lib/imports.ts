@@ -20,3 +20,7 @@ export { default as Button } from "@/components/atoms/Button";
 export { default as InputField } from "@/components/atoms/InputField";
 export { default as Card } from "@/components/atoms/Card";
 export { default as Chip } from "@/components/atoms/Chip";
+
+
+//Auth
+export { AuthProvider, useAuth } from "@/components/auth/AuthProvider";
