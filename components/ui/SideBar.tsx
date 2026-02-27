@@ -1,8 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AllCategories, Logout, AccountSettings, Close, StartQuiz, ProgressTracking, AverageScore } from "@/lib/icons";
+import { createClient } from "@/lib/supabase/client";
+
+import {
+  AllCategories,
+  Logout,
+  AccountSettings,
+  Close,
+  StartQuiz,
+  ProgressTracking,
+  AverageScore,
+} from "@/lib/icons";
 
 type NavItem = {
   href: string;
@@ -16,12 +27,12 @@ interface SidebarProps {
   userName?: string;
   isOpen?: boolean;
   onClose?: () => void;
-  items?: NavItem[]; 
+  items?: NavItem[];
 }
 
 const defaultItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: ProgressTracking, section: "main", exact: true },
-  { href: "/quiz-selection", label: "Start Review", section: "main", icon: StartQuiz, exact:false },
+  { href: "/quiz-selection", label: "Start Review", section: "main", icon: StartQuiz, exact: false },
   { href: "/results", label: "Results History", section: "main", icon: AverageScore, exact: true },
   { href: "/account", label: "Account Settings", icon: AccountSettings, section: "account", exact: true },
 ];
@@ -33,6 +44,7 @@ export default function Sidebar({
   items = defaultItems,
 }: SidebarProps) {
   const pathname = usePathname();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const isActive = (item: NavItem) =>
     item.exact ? pathname === item.href : pathname.startsWith(item.href);
@@ -41,6 +53,29 @@ export default function Sidebar({
 
   const mainItems = items.filter((i) => i.section !== "account");
   const accountItems = items.filter((i) => i.section === "account");
+
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+
+    setIsLoggingOut(true);
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        console.error("Logout failed:", error.message);
+        alert("Failed to sign out. Please try again.");
+        return;
+      }
+      window.location.href = "/login";
+    } catch (err) {
+      console.error("Unexpected logout error:", err);
+      window.location.href = "/login";
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <>
@@ -135,13 +170,20 @@ export default function Sidebar({
             </div>
 
             <button
-              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-destructive hover:bg-destructive/10 transition-colors font-medium"
-              onClick={() => {
-                console.log("Sign out →", userName);
-              }}
+              className={`
+                w-full flex items-center gap-3 px-4 py-2.5 rounded-lg 
+                font-medium transition-colors
+                ${
+                  isLoggingOut
+                    ? "opacity-60 cursor-not-allowed bg-destructive/5"
+                    : "text-destructive hover:bg-destructive/10"
+                }
+              `}
+              onClick={handleLogout}
+              disabled={isLoggingOut}
             >
               <Logout className="w-5 h-5" />
-              Sign Out
+              <span>{isLoggingOut ? "Signing out..." : "Sign Out"}</span>
             </button>
           </div>
         </div>
