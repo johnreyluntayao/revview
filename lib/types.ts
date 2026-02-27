@@ -20,11 +20,12 @@ export interface InputFieldProps {
 
 
 export interface ButtonProps {
-  textColor?: string;          
-  backgroundColor?: string;   
+  textColor: string;          
+  backgroundColor: string;   
+  borderColor?: string;   
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
-  text?: ReactNode;            
+  text: ReactNode;            
   children?: ReactNode;      
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   size?: "sm" | "md" | "lg";
