@@ -8,7 +8,7 @@ import { InputField, Button } from "@/lib/imports";
 
 export default function Login() {
   const router = useRouter();
-  const [identifier, setIdentifier] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -19,33 +19,14 @@ export default function Login() {
     setIsLoading(true);
 
     const supabase = createClient();
-    let emailToUse = identifier.trim();
-
-    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailToUse);
-
-    if (!isEmail) {
-      const { data: profile, error: lookupError } = await supabase
-        .from("users")
-        .select("email")
-        .eq("username", emailToUse)
-        .maybeSingle();
-
-      if (lookupError || !profile?.email) {
-        setError("No account found with that username");
-        setIsLoading(false);
-        return;
-      }
-
-      emailToUse = profile.email;
-    }
 
     const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
-      email: emailToUse,
+      email,
       password,
     });
 
     if (signInError) {
-      setError(signInError.message || "Invalid email/username or password");
+      setError(signInError.message);
       setIsLoading(false);
       return;
     }
@@ -84,7 +65,7 @@ export default function Login() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback`, 
       },
     });
 
@@ -92,10 +73,12 @@ export default function Login() {
       setError(error.message);
       setIsLoading(false);
     }
+
   };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex flex-col w-full">
+      {/* Form Card */}
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
         <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-border p-8">
           <div className="text-center mb-8">
@@ -136,20 +119,19 @@ export default function Login() {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-muted-foreground">Or continue with email/username</span>
+              <span className="px-2 bg-white text-muted-foreground">Or continue with email</span>
             </div>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
             <InputField
-              label="Username or Email"
-              type="text"        
-              placeholder="you@example.com or yourusername"
-              icon={<Email className="w-5 h-5" />} 
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
+              label="Email Address"
+              type="email"
+              placeholder="you@example.com"
+              icon={<Email className="w-5 h-5" />}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              autoComplete="username"
             />
 
             <InputField
