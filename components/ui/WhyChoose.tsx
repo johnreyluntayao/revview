@@ -1,7 +1,6 @@
-import React from 'react'
-import Card from '../atoms/Card'
-import { BookOpen, User } from 'lucide-react'
-import { CustomQuiz, InstantFeedback, ProgressTracking } from '@/lib/icons';
+
+import { Card } from '@/lib/imports'
+import { CustomQuiz, InstantFeedback, ProgressTracking, AllCategories } from '@/lib/icons';
 
 const featureCards = [
     {
@@ -17,7 +16,7 @@ const featureCards = [
         
     },
     {
-        icon: <BookOpen size={44} strokeWidth={1.8} />,
+        icon: <AllCategories size={44} strokeWidth={1.8} />,
         title: "All Categories",
         description: "Complete coverage of Numerical, Analytical, Verbal, and General Information.",
         
@@ -33,13 +32,13 @@ const featureCards = [
 const WhyChoose = () => {
     return (
         <section>
-            <div className='w-full h-screen flex flex-col items-center justify-center text-pretty gap-4 md:gap-6 lg:gap-8'>
+            <div className='w-full min-h-screen flex flex-col items-center justify-center text-pretty gap-4 md:gap-6 lg:gap-8 py-4 md:py-6 lg:py-8'>
 
-                <h1 className='text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-10'>
-                    Why Choose CSE Reviewer?
+                <h1 className='text-2xl md:text-3xl lg:text-4xl font-bold text-foreground'>
+                    Why Choose <span className='text-primary'>RevView</span>?
                 </h1>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-4 lg:gap-6">
                     {featureCards.map((feature, idx) => (
                         <Card
                             key={idx}

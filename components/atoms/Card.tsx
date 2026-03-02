@@ -31,7 +31,7 @@ const Card: React.FC<CardProps> = ({
 }) => {
     // Base styles shared across variants
     const baseClasses = `
-    rounded-xl shadow-sm border border-gray-200 overflow-hidden
+    rounded-xl shadow-sm border border-border overflow-hidden
     ${bg} ${className}
   `;
 
@@ -91,10 +91,13 @@ const Card: React.FC<CardProps> = ({
         // Variant 4: Compact / minimal
         case "compact":
             content = (
-                <div className="p-4 flex flex-col items-left gap-2 w-full">
+                <div className="p-3 md:p-4 lg:p-5 flex flex-col items-left gap-2 md:gap-3 lg:gap-4 w-full">
                     {icon && (<div className={`${iconColor} text-xl md:text-4xl lg:text-6xl`}>{icon}</div>)}
-                    {title && <p className="text-lg md:text-xl lg:text-xl text-gray-900">{title}</p>}
-                    <p className="text-xs md:text-sm lg:text-base text-gray-600">{value}</p>
+                    <div className="flex flex-col gap-1 md:gap-2 lg:gap-3">
+                        {title && <p className="text-base md:text-lg lg:text-xl text-foreground font-semibold">{title}</p>}
+                        <p className="text-xs md:text-sm lg:text-base text-foreground/50">{value}</p>
+                    </div>
+                    
                 </div>
             );
             break;
