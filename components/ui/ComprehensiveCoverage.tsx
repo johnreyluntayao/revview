@@ -1,7 +1,7 @@
 'use client'
-import React from 'react'
-import List from '../atoms/List'
+
 import { CustomQuiz } from '@/lib/icons'
+import { List } from '@/lib/imports'
 
 const categories = [
   {
@@ -41,25 +41,25 @@ const categories = [
 const ComprehensiveCoverage = () => {
   return (
     <section>
-      <div className="w-full h-screen flex flex-col justify-center text-pretty gap-4 md:gap-6 lg:gap-8">
-        <h1 className="self-center text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-10">
+      <div className="w-full flex flex-col justify-center text-pretty gap-4 md:gap-6 lg:gap-8 py-4 md:py-6 lg:py-8 min-h-screen">
+        <h1 className="text-center text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">
           Comprehensive Coverage
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 lg:gap-6 px-0 lg:px-16">
           {categories.map((category) => (
             <div
               key={category.title}
-              className="w-full p-6 bg-primary/10 rounded-xl shadow-md overflow-hidden border"
+              className="w-full p-4 md:p-5 lg:p-6 bg-linear-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden border border-border"
             >
-              <h2 className="text-base md:text-lg lg:text-xl font-bold text-foreground">
+              <h2 className="text-base md:text-lg lg:text-xl font-bold text-foreground mb-2 md:mb-3 lg:mb-4">
                 {category.title}
               </h2>
-              <div className="pl-2 py-2">
+              <div className="pl-1 md:pl-1.5 lg:pl-2 py-1 md:py-1.5 lg:py-0 text-sm md:text-base">
                 <List
                   items={category.items}
                   isNumberedList={false}
-                  sharedIcon={CustomQuiz}
+                  sharedIcon={<CustomQuiz className='text-primary'/>}
                 />
               </div>
             </div>

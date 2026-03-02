@@ -4,7 +4,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-900 text-gray-400 w-full px-6 py-12 md:py-16 lg:px-8">
+    <footer className="bg-gray-900 text-gray-400 w-full px-4 md:px-6 py-12 md:py-16 lg:px-8">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {footerSections.map((section) => (
             <div key={section.title}>

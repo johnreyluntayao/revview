@@ -1,5 +1,5 @@
 import React from 'react'
-import List from '../atoms/List';
+import { List } from '@/lib/imports';
 
 const howItWorks = [
     {
@@ -30,14 +30,11 @@ const howItWorks = [
 const HowItWorks = () => {
     return (
         <section>
-            <div className='w-full h-screen flex flex-col items-center justify-center text-pretty gap-4 md:gap-6 lg:gap-8'>
-                
-                <h1 className='text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-10'>
+            <div className='w-full flex flex-col items-center justify-center text-pretty gap-4 md:gap-6 lg:gap-8 py-4 md:py-6 lg:py-8 min-h-screen'>
+                <h2 className='text-2xl md:text-3xl lg:text-4xl font-bold text-foreground'>
                     How It Works
-                </h1>
-
+                </h2>
                 <List items={howItWorks} isNumberedList={true} />
-
             </div>
 
         </section>
