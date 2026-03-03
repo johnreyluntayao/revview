@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
 export interface InputFieldProps {
-  label?: string;
+  label?: ReactNode;
   placeholder?: string;
   type?: string;
   name?: string;
