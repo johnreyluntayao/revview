@@ -20,6 +20,7 @@ export { default as HowItWorks } from "@/components/ui/HowItWorks";
 export { default as Contact } from "@/components/ui/Contact";
 export { default as ComprehensiveCoverage } from "@/components/ui/ComprehensiveCoverage";
 export { default as WhyChoose } from "@/components/ui/WhyChoose";
+export { default as SubmitFeedback } from "@/components/ui/SubmitFeedback";
 
 
 

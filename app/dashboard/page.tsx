@@ -1,8 +1,10 @@
-import React from 'react'
+import { SubmitFeedback } from '@/lib/imports'
 
 const page = () => {
   return (
-    <div>Dashboard</div>
+    <main>
+      <SubmitFeedback />
+    </main>
   )
 }
 
