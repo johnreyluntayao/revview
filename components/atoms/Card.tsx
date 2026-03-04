@@ -1,7 +1,7 @@
 // components/Card.tsx
 import React, { JSX } from "react";
 
-type CardVariant = "stat" | "highlight" | "overview" | "compact";
+type CardVariant = "stat" | "highlight" | "overview" | "compact" | "data";
 
 interface CardProps {
     variant?: CardVariant;
@@ -31,7 +31,7 @@ const Card: React.FC<CardProps> = ({
 }) => {
     // Base styles shared across variants
     const baseClasses = `
-    rounded-xl shadow-sm border border-gray-200 overflow-hidden
+    rounded-xl border border-gray-200 overflow-hidden
     ${bg} ${className}
   `;
 
@@ -46,13 +46,20 @@ const Card: React.FC<CardProps> = ({
                             <h3 className={`text-xs md:text-sm lg:text-base font-medium ${textColor}`}>{title}</h3>
                         )}
                         {icon && (
-                            <div className={`p-2 rounded-lg ${iconColor}`}>
+                            <div
+                                className={`
+                                p-2 rounded-lg ${iconColor}
+                                text-xl md:text-2xl lg:text-3xl           // font-size here still controls icon
+                                [&>svg]:size-[1em]                        // direct child svg
+                                [&>svg]:block                             // sometimes helps alignment
+                                `}
+                            >
                                 {icon}
                             </div>
                         )}
                     </div>
                     <div className="flex items-baseline">
-                        <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 text-right">{value}</p>
+                        <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground text-right">{value}</p>
                         {trend && (
                             <span
                                 className={`text-xs md:text-sm lg:text-base text-right font-medium ${trend === "up" ? "text-green-600" : "text-red-600"
@@ -71,9 +78,9 @@ const Card: React.FC<CardProps> = ({
         case "highlight":
             content = (
                 <div className="p-6 text-left w-full">
-                    {title && <h1 className="text-sm md:text-base lg:text-lg font-semibold text-gray-600">{title}</h1>}
+                    {title && <h1 className="text-sm md:text-base lg:text-lg font-semibold text-foreground/60">{title}</h1>}
                     <p className={`text-3xl md:text-4xl lg:text-5xl font-bold  ${textColor}`}>{value}</p>
-                    {subValue && <p className="mt-2 text-sm md:text-base lg:text-lg text-gray-600">{subValue}</p>}
+                    {subValue && <p className="mt-2 text-sm md:text-base lg:text-lg text-foreground/60">{subValue}</p>}
                 </div>
             );
             break;
@@ -83,7 +90,7 @@ const Card: React.FC<CardProps> = ({
             content = (
                 <div className="p-4 md:p-6 lg:p-8 text-left w-full">
                     {title && <h3 className={`text-xs md:text-sm lg:text-base font-medium text-muted-foreground mb-1`}>{title}</h3>}
-                    <p className={`text-base md:text-lg lg:text-xl font-semibold text-foreground capitalize ${textColor}`}>{value}</p>
+                    <p className={`text-lg md:text-xl lg:text-2xl font-semibold text-foreground capitalize ${textColor}`}>{value}</p>
                 </div>
             );
             break;
@@ -91,10 +98,42 @@ const Card: React.FC<CardProps> = ({
         // Variant 4: Compact / minimal
         case "compact":
             content = (
-                <div className="p-4 flex flex-col items-left gap-2 w-full">
-                    {icon && (<div className={`${iconColor} text-xl md:text-4xl lg:text-6xl`}>{icon}</div>)}
-                    {title && <p className="text-lg md:text-xl lg:text-xl text-gray-900">{title}</p>}
-                    <p className="text-xs md:text-sm lg:text-base text-gray-600">{value}</p>
+                <div className="p-4 flex flex-col items-left justify-between w-full h-32 md:h-36 lg:h-37.5">
+                    {icon && (
+                        <div
+                            className={`
+                            ${iconColor}
+                            text-xl md:text-2xl lg:text-3xl           // font-size here still controls icon
+                            [&>svg]:size-[1em]                        // direct child svg
+                            [&>svg]:block                             // sometimes helps alignment
+                            `}
+                        >
+                            {icon}
+                        </div>
+                    )}
+                    {title && <p className="text-lg md:text-xl lg:text-xl text-foreground">{title}</p>}
+                    <p className="text-xs md:text-sm lg:text-base text-foreground/60">{value}</p>
+                </div>
+            );
+            break;
+
+            case "data":
+            content = (
+                <div className="p-4 flex flex-col items-left justify-between w-full h-32 md:h-36 lg:h-37.5">
+                    {icon && (
+                        <div
+                            className={`
+                            ${iconColor}
+                            text-xl md:text-2xl lg:text-3xl           // font-size here still controls icon
+                            [&>svg]:size-[1em]                        // direct child svg
+                            [&>svg]:block                             // sometimes helps alignment
+                            `}
+                        >
+                            {icon}
+                        </div>
+                    )}
+                    {title && <p className="text-xs md:text-sm lg:text-base text-foreground/60">{title}</p>}
+                    <p className="text-lg md:text-xl lg:text-2xl font-bold text-foreground">{value}</p>
                 </div>
             );
             break;
