@@ -2,48 +2,65 @@
 
 import { useState } from "react";
 import { FeedbackIcon, SendFeedback, Feedback } from "@/lib/icons";
-import { createClient } from "@/lib/supabase/client"; 
+import { createClient } from "@/lib/supabase/client";
+import { Button, InputField } from "@/lib/imports";
+import { toast } from "sonner";
 
-import { Button, InputField } from "@/lib/imports"; 
-
-interface SubmitFeedbackProps {
-  
-}
+interface SubmitFeedbackProps {}
 
 export default function SubmitFeedback({}: SubmitFeedbackProps) {
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbackRating, setFeedbackRating] = useState(0);
   const [feedbackHoverRating, setFeedbackHoverRating] = useState(0);
   const [feedbackText, setFeedbackText] = useState("");
-  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const supabase = createClient();
 
   const handleSubmitFeedback = async () => {
-    if (feedbackRating === 0) return;
+    if (feedbackRating === 0) {
+      toast.error("Please select a rating", {
+        description: "You need to give at least 1 star before submitting.",
+      });
+      return;
+    }
 
     setIsSubmitting(true);
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        toast.error("Authentication issue", {
+          description: "Please log in again to submit feedback.",
+        });
+        return;
+      }
+
       const { error } = await supabase.from("feedback").insert({
+        user_id: user.id,       
         rating: feedbackRating,
         comment: feedbackText.trim() || null,
-        created_at: new Date().toISOString(),
       });
 
       if (error) throw error;
 
-      setFeedbackSubmitted(true);
+      toast.success("Thank you for your feedback!", {
+        description: "We've received your input and appreciate it ❤️",
+        duration: 5000,
+      });
 
       setTimeout(() => {
         setShowFeedbackModal(false);
         setFeedbackRating(0);
         setFeedbackText("");
-        setFeedbackSubmitted(false);
-      }, 2200);
-    } catch (err) {
+      }, 1800);
+
+    } catch (err: any) {
       console.error("Feedback submission failed:", err);
+      toast.error("Failed to send feedback", {
+        description: err.message || "Something went wrong. Try again later.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -82,98 +99,74 @@ export default function SubmitFeedback({}: SubmitFeedbackProps) {
               </p>
             </div>
 
-            {feedbackSubmitted ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg
-                    className="w-8 h-8 text-success"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  Thank You!
-                </h3>
-                <p className="text-muted-foreground">
-                  Your feedback has been received.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {/* Star Rating */}
-                <div>
-                  <label className="block text-sm font-semibold text-foreground mb-3">
-                    Rate your experience
-                  </label>
-                  <div className="flex gap-3 justify-center">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        aria-label="rate"
-                        key={star}
-                        type="button"
-                        onClick={() => setFeedbackRating(star)}
-                        onMouseEnter={() => setFeedbackHoverRating(star)}
-                        onMouseLeave={() => setFeedbackHoverRating(0)}
-                        className="transition-transform hover:scale-110 focus:outline-none"
-                      >
-                        <Feedback
-                          className={`w-8 h-8 ${
-                            star <= (feedbackHoverRating || feedbackRating)
-                              ? "fill-warning text-warning"
-                              : "text-muted"
-                          }`}
-                        />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Comment Field – using your InputField (multiline) */}
-                <div>
-                  <InputField
-                    label={
-                      <>
-                        Comments{" "}
-                        <span className="text-muted-foreground font-normal">
-                          (Optional)
-                        </span>
-                      </>
-                    }
-                    placeholder="Tell us what you think..."
-                    value={feedbackText}
-                    onChange={(e) => setFeedbackText(e.target.value)}
-                    className="min-h-24"
-                  />
-                </div>
-
-                {/* Buttons */}
-                <div className="flex gap-3 mt-2">
-                  <Button
-                    text="Cancel"
-                    onClick={() => setShowFeedbackModal(false)}
-                    className="flex-1 border border-border  "
-                    textColor="text-foreground"
-                    backgroundColor="hover:bg-muted"
-                  />
-
-                  <Button
-                    text={isSubmitting ? "Sending..." : "Submit"}
-                    leftIcon={<SendFeedback className="w-4 h-4" />}
-                    onClick={handleSubmitFeedback}
-                    isDisabled={feedbackRating === 0 || isSubmitting}
-                    backgroundColor="bg-primary"
-                    textColor="text-primary-foreground"
-                    className="flex-1"
-                  />
+            <div className="space-y-6">
+              {/* Star Rating */}
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-3">
+                  Rate your experience
+                </label>
+                <div className="flex gap-3 justify-center">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      aria-label={`rate ${star} star${star > 1 ? 's' : ''}`}
+                      key={star}
+                      type="button"
+                      onClick={() => setFeedbackRating(star)}
+                      onMouseEnter={() => setFeedbackHoverRating(star)}
+                      onMouseLeave={() => setFeedbackHoverRating(0)}
+                      className="transition-transform hover:scale-110 focus:outline-none"
+                    >
+                      <Feedback
+                        className={`w-8 h-8 ${
+                          star <= (feedbackHoverRating || feedbackRating)
+                            ? "fill-warning text-warning"
+                            : "text-muted"
+                        }`}
+                      />
+                    </button>
+                  ))}
                 </div>
               </div>
-            )}
+
+              {/* Comment Field */}
+              <div>
+                <InputField
+                  label={
+                    <>
+                      Comments{" "}
+                      <span className="text-muted-foreground font-normal">
+                        (Optional)
+                      </span>
+                    </>
+                  }
+                  placeholder="Tell us what you think..."
+                  value={feedbackText}
+                  onChange={(e) => setFeedbackText(e.target.value)}
+                  className="min-h-24"
+                />
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3 mt-2">
+                <Button
+                  text="Cancel"
+                  onClick={() => setShowFeedbackModal(false)}
+                  className="flex-1 border border-border"
+                  textColor="text-foreground"
+                  backgroundColor="hover:bg-muted"
+                />
+
+                <Button
+                  text={isSubmitting ? "Sending..." : "Submit"}
+                  leftIcon={<SendFeedback className="w-4 h-4" />}
+                  onClick={handleSubmitFeedback}
+                  isDisabled={feedbackRating === 0 || isSubmitting}
+                  backgroundColor="bg-primary"
+                  textColor="text-primary-foreground"
+                  className="flex-1"
+                />
+              </div>
+            </div>
           </div>
         </div>
       )}
