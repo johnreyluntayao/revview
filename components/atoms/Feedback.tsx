@@ -1,80 +1,84 @@
-// components/Feedback.tsx  (or wherever you prefer to place it)
+import { Feedback as Star, Resolve, Delete, Close } from "@/lib/icons";
+import { Button, Chip } from "@/lib/imports"; 
 
-import { Star } from "lucide-react"; // optional: nice star icons
-// If you don't want lucide-react, see plain text ★ version at the bottom
-
-interface Feedbackprops {
+interface FeedbackProps {
   name: string;
   date: string;
   rating: number;
   comment: string;
   status?: "resolved" | "pending";
+  onResolveToggle: () => void;
+  onDelete: () => void;
 }
 
-const Feedback: React.FC<Feedbackprops> = ({
+const Feedback: React.FC<FeedbackProps> = ({
   name,
   date,
   rating,
   comment,
-  status = "pending", // default to pending
+  status = "pending",
+  onResolveToggle,
+  onDelete,
 }) => {
+  const isResolved = status === "resolved";
+
   return (
-    <div className="bg-white border-2 border-blue-300  rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow">
-      {/* Header: Name + Date + Rating Stars */}
-      <div className="flex items-start justify-between mb-4">
+    <div className="bg-white border border-border hover:border-primary/50 rounded-xl p-4 md:p-5 lg:p-6 hover:shadow-md transition-shadow">
+      {/* Header */}
+      <div className="flex items-start justify-between mb-2 md:mb-3 lg:mb-4">
         <div>
-          <h3 className="font-semibold text-black">
-            {name}
-          </h3>
-          <p className="text-sm text-black/50">
-            {date}
-          </p>
+          <h3 className="font-semibold text-foreground text-sm md:text-base lg:text-lg">{name}</h3>
+          <p className="text-xs md:text-sm lg:text-base text-foreground/50">{date}</p>
         </div>
 
-        {/* Star rating */}
-        <div className="flex items-center gap-0.5">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <Star
-              key={index}
-              size={20}
-              className={
-                index < rating
-                  ? "fill-yellow-400 text-yellow-400"
-                  : "text-gray-400 "
-              }
-            />
-          ))}
+        <div className="flex items-center gap-3 md:gap-4">
+          <div className="flex items-center gap-0.5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star
+                key={i}
+                size={20}
+                className={
+                  i < rating
+                    ? "fill-yellow-400 text-yellow-400"
+                    : "text-yellow-400 fill-muted-foreground"
+                }
+              />
+            ))}
+          </div>
+          
+          <div className="hidden md:block">
+            {isResolved && (
+              <Chip
+                variant="resolved"
+                text="Resolved"
+              />
+            )}
+          </div>
+          
         </div>
       </div>
 
-      {/* Comment */}
-      <p className="text-black/80 leading-relaxed mb-6">
+      <p className="text-foreground/80 leading-relaxed mb-6 text-sm md:text-base lg:text-lg">
         {comment}
       </p>
 
-      {/* Action buttons */}
-      <div className="flex items-center gap-3 text-sm">
-        <button
-          type="button"
-          className={`
-            px-4 py-2 rounded-md font-medium text-white transition-colors
-            ${
-              status === "resolved"
-                ? "bg-green-700 cursor-not-allowed opacity-70"
-                : "bg-green-600 hover:bg-green-700"
-            }
-          `}
-          disabled={status === "resolved"}
-        >
-          {status === "resolved" ? "Resolved" : "Mark Resolved"}
-        </button>
+      {/* Actions */}
+      <div className="flex items-center gap-1 md:gap-2 lg:gap-3 flex-wrap">
+        <Button
+          onClick={onResolveToggle}
+          text={isResolved ? "Unresolve" : "Mark Resolved"}
+          backgroundColor={isResolved ? "bg-warning/25" : "bg-success/10"}
+          textColor={isResolved ? "text-warning" : "text-success"}
+          leftIcon={isResolved ? <Close /> : <Resolve />}
+        />
 
-        <button
-          type="button"
-          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md font-medium transition-colors"
-        >
-          Delete
-        </button>
+        <Button
+          onClick={onDelete}
+          text="Delete"
+          backgroundColor="bg-destructive/10"
+          textColor="text-destructive"
+          leftIcon={<Delete />}
+        />
       </div>
     </div>
   );

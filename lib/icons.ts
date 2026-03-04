@@ -17,7 +17,7 @@ export {
     Menu,
     MessageCircle as ShowFeedback,
     Star as Feedback,
-    Send as SubmitFeedback,
+    Send as SendFeedback,
     ArrowRight as BeginQuiz,
     Users as Verbal,
     BookMarked as Numerical,
@@ -42,4 +42,8 @@ export {
     EyeClosedIcon as EyeOff,
     X as Close,
     AtSign,
+    MessageCircle as FeedbackIcon,
+    CheckIcon as Resolve,
+    
+
 } from 'lucide-react';

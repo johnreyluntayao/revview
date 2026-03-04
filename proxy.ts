@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
-  const supabase = createServerClient(
+    const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -31,11 +31,13 @@ export async function proxy(request: NextRequest) {
 
   const pathname = request.nextUrl.pathname;
 
-  // 1. If not logged in → redirect to login (except public pages)
+  // ── 1. Unauthenticated users ───────────────────────────────────────
   if (!user) {
     if (
       pathname.startsWith("/dashboard") ||
-      pathname.startsWith("/admin")
+      pathname.startsWith("/admin")    ||
+      pathname.startsWith("/feedbacks") ||
+      pathname.startsWith("/quiz-result")
     ) {
       const redirectUrl = new URL("/login", request.url);
       redirectUrl.searchParams.set("redirect", pathname);
@@ -44,7 +46,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 2. Logged-in user — fetch is_admin once
+  // ── 2. Fetch admin status once ─────────────────────────────────────
   const { data: profile } = await supabase
     .from("users")
     .select("is_admin")
@@ -53,13 +55,16 @@ export async function proxy(request: NextRequest) {
 
   const isAdmin = !!profile?.is_admin;
 
-  // 3. Enforce separation
+  // ── 3. Role-based route enforcement ────────────────────────────────
+  const adminRoutes = ["/admin", "/feedbacks"];
+  const userRoutes = ["/dashboard", "/quiz-result"];
+
   if (isAdmin) {
-    if (pathname.startsWith("/dashboard")) {
+    if (userRoutes.some(p => pathname === p || pathname.startsWith(p + "/"))) {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
   } else {
-    if (pathname.startsWith("/admin")) {
+    if (adminRoutes.some(p => pathname === p || pathname.startsWith(p + "/"))) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }
@@ -71,5 +76,7 @@ export const config = {
   matcher: [
     "/dashboard/:path*",
     "/admin/:path*",
+    "/feedbacks/:path*",
+    "/quiz-result/:path*",
   ],
 };

@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
 export interface InputFieldProps {
-  label?: string;
+  label?: ReactNode;
   placeholder?: string;
   type?: string;
   name?: string;
@@ -35,6 +35,10 @@ export interface ButtonProps {
   isRounded?: boolean;
   ref?: React.ForwardedRef<HTMLButtonElement>;
 }
+
+
+
+//Done
 export interface Users {
     id: number;
     name: string;
@@ -46,88 +50,101 @@ export interface Users {
     updatedAt: Date;
 }
 
+//done
 export interface Question {
-  id: number;
+  id: string;   
   text: string;
-  category: "numerical" | "verbal" | "analytical" | "general";
-  options: string[];
+  imageUrl?: string | null;
+  categoryId: string;            
+  category?: QuizCategory | null;
+  options: string[]; 
   correctAnswer: "A" | "B" | "C" | "D" | "E";
   explanation: string;
-  imageUrl?: string;  
-  dateCreated?: Date;
-  dateUpdated?: Date;
+  dateCreated?: Date;    
+  dateUpdated?: Date;  
 }
 
+
+//done
 export interface QuizSession {
-  id: number;                
-  user_id: string;              
-  category: string;              
-  difficulty: 'easy' | 'medium' | 'hard';  
-  total_questions: number;      
-  time_per_question: number;     
-  total_time: number;            
-  started_at: Date;              
-  completed_at: Date | null;     
+  id: string;  
+  user_id: string; 
+  category_id: string | null;
+  difficulty_id: string;        
+  difficulty?: {                
+    label: string;
+    time_per_question: number;
+    description: string | null;
+  } | null;
+  total_questions: number;
+  total_time_seconds: number;
+  started_at: Date;
+  completed_at: Date | null;
+  is_completed: boolean; 
+  created_at: Date;
 }
 
 
+//done
 export interface QuizAnswer {
-  id: number;
-  quiz_session_id: number;
-  question_id: number;
-  selected_option: 'A' | 'B' | 'C' | 'D' | 'E' | null;
+  id: string;  
+  quiz_session_id: string;   
+  question_id: string;      
+  selected_option: 'A' | 'B' | 'C' | 'D' | 'E' | null; 
   is_correct: boolean;
-  time_taken: number;         
+  time_taken_seconds: number; 
+  created_at: Date;
 }
 
-
+//done
 export interface QuizResult {
-  id: number;
-  user_id: string;         
-  quiz_session_id: number;
-  category: string;
-  score: number;             
+  id: string;  
+  user_id: string;     
+  quiz_session_id: string;    
+  category_id: string | null;    
+  score: number;     
   total_questions: number;
   correct_answers: number;
-  difficulty: 'easy' | 'medium' | 'hard';
-  date_taken: Date;
-  time_used: string; 
+  wrong_answers: number;
+  skipped_answers: number;
+  difficulty_id: string; 
+  time_taken_seconds: number; 
+  percentage: number; 
+  date_taken: Date;  
+  created_at: Date;      
 }
 
+
+//done
 export interface Feedback {
-  id: number;
-  user_id: string;            
-  user_name: string;
+  id: string;             
+  user_id: string;          
   rating: 1 | 2 | 3 | 4 | 5;
   comment: string | null;
-  date_submitted: Date;
+  user_name: string;
+  created_at: Date;          
   resolved: boolean;
   resolved_by: string | null;   
   resolved_at: Date | null;
+  updated_at: Date;             
 }
 
+//done
 export interface QuizCategory {
   id: string;                   
   name: string;               
   description: string | null;
-  icon: string | null;     
-  color: string | null;
+  created_at: Date;
+  updated_at: Date;
 }
 
+
+//Done
 export interface DifficultyLevel {
   id: string;                
   label: string;             
-  time_per_question: number;
+  minutes_per_question: number;
   description: string | null;
-}
-
-export interface AdminStatistics {
-  id: number;
-  total_users: number;
-  active_users: number;       
-  total_quizzes_taken: number;
-  average_score: number;        
-  last_updated: Date;
 }
 
 export interface ChipProps {

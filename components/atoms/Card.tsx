@@ -31,7 +31,7 @@ const Card: React.FC<CardProps> = ({
 }) => {
     // Base styles shared across variants
     const baseClasses = `
-    rounded-xl border border-gray-200 overflow-hidden
+    rounded-xl shadow-sm border border-border overflow-hidden
     ${bg} ${className}
   `;
 
@@ -98,42 +98,13 @@ const Card: React.FC<CardProps> = ({
         // Variant 4: Compact / minimal
         case "compact":
             content = (
-                <div className="p-4 flex flex-col items-left justify-between w-full h-32 md:h-36 lg:h-37.5">
-                    {icon && (
-                        <div
-                            className={`
-                            ${iconColor}
-                            text-xl md:text-2xl lg:text-3xl           // font-size here still controls icon
-                            [&>svg]:size-[1em]                        // direct child svg
-                            [&>svg]:block                             // sometimes helps alignment
-                            `}
-                        >
-                            {icon}
-                        </div>
-                    )}
-                    {title && <p className="text-lg md:text-xl lg:text-xl text-foreground">{title}</p>}
-                    <p className="text-xs md:text-sm lg:text-base text-foreground/60">{value}</p>
-                </div>
-            );
-            break;
-
-            case "data":
-            content = (
-                <div className="p-4 flex flex-col items-left justify-between w-full h-32 md:h-36 lg:h-37.5">
-                    {icon && (
-                        <div
-                            className={`
-                            ${iconColor}
-                            text-xl md:text-2xl lg:text-3xl           // font-size here still controls icon
-                            [&>svg]:size-[1em]                        // direct child svg
-                            [&>svg]:block                             // sometimes helps alignment
-                            `}
-                        >
-                            {icon}
-                        </div>
-                    )}
-                    {title && <p className="text-xs md:text-sm lg:text-base text-foreground/60">{title}</p>}
-                    <p className="text-lg md:text-xl lg:text-2xl font-bold text-foreground">{value}</p>
+                <div className="p-3 md:p-4 lg:p-5 flex flex-col items-left gap-2 md:gap-3 lg:gap-4 w-full">
+                    {icon && (<div className={`${iconColor} text-xl md:text-4xl lg:text-6xl`}>{icon}</div>)}
+                    <div className="flex flex-col gap-1 md:gap-2 lg:gap-3">
+                        {title && <p className="text-base md:text-lg lg:text-xl text-foreground font-semibold">{title}</p>}
+                        <p className="text-xs md:text-sm lg:text-base text-foreground/50">{value}</p>
+                    </div>
+                    
                 </div>
             );
             break;
