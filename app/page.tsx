@@ -7,6 +7,7 @@ import HeroSection from "@/components/ui/HeroSection";
 import HowItWorks from "@/components/ui/HowItWorks";
 import PerformanceOverview from "@/components/ui/PerformanceOverview";
 import RecentScores from "@/components/ui/RecentScores";
+import SelectNumQuestions from "@/components/ui/SelectNumQuestions";
 import SummaryCards from "@/components/ui/SummaryCards";
 import WhyChoose from "@/components/ui/WhyChoose";
 import UserDashboard from "@/components/UserDashboard";
@@ -16,7 +17,7 @@ export default function Home() {
 
   return (
     <div className="w-full">
-      <UserDashboard/>
+      <SelectNumQuestions/>
       <Colors/>
       <IconGallery/>
     </div>

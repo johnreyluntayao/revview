@@ -8,12 +8,13 @@ type Variant = "default" | "pill" | "card" | "boxed" | "choice";
 interface RadioButtonProps {
   variant?: Variant;
   value: string | number;
-  label: ReactNode;
+  label?: ReactNode;
   description?: ReactNode;
   icon?: ReactNode;
   hideIndicator?: boolean;
   disabled?: boolean;
   className?: string;
+  boxedBG?: string;
   /** Background/border/text color when **not** selected */
   unselectedColor?: string;
   /** Background/border/text color when **selected** */
@@ -28,6 +29,7 @@ export default function RadioButton({
   label,
   description,
   icon,
+  boxedBG,
   hideIndicator = false,
   disabled = false,
   className = "",
@@ -95,29 +97,29 @@ export default function RadioButton({
   if (variant === "default") {
     wrapper += " items-center gap-4 py-3 px-4";
     wrapper += isSelected ? ` ${selected.bg}` : ` ${unselected.bg} ${unselected.hover}`;
-  } 
+  }
   else if (variant === "pill") {
     wrapper += " items-center justify-center py-2.5 px-6 min-w-[110px] text-sm font-medium rounded-lg";
-    wrapper += isSelected 
-      ? ` ${selected.bg} ${selected.text} border-primary` 
+    wrapper += isSelected
+      ? ` ${selected.bg} ${selected.text} border-primary`
       : ` ${unselected.bg} ${unselected.text} ${unselected.hover}`;
-  } 
+  }
   else if (variant === "card") {
-    wrapper += " items-center gap-0 pt-5 pr-5 pb-5 pl-0 shadow-sm";
-    wrapper += isSelected 
-      ? ` ${selected.bg} ${selected.border} shadow-md` 
+    wrapper += " items-center gap-0 pt-5 pr-5 pb-5 pl-0";
+    wrapper += isSelected
+      ? ` ${selected.bg} ${selected.border}`
       : ` ${unselected.bg} ${unselected.hover}`;
-  } 
+  }
   else if (variant === "boxed") {
-    wrapper += " items-center gap-5 p-5 min-h-[80px] shadow-sm";
-    wrapper += isSelected 
-      ? ` ${selected.bg} ${selected.border} shadow-md` 
+    wrapper += " items-center gap-5 p-5 min-h-[80px] ";
+    wrapper += isSelected
+      ? ` ${selected.bg} ${selected.border}`
       : ` ${unselected.bg} ${unselected.hover}`;
-  } 
+  }
   else if (variant === "choice") {
     wrapper += " items-center gap-4 py-3 px-4 min-h-[72px]";
-    wrapper += isSelected 
-      ? ` ${selected.bg} ${selected.border}` 
+    wrapper += isSelected
+      ? ` ${selected.bg} ${selected.border}`
       : ` ${unselected.bg} ${unselected.hover}`;
   }
 
@@ -152,7 +154,14 @@ export default function RadioButton({
       {/* LEFT AREA */}
       <div className="flex items-center gap-4 flex-shrink-0">
         {(variant === "boxed" || variant === "default") && icon && (
-          <div className="text-2xl text-muted-foreground group-hover:text-primary/80 transition-colors">
+          <div
+            className={`
+              flex items-center justify-center rounded-lg w-11 h-11
+              text-lg md:text-xl lg:text-2xl font-bold transition-all duration-200
+              [&>svg]:size-[1em] [&>svg]:block   
+              ${boxedBG} text-white
+            `}
+          >
             {icon}
           </div>
         )}
