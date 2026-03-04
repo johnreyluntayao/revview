@@ -43,6 +43,7 @@ export {
     X as Close,
     AtSign,
     MessageCircle as FeedbackIcon,
+    CheckIcon as Resolve,
     
 
 } from 'lucide-react';
