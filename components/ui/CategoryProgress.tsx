@@ -27,7 +27,7 @@ const categories = [
 const CategoryProgress = () => {
   return (
     <section>
-      <div className="w-full flex flex-col gap-1 md:gap-1.5 lg:gap-2 p-2 md:p-3 lg:p-4 rounded-xl border-border border">
+      <div className="w-full h-[50vh] flex flex-col gap-1 md:gap-1.5 lg:gap-2 p-2 md:p-3 lg:p-4 rounded-xl border-border border ">
         <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-5">
           Comprehensive Coverage
         </h1>
