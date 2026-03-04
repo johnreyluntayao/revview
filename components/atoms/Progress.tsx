@@ -34,44 +34,33 @@ const Progress: React.FC<ProgressProps> = ({
   }
 
   return (
-    <div className={`w-full border border-black/20 p-1 md:p-1.5 lg:p-2 ${className} `}>
-      {/* Label row */}
-      <div className="flex items-center justify-between mb-1 md:mb-2 lg:mb-3 text-sm font-medium text-gray-700">
-        {variant === "default" && total ? (
-          <>
-            <span>
-              {label} {current} of {total}
-            </span>
-            <span>{fillPercent}%</span>
-          </>
-        ) : variant === "percent" ? (
-          <>
-            <span>{label}</span>
-            <span>{fillPercent}%</span>
-          </>
-        ) : variant === "milestone" ? (
-          <>
-            <span>{label}</span>
-            <span>{subLabel || `${current} completed`}</span>
-          </>
-        ) : null}
-      </div>
-
-      {/* Progress bar */}
-      <div className="h-1 md:h-2 lg:h-2.5 w-full rounded-full bg-gray-200 overflow-hidden">
-        <div
-          className="h-full rounded-full bg-linear-to-r from-blue-500 to-purple-600 transition-all duration-500 ease-out"
-          style={{ width: `${fillPercent}%` }}
-        />
-      </div>
-
-      {/* Optional hint below for question variant */}
-      {variant === "default" && total && (
-        <div className="mt-1 text-xs text-gray-500 text-right">
-          {current} answered
-        </div>
-      )}
+    <div className={`w-full p-1 md:p-1.5 lg:p-2 ${className}`}>
+    {/* Label + % row */}
+    <div className="flex items-center justify-between mb-1 text-sm md:text-base lg:text-lg font-medium text-foreground">
+      <span>{label}</span>
+      
+      {variant === "default" && total ? (
+        <span>{fillPercent}%</span>
+      ) : variant === "percent" ? (
+        <span>{fillPercent}%</span>
+      ) : null}
     </div>
+
+    {/* Progress bar */}
+    <div className="h-1 md:h-2 lg:h-2.5 w-full rounded-full overflow-hidden mb-1.5">
+      <div
+        className="h-full rounded-full bg-linear-to-r from-primary/80 to-secondary/80 transition-all duration-500 ease-out"
+        style={{ width: `${fillPercent}%` }}
+      />
+    </div>
+
+    {/* Sub-label or hint row – shown for any variant if subLabel exists */}
+    {(subLabel || (variant === "default" && total)) && (
+      <div className="text-xs md:text-sm lg:text-base text-foreground/60 text-left">
+        {subLabel || `${current} answered`}
+      </div>
+    )}
+  </div>
   );
 };
 
