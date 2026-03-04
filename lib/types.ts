@@ -121,6 +121,7 @@ export interface Feedback {
   user_id: string;          
   rating: 1 | 2 | 3 | 4 | 5;
   comment: string | null;
+  user_name: string;
   created_at: Date;          
   resolved: boolean;
   resolved_by: string | null;   
