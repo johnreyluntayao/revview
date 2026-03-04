@@ -101,7 +101,7 @@ export default function RadioButton({
   else if (variant === "pill") {
     wrapper += " items-center justify-center py-2.5 px-6 min-w-[110px] text-sm font-medium rounded-lg";
     wrapper += isSelected
-      ? ` ${selected.bg} ${selected.text} border-primary`
+      ? ` ${selected.bg} ${selected.text} bg-primary/100 text-white`
       : ` ${unselected.bg} ${unselected.text} ${unselected.hover}`;
   }
   else if (variant === "card") {
@@ -172,7 +172,7 @@ export default function RadioButton({
           </div>
         )}
 
-        {!hideIndicator && variant !== "card" && variant !== "boxed" && variant !== "choice" && (
+        {!hideIndicator && variant !== "card" && variant !== "boxed" && variant !== "choice" && variant !== "pill" && (
           <div className="relative">
             <div className={indicatorClasses} />
             {isSelected && (
