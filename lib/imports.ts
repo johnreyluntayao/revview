@@ -22,7 +22,13 @@ export { default as Contact } from "@/components/ui/Contact";
 export { default as ComprehensiveCoverage } from "@/components/ui/ComprehensiveCoverage";
 export { default as WhyChoose } from "@/components/ui/WhyChoose";
 export { default as SubmitFeedback } from "@/components/ui/SubmitFeedback";
-
+export { default as SelectCategory } from "@/components/ui/SelectCategory";
+export { default as SelectDifficultyLevel } from "@/components/ui/SelectDifficultyLevel";
+export { default as SelectNumQuestions } from "@/components/ui/SelectNumQuestions";
+export { default as CategoryProgress } from "@/components/ui/CategoryProgress";
+export { default as PerformanceOverview } from "@/components/ui/PerformanceOverview";
+export { default as RecentScores } from "@/components/ui/RecentScores";
+export { default as SummaryCards } from "@/components/ui/SummaryCards";
 
 
 //Atom Components
@@ -30,6 +36,10 @@ export { default as Button } from "@/components/atoms/Button";
 export { default as InputField } from "@/components/atoms/InputField";
 export { default as Card } from "@/components/atoms/Card";
 export { default as Chip } from "@/components/atoms/Chip";
+export { default as ComboBox } from "@/components/atoms/ComboBox";
+export { default as CountDownTimer } from "@/components/atoms/CountDownTimer";
+export { default as Progress } from "@/components/atoms/Progress";
+export { default as RadioButton } from "@/components/atoms/RadioButton";
 export { default as List } from "@/components/atoms/List";
 
 //Auth

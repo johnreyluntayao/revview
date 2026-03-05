@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import RadioButton from '../atoms/RadioButton'
+import { RadioButton } from '@/lib/imports';
 
 const questionOptions = [
   { value: 5 },

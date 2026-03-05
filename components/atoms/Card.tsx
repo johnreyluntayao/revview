@@ -1,21 +1,6 @@
 // components/Card.tsx
+import { CardProps } from "@/lib/types";
 import React, { JSX } from "react";
-
-type CardVariant = "stat" | "highlight" | "overview" | "compact" | "data";
-
-interface CardProps {
-    variant?: CardVariant;
-    title?: string;                // e.g. "Total Users", "Overall Score"
-    value: string | number;        // main big number/value
-    subValue?: string;             // e.g. "Registered accounts", "Based on 45 completed quizzes"
-    icon?: React.ReactNode;        // Lucide icon, SVG, emoji, etc.
-    bg?: string;                   // e.g. "bg-white", "bg-blue-50", "bg-gradient-to-br from-blue-50 to-indigo-50"
-    iconColor?: string;            // e.g. "text-blue-600", "text-green-600"
-    textColor?: string;
-    trend?: "up" | "down" | null;  // optional arrow/trend indicator
-    className?: string;
-    iconSize?: number;
-}
 
 const Card: React.FC<CardProps> = ({
     variant = "stat",

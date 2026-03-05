@@ -1,7 +1,7 @@
 import React from 'react'
 import Progress from '../atoms/Progress'
 
-const categories = [
+const categoryProgress = [
   {
     title: 'Numerical Ability',
     value: 69,
@@ -31,7 +31,7 @@ const CategoryProgress = () => {
         <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground mb-2 md:mb-4 lg:mb-6">
           Category Progress
         </h1>
-        {categories.map((value) => (
+        {categoryProgress.map((value) => (
           <div key={value.title} className="w-full" >
             <Progress variant='percent' percentage={value.value} label={value.title} subLabel={`${value.testCount} test completed`}/>
 

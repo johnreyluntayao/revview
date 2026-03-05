@@ -1,5 +1,6 @@
+import { Chip } from '@/lib/imports';
 import React from 'react';
-import Chip from '../atoms/Chip';
+
 
 interface ScoreEntry {
     category: string;

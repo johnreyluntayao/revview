@@ -1,12 +1,7 @@
 "use client"
 import { StudyTime } from '@/lib/icons';
+import { CountdownTimerProps } from '@/lib/types';
 import { useState, useEffect, useRef } from 'react';
-
-interface CountdownTimerProps {
-    minutes: number;
-    seconds: number;
-    className?: string;
-}
 
 const CountDownTimer: React.FC<CountdownTimerProps> = ({
     minutes = 0,
