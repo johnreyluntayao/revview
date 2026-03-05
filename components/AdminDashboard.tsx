@@ -1,4 +1,4 @@
-import { Card } from "@/lib/imports";
+import { Card } from "@/lib/client-imports";
 import { Verbal, AverageScore, TotalTests } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/server";
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { FeedbackIcon, SendFeedback, Feedback } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
-import { Button, InputField } from "@/lib/imports";
+import { Button, InputField } from "@/lib/client-imports";
 import { toast } from "sonner";
 
 interface SubmitFeedbackProps {}

@@ -1,4 +1,4 @@
-import { SubmitFeedback, UserDashboard } from '@/lib/imports'
+import { SubmitFeedback, UserDashboard } from '@/lib/client-imports'
 
 const page = () => {
   return (

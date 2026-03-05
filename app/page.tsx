@@ -1,4 +1,4 @@
-import { Homepage, Footer, NavBar, Contact } from "@/lib/imports"
+import { Homepage, Footer, NavBar, Contact } from "@/lib/client-imports"
 
 export default function Home() {
 

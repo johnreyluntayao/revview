@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react'
 import { AllCategories, Analytical, General, Numerical, Verbal } from '@/lib/icons';
-import { RadioButton } from '@/lib/imports';
+import { RadioButton } from '@/lib/client-imports';
 
 const categories = [
     {

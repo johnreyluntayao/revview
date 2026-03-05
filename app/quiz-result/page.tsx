@@ -1,4 +1,4 @@
-import { QuizResult, NavBar } from "@/lib/imports";
+import { QuizResult, NavBar } from "@/lib/client-imports";
 
 const page = () => {
   return (

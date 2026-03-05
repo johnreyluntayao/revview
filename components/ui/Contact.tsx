@@ -1,5 +1,4 @@
-import { Button } from '@/lib/imports'
-import React from 'react'
+import { Button } from '@/lib/client-imports'
 
 
 const Contact = () => {

@@ -1,4 +1,4 @@
-import { CustomizeQuiz, SubmitFeedback } from '@/lib/imports'
+import { CustomizeQuiz, SubmitFeedback } from '@/lib/client-imports'
 
 const page = () => {
   return (
