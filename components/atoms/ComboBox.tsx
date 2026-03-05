@@ -1,8 +1,7 @@
-// ComboBox.tsx
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import { Dropdown, Check } from "@/lib/icons";
 import { ComboBoxProps } from "@/lib/types";
 
 
@@ -62,7 +61,7 @@ export default function ComboBox({
             text-sm md:text-base lg:text-lg
             bg-[hsl(var(--background))] 
             border-2 border-[hsl(var(--border))]
-            rounded-[var(--radius)]
+            rounded-(--radius)
             text-[hsl(var(--foreground))] 
             placeholder:text-[hsl(var(--muted-foreground))]
             shadow-sm
@@ -85,7 +84,7 @@ export default function ComboBox({
           className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
           aria-hidden="true"
         >
-          <ChevronDown
+          <Dropdown
             size={18}
             className={`text-[hsl(var(--muted-foreground))] transition-transform duration-200 ${
               isOpen ? "rotate-180" : ""
@@ -100,7 +99,7 @@ export default function ComboBox({
               absolute z-50 w-full mt-1.5
               bg-[hsl(var(--popover))] 
               border border-[hsl(var(--popover-foreground)/0.12)]
-              rounded-[var(--radius)] 
+              rounded-(--radius)
               shadow-xl
               max-h-64 overflow-auto
               divide-y divide-[hsl(var(--border))]

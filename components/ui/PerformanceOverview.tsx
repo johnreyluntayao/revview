@@ -1,4 +1,4 @@
-import { Card } from "@/lib/imports"
+import { Card } from "@/lib/client-imports"
 
 
 const PerformanceOverview = () => {

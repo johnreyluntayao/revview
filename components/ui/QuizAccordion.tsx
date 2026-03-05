@@ -1,7 +1,7 @@
 "use client";
 
 import { IncorrectAnswer, CorrectAnswer } from "@/lib/icons";
-import { Chip } from "@/lib/imports";
+import { Chip } from "@/lib/client-imports";
 import { useState } from "react";
 
 interface Question {

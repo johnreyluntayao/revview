@@ -1,5 +1,4 @@
-import React from 'react'
-import { List } from '@/lib/imports';
+import { List } from '@/lib/client-imports';
 
 const howItWorks = [
     {

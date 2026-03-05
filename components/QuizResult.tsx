@@ -1,4 +1,4 @@
-import { ScoreCard, Card, QuizAccordion } from "@/lib/imports";
+import { ScoreCard, Card, QuizAccordion } from "@/lib/client-imports";
 
 
 const QuizResult = () => {

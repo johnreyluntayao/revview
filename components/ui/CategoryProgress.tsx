@@ -1,5 +1,4 @@
-import React from 'react'
-import Progress from '../atoms/Progress'
+import { Progress } from '@/lib/client-imports'
 
 const categoryProgress = [
   {

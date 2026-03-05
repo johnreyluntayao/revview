@@ -1,7 +1,7 @@
 'use client'
 
 import { CustomQuiz } from '@/lib/icons'
-import { List } from '@/lib/imports'
+import { List } from '@/lib/client-imports'
 
 const categoryCoverage = [
   {

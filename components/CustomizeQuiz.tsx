@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { SelectCategory, SelectDifficultyLevel, SelectNumQuestions, SummaryPanel } from '@/lib/imports'
+import { SelectCategory, SelectDifficultyLevel, SelectNumQuestions, SummaryPanel } from '@/lib/client-imports'
 
 const CustomizeQuiz = () => {
   return (

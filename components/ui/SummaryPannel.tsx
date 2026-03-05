@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BeginQuiz } from "@/lib/icons";
 import { QuizCategory } from "@/lib/types";
-import { Button } from "@/lib/imports"
+import { Button } from "@/lib/client-imports"
 
 interface SummaryPanelProps {
   categories: QuizCategory[];

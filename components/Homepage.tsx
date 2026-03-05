@@ -1,4 +1,4 @@
-import { HeroSection, HowItWorks, ComprehensiveCoverage, WhyChoose } from "@/lib/imports";
+import { HeroSection, HowItWorks, ComprehensiveCoverage, WhyChoose } from "@/lib/client-imports";
 
 const Homepage = () => {
   return (

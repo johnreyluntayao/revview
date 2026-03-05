@@ -1,4 +1,4 @@
-import { Chip } from '@/lib/imports';
+import { Chip } from '@/lib/client-imports';
 import React from 'react';
 
 

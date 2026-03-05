@@ -1,5 +1,5 @@
-import { NavBar } from '@/lib/imports'
-import AdminDashboard from '@/components/AdminDashboard'
+import { NavBar } from '@/lib/client-imports'
+import { AdminDashboard } from '@/lib/server-imports'
 
 export default function Page() {
   return (

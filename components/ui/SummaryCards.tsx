@@ -1,6 +1,6 @@
 import React from 'react'
 import { AverageScore, BestCategory,  ProgressTracking, StudyTime } from '@/lib/icons';
-import { Card } from '@/lib/imports';
+import { Card } from '@/lib/client-imports';
 
 const featureCards = [
     {

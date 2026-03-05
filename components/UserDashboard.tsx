@@ -1,6 +1,5 @@
 import { StartQuiz } from "@/lib/icons"
-import Button from "./atoms/Button"
-import { CategoryProgress, PerformanceOverview, RecentScores, SummaryCards } from "@/lib/imports"
+import { CategoryProgress, PerformanceOverview, RecentScores, SummaryCards, Button } from "@/lib/client-imports"
 
 
 
