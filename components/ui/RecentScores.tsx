@@ -49,53 +49,49 @@ const recentScores: ScoreEntry[] = [
 
 const RecentScores: React.FC = () => {
     return (
-        <div className="w-full flex flex-col gap-1 md:gap-1.5 lg:gap-2 p-2 md:p-3 lg:p-4 rounded-xl border-border border">
+        <div className="w-full flex flex-col gap-1 md:gap-1.5 lg:gap-2 p-2 md:p-4 lg:p-6 rounded-xl border-border border overflow-hidden">
             {/* Header */}
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-5">
-                Performance Overview
-            </h1>
+            <div className=' mb-2 md:mb-4 lg:mb-6'>
+                <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground">
+                    Performance Overview
+                </h1>
+            </div>
+            
 
             {/* Table */}
-            <div className="overflow-x-auto">
-                <table className="w-full text-xs md:text-sm lg:text-base">
+            <div className="overflow-x-auto -mx-2 md:mx-0">
+                <table className="w-full min-w-auto text-xs md:text-sm lg:text-base">
                     <thead>
-                        <tr className="border-border text-foreground">
-                            <th className="px-5 py-3.5 text-left font-medium">Category</th>
-                            <th className="px-4 py-3.5 text-center font-medium">Score</th>
-                            <th className="px-4 py-3.5 text-center font-medium">Difficulty</th>
-                            <th className="px-4 py-3.5 text-center font-medium">Time</th>
-                            <th className="px-5 py-3.5 text-right font-medium">Date</th>
-                        </tr>
+                    <tr className="border-border text-foreground">
+                        <th className="px-4 py-3.5 text-left font-medium">Category</th>
+                        <th className="px-3 py-3.5 text-center font-medium">Score</th>
+                        <th className="px-3 py-3.5 text-center font-medium hidden md:table-cell">Difficulty</th>
+                        <th className="px-3 py-3.5 text-center font-medium hidden lg:table-cell">Time</th>
+                        <th className="px-4 py-3.5 text-right font-medium hidden lg:table-cell">Date</th>
+                    </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
-                        {recentScores.map((item, index) => (
-                            <tr
-                                key={item.category + item.date}
-                                className={`
-                  ${index === recentScores.length - 1 ? 'font-medium' : ''}
-                `}
-                            >
-                                <td className="px-5 py-4 whitespace-nowrap">
-                                    {item.category}
-                                </td>
-                                <td className="px-4 py-4 text-center font-medium">
-                                    <Chip text={item.score} className='text-primary bg-primary/20' />
-
-                                </td>
-                                <td className="px-4 py-4 text-center">
-                                    {item.difficulty}
-                                </td>
-                                <td className="px-4 py-4 text-center text-muted-foreground">
-                                    {item.time}
-                                </td>
-                                <td className="px-5 py-4 text-right text-muted-foreground">
-                                    {item.date}
-                                </td>
-                            </tr>
-                        ))}
+                    {recentScores.map((item, index) => (
+                        <tr
+                        key={item.category + item.date}
+                        className={index === recentScores.length - 1 ? 'font-medium' : ''}
+                        >
+                        <td className="px-4 py-4 whitespace-nowrap">{item.category}</td>
+                        <td className="px-3 py-4 text-center font-medium">
+                            <Chip text={item.score} className="text-primary bg-primary/20" />
+                        </td>
+                        <td className="px-3 py-4 text-center hidden md:table-cell">{item.difficulty}</td>
+                        <td className="px-3 py-4 text-center text-muted-foreground hidden lg:table-cell">
+                            {item.time}
+                        </td>
+                        <td className="px-4 py-4 text-right text-muted-foreground hidden lg:table-cell">
+                            {item.date}
+                        </td>
+                        </tr>
+                    ))}
                     </tbody>
                 </table>
-            </div>
+                </div>
         </div>
     );
 };

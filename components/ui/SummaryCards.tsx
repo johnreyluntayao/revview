@@ -33,7 +33,7 @@ const featureCards = [
 const SummaryCards = () => {
     return (
         <section>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6 w-full">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6 w-full">
                 {featureCards.map((feature, idx) => (
                     <Card
                         key={idx}
