@@ -1,8 +1,9 @@
-import { SubmitFeedback } from '@/lib/imports'
+import { SubmitFeedback, UserDashboard } from '@/lib/imports'
 
 const page = () => {
   return (
     <main>
+      <UserDashboard />
       <SubmitFeedback />
     </main>
   )
