@@ -1,3 +1,5 @@
+import { StartQuiz } from "@/lib/icons"
+import Button from "./atoms/Button"
 import CategoryProgress from "./ui/CategoryProgress"
 import PerformanceOverview from "./ui/PerformanceOverview"
 import RecentScores from "./ui/RecentScores"
@@ -13,7 +15,8 @@ const UserDashboard = () => {
       <p className="text-sm md:text-base lg:text-lg text-foreground/70">Here is your learning progress and recent quiz scores</p>
 
       <SummaryCards/>
-      <div className="grid grid-cols-2 gap-4 md:gap-5 lg:gap-6"> 
+      <Button text="Start a New Review" backgroundColor="bg-linear-to-r from-primary to-secondary" textColor="text-white" className="w-62.5 h-13.75" leftIcon={<StartQuiz/>}/>
+      <div className="grid grid-cols-2 gap-4 md:gap-5 lg:gap-6 "> 
         <CategoryProgress/>
         <PerformanceOverview/>
       </div>
