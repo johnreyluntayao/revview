@@ -178,7 +178,7 @@ export interface CardProps {
 }
 
 
-interface ComboBoxOption {
+export interface ComboBoxOption {
   value: string;
   label: string;
 }

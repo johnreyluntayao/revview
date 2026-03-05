@@ -3,9 +3,22 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, Check } from "lucide-react";
-import { ComboBoxProps } from "@/lib/types";
 
+interface ComboBoxOption {
+  value: string;
+  label: string;
+}
 
+interface ComboBoxProps {
+  options: ComboBoxOption[];
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  label?: string;
+  disabled?: boolean;
+  className?: string;
+  required?: boolean;
+}
 
 export default function ComboBox({
   options,
