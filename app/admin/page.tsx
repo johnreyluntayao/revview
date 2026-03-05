@@ -1,13 +1,11 @@
-import { NavBar, AdminDashboard } from '@/lib/imports'
+import { NavBar } from '@/lib/imports'
+import AdminDashboard from '@/components/AdminDashboard'
 
-const page = () => {
-
+export default function Page() {
   return (
-    <main className=''>
-    <NavBar State='LoggedIn'/>
-    <AdminDashboard admin="Admin" />
+    <main>
+      <NavBar State="LoggedIn" />
+      <AdminDashboard />
     </main>
   )
 }
-
-export default page
