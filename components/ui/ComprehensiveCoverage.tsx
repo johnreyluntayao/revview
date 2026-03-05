@@ -3,7 +3,7 @@
 import { CustomQuiz } from '@/lib/icons'
 import { List } from '@/lib/imports'
 
-const categories = [
+const categoryCoverage = [
   {
     title: 'Numerical Ability',
     items: [
@@ -47,7 +47,7 @@ const ComprehensiveCoverage = () => {
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 lg:gap-6 px-0 lg:px-16">
-          {categories.map((category) => (
+          {categoryCoverage.map((category) => (
             <div
               key={category.title}
               className="w-full p-4 md:p-5 lg:p-6 bg-linear-to-br from-primary/10 to-secondary/10 rounded-xl overflow-hidden border border-border"

@@ -1,5 +1,5 @@
+import { Card } from "@/lib/imports"
 
-import Card from '../atoms/Card'
 
 const PerformanceOverview = () => {
     return (
