@@ -1,9 +1,7 @@
 import { StartQuiz } from "@/lib/icons"
 import Button from "./atoms/Button"
-import CategoryProgress from "./ui/CategoryProgress"
-import PerformanceOverview from "./ui/PerformanceOverview"
-import RecentScores from "./ui/RecentScores"
-import SummaryCards from "./ui/SummaryCards"
+import { CategoryProgress, PerformanceOverview, RecentScores, SummaryCards } from "@/lib/imports"
+
 
 
 const UserDashboard = () => {

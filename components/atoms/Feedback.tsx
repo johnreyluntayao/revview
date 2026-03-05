@@ -1,15 +1,8 @@
 import { Feedback as Star, Resolve, Delete, Close } from "@/lib/icons";
 import { Button, Chip } from "@/lib/imports"; 
+import { FeedbackProps } from "@/lib/types";
 
-interface FeedbackProps {
-  name: string;
-  date: string;
-  rating: number;
-  comment: string;
-  status?: "resolved" | "pending";
-  onResolveToggle: () => void;
-  onDelete: () => void;
-}
+
 
 const Feedback: React.FC<FeedbackProps> = ({
   name,

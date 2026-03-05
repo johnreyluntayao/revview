@@ -1,17 +1,6 @@
 // components/Progress.tsx
+import { ProgressProps } from "@/lib/types";
 import React from "react";
-
-type ProgressVariant = "default" | "percent" | "milestone";
-
-interface ProgressProps {
-  variant?: ProgressVariant;
-  current?: number;
-  total?: number;           // required when variant = "default"
-  percentage?: number;      // used when variant = "percent"
-  label?: string;
-  subLabel?: string;
-  className?: string;
-}
 
 const Progress: React.FC<ProgressProps> = ({
   variant = "default",

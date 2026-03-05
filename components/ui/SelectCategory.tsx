@@ -1,8 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import RadioButton from '../atoms/RadioButton'
 import { AllCategories, Analytical, General, Numerical, Verbal } from '@/lib/icons';
+import { RadioButton } from '@/lib/imports';
 
 const categories = [
     {

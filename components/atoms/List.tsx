@@ -1,18 +1,7 @@
+import { ListProps } from "@/lib/types";
 import { ReactNode } from "react";
 
-interface ListItem {
-  label: string;
-  description?: string;
-}
-
-interface ListProps {
-  items: ListItem[];
-  isNumberedList?: boolean;
-  sharedIcon?: ReactNode;
-  className?: string;
-}
-
-export const List = ({
+const List = ({
   items,
   isNumberedList = false,
   sharedIcon,

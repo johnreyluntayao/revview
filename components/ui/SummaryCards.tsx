@@ -1,7 +1,6 @@
 import React from 'react'
-import Card from '../atoms/Card'
-import { BookOpen, User } from 'lucide-react'
-import { AverageScore, BestCategory, CustomQuiz, InstantFeedback, ProgressTracking, StudyTime } from '@/lib/icons';
+import { AverageScore, BestCategory,  ProgressTracking, StudyTime } from '@/lib/icons';
+import { Card } from '@/lib/imports';
 
 const featureCards = [
     {

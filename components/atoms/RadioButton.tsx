@@ -1,27 +1,8 @@
 // components/RadioButton.tsx
 "use client";
 
+import { RadioButtonProps } from "@/lib/types";
 import React, { ReactNode } from "react";
-
-type Variant = "default" | "pill" | "card" | "boxed" | "choice";
-
-interface RadioButtonProps {
-  variant?: Variant;
-  value: string | number;
-  label?: ReactNode;
-  description?: ReactNode;
-  icon?: ReactNode;
-  hideIndicator?: boolean;
-  disabled?: boolean;
-  className?: string;
-  boxedBG?: string;
-  /** Background/border/text color when **not** selected */
-  unselectedColor?: string;
-  /** Background/border/text color when **selected** */
-  selectedColor?: string;
-  isSelected: boolean;
-  onSelect: (value: string | number) => void;
-}
 
 export default function RadioButton({
   variant = "default",
@@ -33,8 +14,8 @@ export default function RadioButton({
   hideIndicator = false,
   disabled = false,
   className = "",
-  unselectedColor, // e.g. "bg-gray-100 border-gray-300 text-gray-700"
-  selectedColor,   // e.g. "bg-blue-600 border-blue-600 text-white"
+  unselectedColor, 
+  selectedColor,
   isSelected,
   onSelect,
 }: RadioButtonProps) {

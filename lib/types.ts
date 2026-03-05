@@ -162,3 +162,88 @@ export interface ChipProps {
     | 'score'
     | 'default'
 }
+
+export interface CardProps {
+    variant?: "stat" | "highlight" | "overview" | "compact" | "data";
+    title?: string;                
+    value: string | number;        
+    subValue?: string;             
+    icon?: React.ReactNode;        
+    bg?: string;                   
+    iconColor?: string;
+    textColor?: string;
+    trend?: "up" | "down" | null;
+    className?: string;
+    iconSize?: number;
+}
+
+
+interface ComboBoxOption {
+  value: string;
+  label: string;
+}
+
+export interface ComboBoxProps {
+  options: ComboBoxOption[];
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  label?: string;
+  disabled?: boolean;
+  className?: string;
+  required?: boolean;
+}
+
+export interface CountdownTimerProps {
+    minutes: number;
+    seconds: number;
+    className?: string;
+}
+
+export interface FeedbackProps {
+  name: string;
+  date: string;
+  rating: number;
+  comment: string;
+  status?: "resolved" | "pending";
+  onResolveToggle: () => void;
+  onDelete: () => void;
+}
+
+interface ListItem {
+  label: string;
+  description?: string;
+}
+
+export interface ListProps {
+  items: ListItem[];
+  isNumberedList?: boolean;
+  sharedIcon?: ReactNode;
+  className?: string;
+}
+
+export interface ProgressProps {
+  variant?: "default" | "percent" | "milestone";
+  current?: number;
+  total?: number;           
+  percentage?: number;      
+  label?: string;
+  subLabel?: string;
+  className?: string;
+}
+
+export interface RadioButtonProps {
+  variant?: "default" | "pill" | "card" | "boxed" | "choice";
+  value: string | number;
+  label?: ReactNode;
+  description?: ReactNode;
+  icon?: ReactNode;
+  hideIndicator?: boolean;
+  disabled?: boolean;
+  className?: string;
+  boxedBG?: string;
+  unselectedColor?: string;
+  selectedColor?: string;
+  isSelected: boolean;
+  onSelect: (value: string | number) => void;
+}
