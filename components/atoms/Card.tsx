@@ -109,6 +109,19 @@ const Card: React.FC<CardProps> = ({
             );
             break;
 
+            case "data":
+            content = (
+                <div className="p-3 md:p-4 lg:p-5 flex flex-col items-left gap-2 md:gap-3 lg:gap-4 w-full">
+                    {icon && (<div className={`${iconColor} text-2xl md:text-3xl lg:text-4xl [&>svg]:block [&>svg]:size-[1em]`}>{icon}</div>)}
+                    <div className="flex flex-col gap-1 md:gap-2 lg:gap-3">
+                        {title && <p className="text-xs md:text-sm lg:text-base text-foreground/50">{title}</p>}
+                        <p className="text-xl md:text-2xl lg:text-3xl text-foreground font-semibold">{value}</p>
+                    </div>
+                    
+                </div>
+            );
+            break;
+
         default:
             content = <div className="p-6 text-center">Invalid variant</div>;
     }
