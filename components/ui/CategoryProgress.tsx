@@ -1,44 +1,34 @@
 import { Progress } from '@/lib/client-imports'
 
-const categoryProgress = [
-  {
-    title: 'Numerical Ability',
-    value: 69,
-    testCount: 4
-  },
-  {
-    title: 'Analytical Ability',
-    value: 42,
-    testCount: 10
-  },
-  {
-    title: 'Verbal Ability',
-    value: 6,
-    testCount: 7
-  },
-  {
-    title: 'General Information',
-    value: 40,
-    testCount: 44
-  }
-]
+interface CategoryItem {
+  title: string
+  value: number
+  testCount: number
+}
 
-const CategoryProgress = () => {
+interface CategoryProgressProps {
+  categories: CategoryItem[]
+}
+
+const CategoryProgress = ({ categories }: CategoryProgressProps) => {
   return (
     <section>
-      <div className="w-full flex flex-col gap-1 md:gap-1.5 lg:gap-2 p-2 md:p-4 lg:p-6 rounded-xl border-border border ">
+      <div className="w-full flex flex-col gap-2 md:gap-3 lg:gap-4 p-2 md:p-4 lg:p-6 rounded-xl border-border border">
         <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground mb-2 md:mb-4 lg:mb-6">
           Category Progress
         </h1>
-        {categoryProgress.map((value) => (
-          <div key={value.title} className="w-full" >
-            <Progress variant='percent' percentage={value.value} label={value.title} subLabel={`${value.testCount} test completed`}/>
 
+        {categories.map((cat) => (
+          <div key={cat.title} className="w-full">
+            <Progress
+              variant="percent"
+              percentage={cat.value}
+              label={cat.title}
+              subLabel={`${cat.testCount} test completed`}
+            />
           </div>
         ))}
-
       </div>
-
     </section>
   )
 }
