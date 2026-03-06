@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Feedback as FeedbackComponent, Button } from "@/lib/imports";
+import { Feedback as FeedbackComponent, Button } from "@/lib/client-imports";
 import { createClient } from "@/lib/supabase/client";
 
 import type { Feedback } from "@/lib/types";

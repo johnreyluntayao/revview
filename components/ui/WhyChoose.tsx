@@ -1,5 +1,5 @@
 
-import { Card } from '@/lib/imports'
+import { Card } from '@/lib/client-imports'
 import { CustomQuiz, InstantFeedback, ProgressTracking, AllCategories } from '@/lib/icons';
 
 const featureCards = [

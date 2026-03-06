@@ -44,6 +44,7 @@ export {
     AtSign,
     MessageCircle as FeedbackIcon,
     CheckIcon as Resolve,
-    
+    ChevronDown as Dropdown,
+    Check
 
 } from 'lucide-react';

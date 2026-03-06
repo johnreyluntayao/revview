@@ -1,5 +1,4 @@
-import React from 'react'
-import { Button } from '@/lib/imports'
+import { Button } from '@/lib/client-imports'
 
 const HeroSection = () => {
   return (

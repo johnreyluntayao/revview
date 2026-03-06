@@ -1,4 +1,4 @@
-import { ManageFeedback, NavBar } from "@/lib/imports";
+import { ManageFeedback, NavBar } from "@/lib/client-imports";
 
 const page = () => {
   return (

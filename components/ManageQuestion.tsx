@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Card, Chip, ComboBox, InputField } from "@/lib/imports";
 import { Add, Delete, Edit, Search } from "@/lib/icons";
+import { Button, Chip, ComboBox, InputField } from "@/lib/client-imports";
 
 const questionsData = [
     {

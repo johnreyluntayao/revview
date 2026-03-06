@@ -1,4 +1,4 @@
-import { Login, NavBar } from "@/lib/imports"
+import { Login, NavBar } from "@/lib/client-imports"
 
 const page = () => {
   return (

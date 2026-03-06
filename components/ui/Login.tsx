@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Email, Password, LogIn } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
-import { InputField, Button } from "@/lib/imports";
+import { InputField, Button } from "@/lib/client-imports";
 
 export default function Login() {
   const router = useRouter();

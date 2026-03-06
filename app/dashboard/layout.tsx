@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sidebar } from "@/lib/imports";
+import { Sidebar } from "@/lib/client-imports";
 import { Menu } from "@/lib/icons";
 import { Metadata } from "next";
 

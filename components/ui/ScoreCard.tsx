@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/lib/imports";
+import { Button } from "@/lib/client-imports";
 import { RetakeQuiz, BackToDashboard } from "@/lib/icons"; 
 import { useRouter } from "next/navigation";
 

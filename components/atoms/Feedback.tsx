@@ -1,5 +1,5 @@
 import { Feedback as Star, Resolve, Delete, Close } from "@/lib/icons";
-import { Button, Chip } from "@/lib/imports"; 
+import { Button, Chip } from "@/lib/client-imports"; 
 import { FeedbackProps } from "@/lib/types";
 
 
