@@ -178,13 +178,8 @@ export interface CardProps {
 }
 
 
-export interface ComboBoxOption {
-  value: string;
-  label: string;
-}
-
 export interface ComboBoxProps {
-  options: ComboBoxOption[];
+  options: string[];
   value?: string;
   onChange?: (value: string) => void;
   placeholder?: string;

@@ -4,13 +4,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, Check } from "lucide-react";
 
-interface ComboBoxOption {
-  value: string;
-  label: string;
-}
+type Size = "sm" | "md" | "lg" | undefined;
 
 interface ComboBoxProps {
-  options: ComboBoxOption[];
+  options: string[];
   value?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
@@ -18,6 +15,8 @@ interface ComboBoxProps {
   disabled?: boolean;
   className?: string;
   required?: boolean;
+  isSearchable?: boolean;
+  size?: Size;                    // ← NEW: "sm" | "md" | "lg"
 }
 
 export default function ComboBox({
@@ -29,6 +28,8 @@ export default function ComboBox({
   disabled = false,
   className = "",
   required = false,
+  isSearchable = true,
+  size,
 }: ComboBoxProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -45,15 +46,46 @@ export default function ComboBox({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const selectedOption = options.find((opt) => opt.value === value);
-  const displayText = isOpen ? search : (selectedOption?.label ?? "");
+  useEffect(() => {
+    if (!isOpen) setSearch("");
+  }, [isOpen]);
+
+  const displayText = isOpen && isSearchable ? search : value;
+  const filteredOptions = isSearchable
+    ? options.filter((opt) => opt.toLowerCase().includes(search.toLowerCase()))
+    : options;
+
+  // Size logic exactly as you provided
+  const sizeClasses = size
+    ? {
+        lg: "text-[16px] gap-2 py-3 px-6",
+        md: "text-[14px] gap-1.5 py-2.5 px-5",
+        sm: "text-[12px] gap-1 py-2 px-4",
+      }[size]
+    : "text-[12px] gap-1 py-2 px-4 " +
+      "md:text-[14px] md:gap-1.5 md:py-2.5 md:px-5 " +
+      "lg:text-[16px] lg:gap-2 lg:py-3 lg:px-6";
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isSearchable) return;
+    setSearch(e.target.value);
+    if (!isOpen) setIsOpen(true);
+  };
+
+  const handleInputClick = () => {
+    if (disabled) return;
+    setIsOpen(true);
+    if (isSearchable && inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
 
   return (
     <div className={`w-full ${className}`} ref={wrapperRef}>
       {label && (
-        <label className="mb-1.5 block text-xs md:text-sm lg:text-base font-medium text-[hsl(var(--foreground))]">
+        <label className="mb-1.5 block text-sm font-medium text-foreground">
           {label}
-          {required && <span className="text-[hsl(var(--destructive))] ml-1">*</span>}
+          {required && <span className="text-destructive ml-1">*</span>}
         </label>
       )}
 
@@ -62,103 +94,79 @@ export default function ComboBox({
           ref={inputRef}
           type="text"
           value={displayText}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setIsOpen(true);
-          }}
-          placeholder={selectedOption?.label ?? placeholder}
+          onChange={handleInputChange}
+          onClick={handleInputClick}
+          placeholder={value || placeholder}
           disabled={disabled}
-          readOnly={!isOpen}
-          onClick={() => !disabled && setIsOpen(true)}
+          readOnly={!isSearchable || !isOpen}
           className={`
-            w-full px-3.5 py-2.5 pr-10
-            text-sm md:text-base lg:text-lg
-            bg-[hsl(var(--background))] 
-            border-2 border-[hsl(var(--border))]
-            rounded-[var(--radius)]
-            text-[hsl(var(--foreground))] 
-            placeholder:text-[hsl(var(--muted-foreground))]
-            shadow-sm
-            transition-all duration-150 ease-in-out
-            cursor-pointer
-            hover:border-[hsl(var(--muted-foreground))]
-
-            focus:border-[hsl(var(--primary))]
-            focus:ring-2 focus:ring-[hsl(var(--ring)/0.25)] focus:ring-offset-1 focus:ring-offset-[hsl(var(--background))]
-            focus-visible:border-[hsl(var(--primary))]
-            focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring)/0.3)] focus-visible:ring-offset-1
-
-            disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-[hsl(var(--muted)/0.4)]
-            disabled:border-[hsl(var(--border))]
-            caret-[hsl(var(--primary))]
+            w-full pr-10
+            bg-background
+            border-2 border-input rounded-lg
+            text-foreground
+            placeholder:text-muted-foreground
+            focus:border-primary focus:ring-2 focus:ring-ring/30 focus:outline-none
+            disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-muted/40
+            transition-all duration-150
+            ${!isSearchable ? "cursor-pointer" : "cursor-text"}
+            ${sizeClasses}
           `}
         />
 
-        <div
-          className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none"
-          aria-hidden="true"
-        >
+        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
           <ChevronDown
-            size={18}
-            className={`text-[hsl(var(--muted-foreground))] transition-transform duration-200 ${
+            className={`text-muted-foreground transition-transform duration-200 ${
               isOpen ? "rotate-180" : ""
             }`}
+            size={size === "lg" ? 20 : size === "sm" ? 16 : 18}
           />
         </div>
 
-        {/* Dropdown */}
         {isOpen && !disabled && (
           <div
             className={`
               absolute z-50 w-full mt-1.5
-              bg-[hsl(var(--popover))] 
-              border border-[hsl(var(--popover-foreground)/0.12)]
-              rounded-[var(--radius)] 
-              shadow-xl
-              max-h-64 overflow-auto
-              divide-y divide-[hsl(var(--border))]
-              text-[hsl(var(--popover-foreground))]
+              bg-popover border border-border rounded-lg
+              shadow-xl overflow-auto
+              text-popover-foreground
+              ${size === "lg" ? "max-h-72 text-base" : size === "sm" ? "max-h-52 text-xs" : "max-h-64 text-sm"}
             `}
           >
-            {options.filter((opt) =>
-              opt.label.toLowerCase().includes(search.toLowerCase())
-            ).length === 0 ? (
-              <div className="px-4 py-3 text-xs md:text-sm lg:text-base text-[hsl(var(--muted-foreground))]">
+            {filteredOptions.length === 0 && isSearchable ? (
+              <div className="px-4 py-3 text-muted-foreground">
                 No options found
               </div>
             ) : (
-              options
-                .filter((opt) =>
-                  opt.label.toLowerCase().includes(search.toLowerCase())
-                )
-                .map((option) => {
-                  const isSelected = option.value === value;
-                  return (
-                    <div
-                      key={option.value}
-                      className={`
-                        px-4 py-2.5 text-sm cursor-pointer
-                        flex items-center justify-between
-                        transition-colors
-                        ${
-                          isSelected
-                            ? "bg-[hsl(var(--accent))] text-[hsl(var(--accent-foreground))]"
-                            : "hover:bg-[hsl(var(--muted))]"
-                        }
-                      `}
-                      onClick={() => {
-                        onChange?.(option.value);
-                        setSearch("");
-                        setIsOpen(false);
-                      }}
-                    >
-                      <span>{option.label}</span>
-                      {isSelected && (
-                        <Check size={16} className="text-current opacity-90" />
-                      )}
-                    </div>
-                  );
-                })
+              filteredOptions.map((option) => {
+                const isSelected = option === value;
+                return (
+                  <div
+                    key={option}
+                    className={`
+                      px-4 cursor-pointer flex items-center justify-between
+                      transition-colors
+                      ${isSelected
+                        ? "bg-primary text-primary-foreground font-medium"
+                        : "hover:bg-primary hover:text-background"
+                      }
+                      ${size === "lg" ? "py-3 text-base" : size === "sm" ? "py-2 text-xs" : "py-2.5 text-sm"}
+                    `}
+                    onClick={() => {
+                      onChange?.(option);
+                      setSearch("");
+                      setIsOpen(false);
+                    }}
+                  >
+                    <span>{option}</span>
+                    {isSelected && (
+                      <Check
+                        size={size === "lg" ? 18 : size === "sm" ? 14 : 16}
+                        className="text-primary"
+                      />
+                    )}
+                  </div>
+                );
+              })
             )}
           </div>
         )}
