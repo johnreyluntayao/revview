@@ -37,7 +37,8 @@ export async function proxy(request: NextRequest) {
       pathname.startsWith("/dashboard") ||
       pathname.startsWith("/admin")    ||
       pathname.startsWith("/feedbacks") ||
-      pathname.startsWith("/quiz-result")
+      pathname.startsWith("/quiz-result") ||
+      pathname.startsWith("/manage-questions")
     ) {
       const redirectUrl = new URL("/login", request.url);
       redirectUrl.searchParams.set("redirect", pathname);
@@ -56,7 +57,7 @@ export async function proxy(request: NextRequest) {
   const isAdmin = !!profile?.is_admin;
 
   // ── 3. Role-based route enforcement ────────────────────────────────
-  const adminRoutes = ["/admin", "/feedbacks"];
+  const adminRoutes = ["/admin", "/feedbacks", "/manage-questions"];
   const userRoutes = ["/dashboard", "/quiz-result"];
 
   if (isAdmin) {
@@ -78,5 +79,6 @@ export const config = {
     "/admin/:path*",
     "/feedbacks/:path*",
     "/quiz-result/:path*",
+    "/manage-questions/:path*",
   ],
 };
