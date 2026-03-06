@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import Image from "next/image";
 
 import {
-  AllCategories,
   ProgressTracking,
   ShowFeedback,
   Questions,
@@ -55,6 +55,33 @@ export default function Navbar({ State, title }: NavbarProps) {
 
   const { logout: handleLogout, isLoggingOut } = useLogout();
 
+  const [dashboardHref, setDashboardHref] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (State !== "Home") return;
+
+    async function checkUserAndSetLink() {
+      const supabase = createClient();
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setDashboardHref("/login");
+        return;
+      }
+
+      const { data: profile } = await supabase
+        .from("users")
+        .select("is_admin")
+        .eq("id", user.id)
+        .single();
+
+      const isAdmin = profile?.is_admin === true;
+      setDashboardHref(isAdmin ? "/admin" : "/dashboard");
+    }
+
+    checkUserAndSetLink();
+  }, [State]);
+
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: ProgressTracking },
     { href: "/feedbacks", label: "Feedback", icon: ShowFeedback },
@@ -63,21 +90,22 @@ export default function Navbar({ State, title }: NavbarProps) {
   ];
 
   return (
-    <nav className="relative top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-border z-50">
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 bg-background backdrop-blur-md border-b border-border z-50">
+      <div className="max-w-screen-3xl mx-auto px-4 sm:px-6 lg:px-8 h-16 lg:h-20 flex items-center justify-between">
         {/* Logo + Brand */}
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-linear-to-br from-primary to-secondary rounded-md flex items-center justify-center shadow-sm">
-            <AllCategories className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-foreground">
-            RevView
-          </span>
-        </div>
+        <Link href="/">
+          <Image
+            src="/Long-logo.svg"
+            alt="RevView Logo"
+            width={40}
+            height={40}
+            className="w-32 h-20 lg:w-40 lg:h-28"
+          />
+        </Link>
 
         {/* CENTER DESKTOP NAV – only when logged in */}
         {State === "LoggedIn" && (
-          <div className="hidden md:flex items-center justify-center gap-1.5 lg:gap-2 absolute left-1/2 -translate-x-1/2">
+          <div className="hidden lg:flex items-center justify-center gap-1.5 lg:gap-2 absolute left-1/2 -translate-x-1/2">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -86,7 +114,7 @@ export default function Navbar({ State, title }: NavbarProps) {
                   href={item.href}
                   className={`
                     flex items-center gap-1.5 
-                    px-4 py-2 text-sm font-medium 
+                    px-4 py-2 text-base font-medium 
                     transition-colors duration-150
                     ${
                       isActive
@@ -95,7 +123,7 @@ export default function Navbar({ State, title }: NavbarProps) {
                     }
                   `}
                 >
-                  <item.icon className="w-4 h-4" />
+                  <item.icon className="w-5 h-5" />
                   <span>{item.label}</span>
                 </Link>
               );
@@ -112,9 +140,13 @@ export default function Navbar({ State, title }: NavbarProps) {
                 onClick={handleLogout}
                 disabled={isLoggingOut}
                 className={`
-                  hidden sm:flex items-center gap-2.5 px-3 py-1.5 
-                  text-sm font-medium transition-opacity
-                  ${isLoggingOut ? "opacity-50 cursor-not-allowed" : "text-destructive hover:opacity-80"}
+                  hidden lg:flex items-center gap-2.5 px-4 py-2 
+                  text-base font-medium transition-opacity bg-destructive/10 rounded-l
+                  ${
+                    isLoggingOut
+                      ? "opacity-50 cursor-not-allowed"
+                      : "text-destructive hover:opacity-80"
+                  }
                 `}
               >
                 <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
@@ -123,7 +155,7 @@ export default function Navbar({ State, title }: NavbarProps) {
 
               {/* Mobile Hamburger */}
               <button
-                className="md:hidden p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors"
+                className="lg:hidden p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-label="Toggle menu"
               >
@@ -135,30 +167,63 @@ export default function Navbar({ State, title }: NavbarProps) {
               </button>
             </>
           ) : State === "Home" ? (
-            <Link
-              href="/login"
-              className="
-                px-5 sm:px-6 py-2 
-                bg-primary text-primary-foreground 
-                text-sm font-medium 
-                rounded-lg shadow-sm 
-                hover:bg-primary/90 active:bg-primary/95 
-                transition
-              "
-            >
-              Sign In
-            </Link>
+            dashboardHref === null ? (
+              <button
+                disabled
+                className="
+                  px-5 sm:px-6 py-2 
+                  bg-primary/50 text-primary-foreground/70 
+                  font-medium rounded-lg shadow-sm cursor-wait
+                "
+              >
+                Loading...
+              </button>
+            ) : dashboardHref === "/login" ? (
+              <Link
+                href="/login"
+                className="
+                  px-5 sm:px-6 py-2 
+                  bg-primary text-primary-foreground 
+                  font-medium 
+                  rounded-lg shadow-sm 
+                  hover:bg-primary/90 active:bg-primary/95 
+                  transition text-base
+                "
+              >
+                Sign In
+              </Link>
+            ) : (
+              <Link
+                href={dashboardHref}
+                className="
+                  px-5 sm:px-6 py-2 
+                  bg-primary text-primary-foreground 
+                  font-medium 
+                  rounded-lg shadow-sm 
+                  hover:bg-primary/90 active:bg-primary/95 
+                  transition text-base
+                "
+              >
+                Dashboard
+              </Link>
+            )
           ) : State === "SignIn" ? (
-            <div className="flex items-center text-muted-foreground text-sm">
+            <div className="flex items-center text-muted-foreground text-base">
               <span className="hidden md:inline">Don't have an account?</span>
-              <Link href="/signup" className="text-primary font-semibold hover:underline ml-1.5">
+              <Link
+                href="/signup"
+                className="text-primary font-semibold hover:underline ml-1.5"
+              >
                 Sign up
               </Link>
             </div>
           ) : State === "SignUp" ? (
-            <div className="flex items-center text-muted-foreground text-sm">
+            <div className="flex items-center text-muted-foreground text-base">
               <span className="hidden md:inline">Already have an account?</span>
-              <Link href="/login" className="text-primary font-semibold hover:underline ml-1.5">
+              <Link
+                href="/login"
+                className="text-primary font-semibold hover:underline ml-1.5"
+              >
                 Sign in
               </Link>
             </div>
@@ -172,8 +237,8 @@ export default function Navbar({ State, title }: NavbarProps) {
 
       {/* MOBILE MENU */}
       {State === "LoggedIn" && isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-16 bg-background/95 backdrop-blur-sm border-t border-border z-50 animate-in fade-in slide-in-from-top-5 duration-200">
-          <div className="max-w-screen-2xl mx-auto px-4 py-6 flex flex-col gap-2 bg-white/90 h-full overflow-y-auto">
+        <div className="lg:hidden fixed h-screen top-16 left-0 right-0 bottom-0 z-50 bg-white/75 border-t border-border animate-in fade-in slide-in-from-top-5 duration-200">
+          <div className="mx-auto px-4 py-6 flex flex-col gap-2 h-auto bg-background/95 border border-border">
             {navItems.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -181,8 +246,8 @@ export default function Navbar({ State, title }: NavbarProps) {
                   key={item.href}
                   href={item.href}
                   className={`
-                    flex items-center gap-3 px-5 py-4 text-base font-medium 
-                    rounded-lg transition-colors
+                    flex items-center gap-2 md:gap-3 px-4 md:px-5 py-3 md:py-4 font-medium 
+                    rounded-lg transition-colors text-sm md:text-base
                     ${
                       isActive
                         ? "bg-primary/10 text-primary"
@@ -191,14 +256,14 @@ export default function Navbar({ State, title }: NavbarProps) {
                   `}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <item.icon className="w-5 h-5" />
+                  <item.icon className="w-4 h-4 md:w-5 md:h-5" />
                   <span>{item.label}</span>
                 </Link>
               );
             })}
 
             {/* Mobile Logout */}
-            <div className="mt-auto pt-6 border-t border-border">
+            <div className="mt-auto pt-4 md:pt-6 border-t border-border">
               <button
                 onClick={() => {
                   handleLogout();
@@ -206,9 +271,13 @@ export default function Navbar({ State, title }: NavbarProps) {
                 }}
                 disabled={isLoggingOut}
                 className={`
-                  w-full flex items-center justify-center gap-3 
-                  px-5 py-4 text-base font-medium rounded-lg
-                  ${isLoggingOut ? "opacity-50 cursor-not-allowed" : "text-destructive hover:bg-destructive/10"}
+                  w-full flex items-center justify-center gap-2 md:gap-3 
+                  px-4 md:px-5 py-3 md:py-4 text-sm md:text-base font-medium rounded-lg bg-destructive/10
+                  ${
+                    isLoggingOut
+                      ? "opacity-50 cursor-not-allowed"
+                      : "text-destructive"
+                  }
                 `}
               >
                 <Logout className="w-5 h-5" />
