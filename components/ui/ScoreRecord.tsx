@@ -33,7 +33,7 @@ const ScoreRecord = ({
           border border-border/40
         "
       >
-        <div className="p-5 pb-4 flex items-start gap-5 flex-wrap sm:flex-nowrap">
+        <div className="p-5 flex items-start gap-5 flex-wrap sm:flex-nowrap">
           {/* Circular score badge */}
           <div
             className="
