@@ -6,9 +6,9 @@ import { ButtonProps } from "@/lib/types";
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
-      textColor = "",
+      textColor = "text-foreground",
       backgroundColor = "",
-      borderColor = "",
+      borderColor = "border-border",
       leftIcon,
       rightIcon,
       text,

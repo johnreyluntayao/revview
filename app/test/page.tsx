@@ -1,10 +1,11 @@
 import ManageQuestion from '@/components/ManageQuestion'
+import DeletePopup from '@/components/ui/DeletePopup'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-        <ManageQuestion/>
+        <DeletePopup/>
     </div>
   )
 }
