@@ -41,6 +41,7 @@ export { default as CountDownTimer } from "@/components/atoms/CountDownTimer";
 export { default as Progress } from "@/components/atoms/Progress";
 export { default as RadioButton } from "@/components/atoms/RadioButton";
 export { default as List } from "@/components/atoms/List";
+export { default as InsertImage } from "@/components/atoms/InsertImage";
 
 //Auth
 export { AuthProvider, useAuth } from "@/components/auth/AuthProvider";
