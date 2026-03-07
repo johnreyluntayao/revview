@@ -164,7 +164,7 @@ export interface ChipProps {
 }
 
 export interface CardProps {
-    variant?: "stat" | "highlight" | "overview" | "compact" | "data";
+    variant?: "stat" | "highlight" | "overview" | "compact" | "data" | "report";
     title?: string;                
     value: string | number;        
     subValue?: string;             
