@@ -20,7 +20,7 @@ const ScoreRecord = ({
   date,
 }: ScoreRecordProps) => {
 
-    const calculatedPercent = items > 0 ? Math.round((score / items) * 100) : 0;
+  const calculatedPercent = items > 0 ? Math.round((score / items) * 100) : 0;
   return (
     <div className="w-full p-4">
       <div
@@ -31,24 +31,27 @@ const ScoreRecord = ({
           bg-white
           shadow-sm
           border border-border/40
+          self-center
         "
       >
-        <div className="p-5 flex items-start gap-5 flex-wrap sm:flex-nowrap">
-          {/* Circular score badge */}
+        <div className="p-5 flex items-start gap-4 md:gap-5 lg:gap-6 flex-wrap">
+
           <div
             className="
               relative 
-              w-20 h-20 sm:w-24 sm:h-24 
+              w-18 h-18 md:w-20 md:h-20 lg:w-24 lg:h-24 
               shrink-0
               rounded-full 
               bg-success/30
-              flex items-center justify-center
               shadow-inner
+              self-center
             "
           >
-            <div className="text-center leading-tight">
-              <div className="text-lg sm:text-xl md:text-2xl font-bold text-success text-nowrap">
-                {Math.round(calculatedPercent)}<span>%</span>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center leading-tight">
+                <div className="text-lg sm:text-xl md:text-2xl font-bold text-success text-nowrap">
+                  {Math.round(calculatedPercent)}<span>%</span>
+                </div>
               </div>
             </div>
           </div>
@@ -59,7 +62,7 @@ const ScoreRecord = ({
               {title}
             </h3>
 
-            <div className="flex flex-wrap gap-x-10 gap-y-1 md:gap-x-16 lg:gap-x-24 text-sm md:text-base lg:text-lg font-medium text-foreground/80">
+            <div className="flex flex-wrap flex-col md:flex-row md:gap-x-12 lg:gap-x-18 text-sm md:text-base lg:text-lg font-medium text-foreground/80">
               <div>
                 <span className="text-foreground/60">Difficulty:</span> {difficulty}
               </div>
@@ -78,13 +81,14 @@ const ScoreRecord = ({
           </div>
 
           {/* Right arrow / detail button */}
-          <div className="self-center ml-auto hidden sm:flex items-center">
+          <div className="self-center ml-auto items-center">
             <Button
               leftIcon={<ViewDetailedResults />}
               borderColor="border-none"
               isRounded={true}
               backgroundColor="hover:bg-primary"
               textColor="hover:text-white"
+              className='h-12 w-12'
             />
           </div>
         </div>
