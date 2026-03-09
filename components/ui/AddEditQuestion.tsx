@@ -3,15 +3,20 @@
 
 import { InputField, Button, ComboBox, InsertImage } from "@/lib/client-imports";
 import React, { useState } from "react";
+
 interface QuestionData {
-  mode?: "Text" | "Image";
   questionText?: string;
   questionImage?: string;
-  optionA?: string; 
+  optionA?: string;
   optionB?: string;
   optionC?: string;
   optionD?: string;
   optionE?: string;
+  optionAImage?: string;
+  optionBImage?: string;
+  optionCImage?: string;
+  optionDImage?: string;
+  optionEImage?: string;
   correctAnswer?: string;
   category?: string;
   explanationText?: string;
@@ -31,18 +36,23 @@ const AddEditQuestion: React.FC<AddEditQuestionProps> = ({
   onSave,
   onCancel,
 }) => {
-  const [mode, setMode] = useState<"Text" | "Image">(
-    initialData.mode || "Text"
-  );
-
   const [questionText, setQuestionText] = useState(initialData.questionText || "");
   const [questionImage, setQuestionImage] = useState(initialData.questionImage || "");
 
   const [optionA, setOptionA] = useState(initialData.optionA || "");
+  const [optionAImage, setOptionAImage] = useState(initialData.optionAImage || "");
+
   const [optionB, setOptionB] = useState(initialData.optionB || "");
+  const [optionBImage, setOptionBImage] = useState(initialData.optionBImage || "");
+
   const [optionC, setOptionC] = useState(initialData.optionC || "");
+  const [optionCImage, setOptionCImage] = useState(initialData.optionCImage || "");
+
   const [optionD, setOptionD] = useState(initialData.optionD || "");
+  const [optionDImage, setOptionDImage] = useState(initialData.optionDImage || "");
+
   const [optionE, setOptionE] = useState(initialData.optionE || "");
+  const [optionEImage, setOptionEImage] = useState(initialData.optionEImage || "");
 
   const [correctAnswer, setCorrectAnswer] = useState(initialData.correctAnswer || "");
   const [category, setCategory] = useState(initialData.category || "");
@@ -52,125 +62,152 @@ const AddEditQuestion: React.FC<AddEditQuestionProps> = ({
 
   const handleSave = () => {
     const data: QuestionData = {
-      mode,
-      questionText: mode === "Text" ? questionText : undefined,
-      questionImage: mode === "Image" ? questionImage : undefined,
+      questionText: questionText.trim() || undefined,
+      questionImage: questionImage.trim() || undefined,
       optionA: optionA.trim() || undefined,
       optionB: optionB.trim() || undefined,
       optionC: optionC.trim() || undefined,
       optionD: optionD.trim() || undefined,
       optionE: optionE.trim() || undefined,
+      optionAImage: optionAImage.trim() || undefined,
+      optionBImage: optionBImage.trim() || undefined,
+      optionCImage: optionCImage.trim() || undefined,
+      optionDImage: optionDImage.trim() || undefined,
+      optionEImage: optionEImage.trim() || undefined,
       correctAnswer,
       category,
-      explanationText: mode === "Text" ? explanationText : undefined,
-      explanationImage: mode === "Image" ? explanationImage : undefined,
+      explanationText: explanationText.trim() || undefined,
+      explanationImage: explanationImage.trim() || undefined,
     };
 
-    // Basic validation
-    const requiredFields = [optionA, optionB, optionC, optionD, correctAnswer, category];
+    const required = [questionText, correctAnswer, category];
+    const requiredOptions = [optionA, optionB, optionC, optionD];
 
-    if (requiredFields.some((v) => !v?.trim())) {
+    if (required.some(v => !v?.trim())) {
       alert("Please fill in all required fields (*)");
       return;
     }
 
-    if (mode === "Text") {
-      if (!questionText.trim() || !explanationText.trim()) {
-        alert("Question and explanation text are required in Text mode");
-        return;
-      }
-    } else {
-      if (!questionImage.trim() || !explanationImage.trim()) {
-        alert("Question and explanation images are required in Image mode");
-        return;
-      }
-      // Optional: also require image for A,B,C,D (or make them optional)
+    if (requiredOptions.some(v => !v?.trim())) {
+      alert("Options A–D are required");
+      return;
     }
 
     onSave?.(data);
   };
 
-  // Reusable Option renderer that switches based on global mode
-  const OptionInput = ({
-    label,
-    value,
-    onChange,
-  }: {
-    label: string;
-    value: string;
-    onChange: (v: string) => void;
-  }) => {
-    const isRequired = !label.includes("E");
-
-    if (mode === "Text") {
-      return (
-        <InputField
-          label={`${label} ${isRequired ? "*" : "(optional)"}`}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={`Enter ${label.toLowerCase()}...`}
-        />
-      );
-    }
-
-    return (
-      <InsertImage
-        label={`${label} Image ${isRequired ? "*" : "(optional)"}`}
-        value={value}
-        onChange={onChange}
-        placeholder="Drag & drop, upload or paste image URL..."
-      />
-    );
-  };
-
   return (
-    <div className="w-full max-w-3xl mx-auto p-6 bg-background rounded-xl border border-border shadow-sm space-y-7">
-      <h2 className="text-2xl font-bold text-foreground">
-        {isEdit ? "Edit Question" : "Add New Question"}
-      </h2>
-
-      {/* Single global mode toggle */}
-      <ComboBox
-        label="Content Mode (Question, Options & Explanation)"
-        options={["Text", "Image"]}
-        value={mode}
-        onChange={(val) => setMode(val as "Text" | "Image")}
-        size="md"
-      />
+    <div className="w-full max-w-5xl mx-auto p-6 bg-background rounded-xl border border-border shadow-sm space-y-8">
+      <h2 className="text-2xl font-bold">{isEdit ? "Edit Question" : "Add New Question"}</h2>
 
       {/* Question */}
-      {mode === "Text" ? (
+      <div className="space-y-5">
         <InputField
           label="Question Text *"
           value={questionText}
-          onChange={(e) => setQuestionText(e.target.value)}
+          onChange={e => setQuestionText(e.target.value)}
           placeholder="Enter the full question here..."
         />
-      ) : (
         <InsertImage
-          label="Question Image *"
+          label="Question Image (optional)"
           value={questionImage}
           onChange={setQuestionImage}
         />
-      )}
-
-      {/* Options – now follow the same mode */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <OptionInput label="Option A" value={optionA} onChange={setOptionA} />
-        <OptionInput label="Option B" value={optionB} onChange={setOptionB} />
-        <OptionInput label="Option C" value={optionC} onChange={setOptionC} />
-        <OptionInput label="Option D" value={optionD} onChange={setOptionD} />
-        <OptionInput label="Option E" value={optionE} onChange={setOptionE} />
       </div>
 
-      {/* Correct Answer + Category (always text) */}
+      {/* Options – 3-column grid */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Options</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {/* A */}
+          <div className="md:col-span-2">
+            <InputField
+              label="Option A *"
+              value={optionA}
+              onChange={e => setOptionA(e.target.value)}
+              placeholder="Enter option A..."
+            />
+          </div>
+          <InsertImage
+            label="Option A Image"
+            value={optionAImage}
+            onChange={setOptionAImage}
+            variant="compact"
+          />
+
+          {/* B */}
+          <div className="md:col-span-2">
+            <InputField
+              label="Option B *"
+              value={optionB}
+              onChange={e => setOptionB(e.target.value)}
+              placeholder="Enter option B..."
+            />
+          </div>
+          <InsertImage
+            label="Option B Image"
+            value={optionBImage}
+            onChange={setOptionBImage}
+            variant="compact"
+          />
+
+          {/* C */}
+          <div className="md:col-span-2">
+            <InputField
+              label="Option C *"
+              value={optionC}
+              onChange={e => setOptionC(e.target.value)}
+              placeholder="Enter option C..."
+            />
+          </div>
+          <InsertImage
+            label="Option C Image"
+            value={optionCImage}
+            onChange={setOptionCImage}
+            variant="compact"
+          />
+
+          {/* D */}
+          <div className="md:col-span-2">
+            <InputField
+              label="Option D *"
+              value={optionD}
+              onChange={e => setOptionD(e.target.value)}
+              placeholder="Enter option D..."
+            />
+          </div>
+          <InsertImage
+            label="Option D Image"
+            value={optionDImage}
+            onChange={setOptionDImage}
+            variant="compact"
+          />
+
+          {/* E – optional */}
+          <div className="md:col-span-2">
+            <InputField
+              label="Option E (optional)"
+              value={optionE}
+              onChange={e => setOptionE(e.target.value)}
+              placeholder="Enter option E (optional)..."
+            />
+          </div>
+          <InsertImage
+            label="Option E Image (optional)"
+            value={optionEImage}
+            onChange={setOptionEImage}
+            variant="compact"
+          />
+        </div>
+      </div>
+
+      {/* Correct Answer + Category */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <ComboBox
           label="Correct Answer *"
           options={["A", "B", "C", "D", "E"]}
           value={correctAnswer}
           onChange={setCorrectAnswer}
-          placeholder="Select correct option..."
         />
         <ComboBox
           label="Category *"
@@ -180,29 +217,23 @@ const AddEditQuestion: React.FC<AddEditQuestionProps> = ({
         />
       </div>
 
-      {/* Explanation – follows same mode */}
-      {mode === "Text" ? (
+      {/* Explanation */}
+      <div className="space-y-5">
         <InputField
-          label="Explanation *"
+          label="Explanation Text *"
           value={explanationText}
-          onChange={(e) => setExplanationText(e.target.value)}
+          onChange={e => setExplanationText(e.target.value)}
           placeholder="Explain why this is the correct answer..."
         />
-      ) : (
         <InsertImage
-          label="Explanation Image *"
+          label="Explanation Image (optional)"
           value={explanationImage}
           onChange={setExplanationImage}
         />
-      )}
+      </div>
 
       <div className="flex justify-end gap-4 pt-6">
-        <Button
-          text="Cancel"
-          textColor="text-foreground"
-          onClick={onCancel}
-          size="md"
-        />
+        <Button text="Cancel" textColor="text-foreground" onClick={onCancel} size="md" />
         <Button
           text={isEdit ? "Update Question" : "Save Question"}
           backgroundColor="bg-primary"

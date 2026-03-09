@@ -2,179 +2,109 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Upload, Link as LinkIcon, X } from "lucide-react"; // assuming you have lucide-react
+import { Button } from "@/lib/client-imports";
+import { Upload } from "@/lib/icons";
 
 interface InsertImageProps {
-  label: string;
-  value: string;                    // this will be the final image URL (remote or blob)
-  onChange: (url: string) => void;  // called with final usable URL
+  label?: string;
+  value: string;
+  onChange: (url: string) => void;
   placeholder?: string;
   error?: string;
   required?: boolean;
   className?: string;
-  maxSizeMB?: number;               // default 5MB
+  maxSizeMB?: number;
+  variant?: "default" | "compact";   // ← new: compact = input-field-like height
 }
 
 const InsertImage: React.FC<InsertImageProps> = ({
   label,
   value,
   onChange,
-  placeholder = "Paste image URL or drag & drop here...",
+  placeholder = "Drag/drop or click to add image...",
   error,
   required = false,
   className = "",
   maxSizeMB = 5,
+  variant = "default",
 }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState<string | null>(value || null);
-  const [inputMode, setInputMode] = useState<"url" | "file">("url"); // default to URL input
   const [localError, setLocalError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const dropZoneRef = useRef<HTMLDivElement>(null);
 
   const hasError = !!error || !!localError;
 
-  // Sync external value → preview
-  useEffect(() => {
-    if (value) {
-      setPreview(value);
-    } else {
-      setPreview(null);
-    }
-  }, [value]);
+  useEffect(() => setPreview(value || null), [value]);
 
-  // Cleanup blob URLs when component unmounts or value changes
   useEffect(() => {
     return () => {
-      if (preview && preview.startsWith("blob:")) {
-        URL.revokeObjectURL(preview);
-      }
+      if (preview?.startsWith("blob:")) URL.revokeObjectURL(preview);
     };
   }, [preview]);
 
   const handleFiles = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-
+    if (!files?.length) return;
     const file = files[0];
     setLocalError(null);
 
-    // Validate file type & size
     if (!file.type.startsWith("image/")) {
-      setLocalError("Only image files are allowed (jpg, png, gif, etc.)");
+      setLocalError("Only images allowed");
       return;
     }
-
     if (file.size > maxSizeMB * 1024 * 1024) {
-      setLocalError(`File too large. Max ${maxSizeMB}MB allowed.`);
+      setLocalError(`Max ${maxSizeMB}MB`);
       return;
     }
 
-    const blobUrl = URL.createObjectURL(file);
-    setPreview(blobUrl);
-    onChange(blobUrl); // Pass blob URL to parent — you can upload it later
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-    handleFiles(e.dataTransfer.files);
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
-
-  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const url = e.target.value.trim();
-    setPreview(url || null);
+    const url = URL.createObjectURL(file);
+    setPreview(url);
     onChange(url);
-    setLocalError(null);
   };
 
-  const clearImage = () => {
-    if (preview && preview.startsWith("blob:")) {
-      URL.revokeObjectURL(preview);
-    }
+  const clearImage = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (preview?.startsWith("blob:")) URL.revokeObjectURL(preview);
     setPreview(null);
     onChange("");
     setLocalError(null);
   };
 
-  return (
-    <div className={`space-y-2 ${className}`}>
-      <div className="flex items-center justify-between">
-        <label className="block text-sm font-medium text-gray-700">
-          {label}
-          {required && <span className="text-destructive/50 ml-1">*</span>}
-        </label>
+  // ────────────────────────────────────────────────
+  // COMPACT variant – looks similar to InputField
+  // ────────────────────────────────────────────────
+  if (variant === "compact") {
+    return (
+      <div className={`space-y-1.5 ${className}`}>
+        {label && (
+          <label className="block text-xs md:text-sm lg:text-base font-medium text-gray-700">
+            {label}
+            {required && <span className="text-destructive/50 ml-1">*</span>}
+          </label>
+        )}
 
-        {/* Toggle between URL and Upload mode */}
-        <div className="flex space-x-2 text-xs">
-          <button
-            type="button"
-            onClick={() => setInputMode("url")}
-            className={`px-2.5 py-1 rounded-md ${
-              inputMode === "url"
-                ? "bg-primary/10 text-primary font-medium"
-                : "text-border/60 hover:bg-border/10"
-            }`}
-          >
-            <LinkIcon className="inline w-3.5 h-3.5 mr-1" />
-            Link
-          </button>
-          <button
-            type="button"
-            onClick={() => setInputMode("file")}
-            className={`px-2.5 py-1 rounded-md ${
-              inputMode === "file"
-                ? "bg-primary/10 text-primary font-medium"
-                : "text-border/60 hover:bg-border/10"
-            }`}
-          >
-            <Upload className="inline w-3.5 h-3.5 mr-1" />
-            Upload
-          </button>
-        </div>
-      </div>
-
-      {inputMode === "url" ? (
-        <input
-          type="url"
-          value={value}
-          onChange={handleUrlChange}
-          placeholder={placeholder}
-          className={`
-            w-full px-4 py-3 rounded-xl border transition-all duration-200
-            text-base focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50
-            ${hasError
-              ? "border-destructive/50 ring-2 ring-destructive/20"
-              : "border-border/30 hover:border-border/40"}
-            bg-white
-          `}
-        />
-      ) : (
         <div
-          ref={dropZoneRef}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
           onClick={() => fileInputRef.current?.click()}
+          onDrop={(e) => {
+            e.preventDefault();
+            setIsDragging(false);
+            handleFiles(e.dataTransfer.files);
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragLeave={() => setIsDragging(false)}
           className={`
-            relative border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all
+            relative flex items-center px-4 py-4 rounded-xl border transition-all
+            cursor-pointer text-sm
             ${isDragging
-              ? "border-primary/50 bg-primary/5"
-              : hasError
-              ? "border-destructive/50 bg-destructive/5"
-              : "border-border/5 hover:border-primary/40 hover:bg-background/5"}
+              ? "border-blue-500 bg-blue-50"
+              : preview
+                ? "border-green-500/60 bg-green-50/40"
+                : hasError
+                  ? "border-destructive/50 bg-destructive/20"
+                  : "border-gray-300 hover:border-foreground/40 bg-white"}
           `}
         >
           <input
@@ -185,56 +115,145 @@ const InsertImage: React.FC<InsertImageProps> = ({
             className="hidden"
           />
 
-          {!preview ? (
-            <>
-              <Upload className="mx-auto h-10 w-10 text-foreground/60" />
-              <p className="mt-2 text-sm font-medium text-foreground/60">
-                Drag & drop image here or click to browse
-              </p>
-              <p className="mt-1 text-xs text-foreground/50">
-                PNG, JPG, GIF up to {maxSizeMB}MB
-              </p>
-            </>
-          ) : (
-            <div className="space-y-2">
-              <img
-                src={preview}
-                alt="Preview"
-                className="max-h-48 mx-auto object-contain rounded shadow-sm"
-                onError={() => setLocalError("Invalid image URL")}
+          {preview ? (
+            <div className="flex items-center gap-3 w-full">
+              <div className="shrink-0 w-10 h-10 rounded overflow-hidden border bg-gray-50">
+                <img src={preview} alt="preview" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">Image selected</p>
+                <p className="text-xs text-foreground/50">Click to change • drag to replace</p>
+              </div>
+              <Button
+                text="Remove"
+                backgroundColor="hover:bg-destructive"
+                textColor="text-destructive hover:text-destructive-foreground"
+                className="shrink-0"
+                onClick={clearImage}
               />
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  clearImage();
-                }}
-                className="text-sm text-destructive/60 hover:text-destructive/80"
-              >
-                <X className="inline w-4 h-4 mr-1" />
-                Remove
-              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3 text-foreground">
+              <Upload className="h-5 w-5" />
+              <span>{placeholder}</span>
             </div>
           )}
         </div>
+
+        {(error || localError) && (
+          <p className="text-destructive/50 text-xs mt-1">{error || localError}</p>
+        )}
+      </div>
+    );
+  }
+
+  // ────────────────────────────────────────────────
+  // DEFAULT (larger drag-drop area)
+  // ────────────────────────────────────────────────
+  return (
+    <div className={`space-y-2 ${className}`}>
+      {(label || required) && (
+        <label className="block text-sm font-medium text-gray-700">
+          {label}
+          {required && <span className="text-destructive/50 ml-1">*</span>}
+        </label>
       )}
+
+      <div
+        onDrop={(e) => {
+          e.preventDefault();
+          setIsDragging(false);
+          handleFiles(e.dataTransfer.files);
+        }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDragging(true);
+        }}
+        onDragLeave={() => setIsDragging(false)}
+        onClick={() => !preview && fileInputRef.current?.click()}
+        className={`
+          border-2 border-dashed rounded-xl p-6 cursor-pointer transition-all
+          min-h-35 flex flex-col justify-center
+          ${isDragging ? "border-primary/50 bg-blue-primary/20" :
+            preview ? "border-success/50 bg-success/20" :
+              hasError ? "border-destructive/50 bg-destructive/20" :
+                "border-border hover:border-foreground/40 hover:bg-foreground/5"}
+        `}
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={(e) => handleFiles(e.target.files)}
+          className="hidden"
+        />
+
+        <div className="flex items-center justify-between gap-4 w-full">
+          {/* Left / Center content */}
+          <div className="flex-1 flex items-center gap-4">
+            {!preview ? (
+              <>
+                <Upload className="h-9 w-9 text-foreground shrink-0" />
+                <div>
+                  <p className="text-base font-medium text-foreground/70">
+                    {placeholder}
+                  </p>
+                  <p className="text-sm text-foreground/50 mt-0.5">
+                    PNG, JPG, GIF • max {maxSizeMB}MB
+                  </p>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-center gap-4 flex-1 min-w-0">
+                <div className="shrink-0 w-20 h-20 rounded-md overflow-hidden border bg-white shadow-sm">
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground/80 truncate">
+                    Image uploaded
+                  </p>
+                  <p className="text-xs text-foreground/50">
+                    Click area to replace • drag new image
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right-side button */}
+          {preview ? (
+            <Button
+              text="Remove"
+              backgroundColor="hover:bg-destructive"
+              textColor="text-destructive hover:text-destructive-foreground"
+              className="shrink-0"
+              onClick={(e) => {
+                e.stopPropagation();
+                clearImage();
+              }}
+            />
+          ) : (
+            <Button
+              text="Browse files"
+              size="sm"
+              backgroundColor="bg-primary"
+              textColor="text-white"
+              className="shrink-0 hover:bg-primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                fileInputRef.current?.click();
+              }}
+            />
+          )}
+        </div>
+      </div>
 
       {(error || localError) && (
-        <p className="text-destructive/50 text-xs mt-1">{error || localError}</p>
-      )}
-
-      {preview && inputMode === "url" && (
-        <div className="mt-3 border border-border/20 rounded-lg overflow-hidden bg-border/20">
-          <div className="aspect-video bg-border/20 flex items-center justify-center">
-            <img
-              src={preview}
-              alt="Preview"
-              className="max-h-full max-w-full object-contain"
-              onError={() => setLocalError("Failed to load image from URL")}
-            />
-          </div>
-          <p className="text-xs text-foreground/60 p-2 truncate">{preview}</p>
-        </div>
+        <p className="text-destructive/50 text-xs mt-1.5">{error || localError}</p>
       )}
     </div>
   );
