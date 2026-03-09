@@ -42,7 +42,6 @@ const ScoreRecord = ({
               shrink-0
               rounded-full 
               bg-success/30
-              border-4 border-success
               flex items-center justify-center
               shadow-inner
             "
