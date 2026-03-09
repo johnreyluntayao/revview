@@ -45,6 +45,7 @@ export {
     MessageCircle as FeedbackIcon,
     CheckIcon as Resolve,
     ChevronDown as Dropdown,
-    Check
+    Check,
+    Upload as Upload
 
 } from 'lucide-react';

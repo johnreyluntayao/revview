@@ -7,6 +7,7 @@ import AddEditQuestion from '@/components/ui/AddEditQuestion'
 import DeletePopup from '@/components/ui/DeletePopup'
 import ResultsHistory from '@/components/ui/ResultsHistory'
 import ScoreRecord from '@/components/ui/ScoreRecord'
+import { Icon } from 'lucide-react'
 import React from 'react'
 
 const page = () => {
@@ -23,7 +24,8 @@ const accountDetails = {
 };
   return (
     <div>
-      <ResultsHistory/>
+      <AddEditQuestion/>
+      <IconGallery/>
     </div>
   )
 }
