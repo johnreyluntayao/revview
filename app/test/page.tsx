@@ -1,4 +1,5 @@
 import ManageQuestion from '@/components/ManageQuestion'
+import Quiz from '@/components/Quiz'
 import Colors from '@/components/samples/Colors'
 import { IconGallery } from '@/components/samples/Icons'
 import AddEditQuestion from '@/components/ui/AddEditQuestion'
@@ -10,7 +11,7 @@ import React from 'react'
 const page = () => {
   return (
     <div>
-      <ResultsHistory/>
+      <Quiz/>
     </div>
   )
 }
