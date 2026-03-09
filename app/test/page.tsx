@@ -1,3 +1,4 @@
+import AccountSettings from '@/components/AccountSettings'
 import ManageQuestion from '@/components/ManageQuestion'
 import Quiz from '@/components/Quiz'
 import Colors from '@/components/samples/Colors'
@@ -9,9 +10,20 @@ import ScoreRecord from '@/components/ui/ScoreRecord'
 import React from 'react'
 
 const page = () => {
+  const user = {
+    fullName: "Alice Wonderland",
+    username: "alice_in_chains",
+    email: "alice@example.com",
+  };
+
+const accountDetails = {
+  createdAt: "March 12, 2025",
+  lastLogin: "Today at 9:45 AM",
+  status: "Active",           // ← or "Inactive", "Suspended", etc.
+};
   return (
     <div>
-      <Quiz/>
+      <AccountSettings initialData={user} accountInfo={accountDetails} />
     </div>
   )
 }
