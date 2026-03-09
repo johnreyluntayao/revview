@@ -23,7 +23,7 @@ const accountDetails = {
 };
   return (
     <div>
-      <AccountSettings initialData={user} accountInfo={accountDetails} />
+      <ResultsHistory/>
     </div>
   )
 }
