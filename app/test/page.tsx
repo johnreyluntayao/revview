@@ -25,7 +25,6 @@ const accountDetails = {
   return (
     <div>
       <AddEditQuestion/>
-      <IconGallery/>
     </div>
   )
 }
