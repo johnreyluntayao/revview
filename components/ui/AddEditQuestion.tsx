@@ -1,8 +1,7 @@
-// components/AddEditQuestion.tsx
 "use client";
 
 import { InputField, Button, ComboBox, InsertImage } from "@/lib/client-imports";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 interface QuestionData {
   questionText?: string;
@@ -24,41 +23,71 @@ interface QuestionData {
 }
 
 interface AddEditQuestionProps {
+  isOpen: boolean;
   isEdit?: boolean;
   initialData?: QuestionData;
   onSave?: (data: QuestionData) => void;
-  onCancel?: () => void;
+  onClose: () => void;
 }
 
 const AddEditQuestion: React.FC<AddEditQuestionProps> = ({
+  isOpen,
   isEdit = false,
   initialData = {},
   onSave,
-  onCancel,
+  onClose,
 }) => {
   const [questionText, setQuestionText] = useState(initialData.questionText || "");
   const [questionImage, setQuestionImage] = useState(initialData.questionImage || "");
-
   const [optionA, setOptionA] = useState(initialData.optionA || "");
   const [optionAImage, setOptionAImage] = useState(initialData.optionAImage || "");
-
   const [optionB, setOptionB] = useState(initialData.optionB || "");
   const [optionBImage, setOptionBImage] = useState(initialData.optionBImage || "");
-
   const [optionC, setOptionC] = useState(initialData.optionC || "");
   const [optionCImage, setOptionCImage] = useState(initialData.optionCImage || "");
-
   const [optionD, setOptionD] = useState(initialData.optionD || "");
   const [optionDImage, setOptionDImage] = useState(initialData.optionDImage || "");
-
   const [optionE, setOptionE] = useState(initialData.optionE || "");
   const [optionEImage, setOptionEImage] = useState(initialData.optionEImage || "");
-
   const [correctAnswer, setCorrectAnswer] = useState(initialData.correctAnswer || "");
   const [category, setCategory] = useState(initialData.category || "");
-
   const [explanationText, setExplanationText] = useState(initialData.explanationText || "");
   const [explanationImage, setExplanationImage] = useState(initialData.explanationImage || "");
+
+  useEffect(() => {
+    if (isOpen) {
+      setQuestionText(initialData.questionText || "");
+      setQuestionImage(initialData.questionImage || "");
+      setOptionA(initialData.optionA || "");
+      setOptionB(initialData.optionB || "");
+      setOptionC(initialData.optionC || "");
+      setOptionD(initialData.optionD || "");
+      setOptionE(initialData.optionE || "");
+      setOptionAImage(initialData.optionAImage || "");
+      setOptionBImage(initialData.optionBImage || "");
+      setOptionCImage(initialData.optionCImage || "");
+      setOptionDImage(initialData.optionDImage || "");
+      setOptionEImage(initialData.optionEImage || "");
+      setCorrectAnswer(initialData.correctAnswer || "");
+      setCategory(initialData.category || "");
+      setExplanationText(initialData.explanationText || "");
+      setExplanationImage(initialData.explanationImage || "");
+    }
+  }, [isOpen, initialData]);
+
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    if (isOpen) window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [isOpen, onClose]);
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === modalRef.current) onClose();
+  };
 
   const handleSave = () => {
     const data: QuestionData = {
@@ -96,9 +125,23 @@ const AddEditQuestion: React.FC<AddEditQuestionProps> = ({
     onSave?.(data);
   };
 
+  if (!isOpen) return null;
+
   return (
-      <div className="flex flex-col h-[95vh] w-full max-w-5xl mx-auto bg-background rounded-xl border border-border overflow-hidden">
-        {/* Fixed Header */}
+    <div
+      ref={modalRef}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      onClick={handleBackdropClick}
+    >
+      <div
+        className={`
+          flex flex-col w-full max-w-5xl max-h-[95vh] mx-4 md:mx-8 
+          bg-background rounded-xl border border-border 
+          shadow-2xl overflow-hidden
+          scale-100 animate-in fade-in-60 zoom-in-95 duration-200
+        `}
+      >
+        {/* Header */}
         <div className="px-6 pt-6 pb-4 border-b border-border bg-background/80">
           <h2 className="text-2xl font-bold">
             {isEdit ? "Edit Question" : "Add New Question"}
@@ -126,85 +169,34 @@ const AddEditQuestion: React.FC<AddEditQuestionProps> = ({
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Options</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {/* A */}
-              <div className="md:col-span-2">
-                <InputField
-                  label="Option A *"
-                  value={optionA}
-                  onChange={(e) => setOptionA(e.target.value)}
-                  placeholder="Enter option A..."
-                />
-              </div>
-              <InsertImage
-                label="Option A Image"
-                value={optionAImage}
-                onChange={setOptionAImage}
-                variant="compact"
-              />
+              {(["A", "B", "C", "D", "E"] as const).map((letter) => {
+                const optKey = `option${letter}` as keyof typeof initialData;
+                const imgKey = `option${letter}Image` as keyof typeof initialData;
 
-              {/* B */}
-              <div className="md:col-span-2">
-                <InputField
-                  label="Option B *"
-                  value={optionB}
-                  onChange={(e) => setOptionB(e.target.value)}
-                  placeholder="Enter option B..."
-                />
-              </div>
-              <InsertImage
-                label="Option B Image"
-                value={optionBImage}
-                onChange={setOptionBImage}
-                variant="compact"
-              />
+                const textState = eval(`option${letter}`) as string;
+                const setText = eval(`setOption${letter}`) as React.Dispatch<React.SetStateAction<string>>;
+                const imgState = eval(`option${letter}Image`) as string;
+                const setImg = eval(`setOption${letter}Image`) as React.Dispatch<React.SetStateAction<string>>;
 
-              {/* C */}
-              <div className="md:col-span-2">
-                <InputField
-                  label="Option C *"
-                  value={optionC}
-                  onChange={(e) => setOptionC(e.target.value)}
-                  placeholder="Enter option C..."
-                />
-              </div>
-              <InsertImage
-                label="Option C Image"
-                value={optionCImage}
-                onChange={setOptionCImage}
-                variant="compact"
-              />
-
-              {/* D */}
-              <div className="md:col-span-2">
-                <InputField
-                  label="Option D *"
-                  value={optionD}
-                  onChange={(e) => setOptionD(e.target.value)}
-                  placeholder="Enter option D..."
-                />
-              </div>
-              <InsertImage
-                label="Option D Image"
-                value={optionDImage}
-                onChange={setOptionDImage}
-                variant="compact"
-              />
-
-              {/* E */}
-              <div className="md:col-span-2">
-                <InputField
-                  label="Option E (optional)"
-                  value={optionE}
-                  onChange={(e) => setOptionE(e.target.value)}
-                  placeholder="Enter option E (optional)..."
-                />
-              </div>
-              <InsertImage
-                label="Option E Image (optional)"
-                value={optionEImage}
-                onChange={setOptionEImage}
-                variant="compact"
-              />
+                return (
+                  <React.Fragment key={letter}>
+                    <div className="md:col-span-2">
+                      <InputField
+                        label={`Option ${letter}${letter !== "E" ? " *" : ""}`}
+                        value={textState}
+                        onChange={(e) => setText(e.target.value)}
+                        placeholder={`Enter option ${letter}${letter !== "E" ? "" : " (optional)"}...`}
+                      />
+                    </div>
+                    <InsertImage
+                      label={`Option ${letter} Image${letter !== "E" ? "" : " (optional)"}`}
+                      value={imgState}
+                      onChange={setImg}
+                      variant="compact"
+                    />
+                  </React.Fragment>
+                );
+              })}
             </div>
           </div>
 
@@ -240,12 +232,12 @@ const AddEditQuestion: React.FC<AddEditQuestionProps> = ({
           </div>
         </div>
 
-        {/* Fixed Bottom Bar */}
+        {/* Footer */}
         <div className="px-6 py-5 border-t border-border bg-background/95 backdrop-blur-sm flex justify-end gap-4">
           <Button
             text="Cancel"
             textColor="text-foreground"
-            onClick={onCancel}
+            onClick={onClose}
             size="md"
           />
           <Button
@@ -257,6 +249,7 @@ const AddEditQuestion: React.FC<AddEditQuestionProps> = ({
           />
         </div>
       </div>
+    </div>
   );
 };
 
