@@ -5,8 +5,15 @@ import { ChevronDown, Check } from "lucide-react";
 
 type Size = "sm" | "md" | "lg" | undefined;
 
+interface Option {
+  value: string;
+  label: string;
+}
+
+type ComboBoxOption = string | Option;
+
 interface ComboBoxProps {
-  options: string[];
+  options: ComboBoxOption[];
   value?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
@@ -15,7 +22,7 @@ interface ComboBoxProps {
   className?: string;
   required?: boolean;
   isSearchable?: boolean;
-  size?: Size;                    // ← NEW: "sm" | "md" | "lg"
+  size?: Size;
 }
 
 export default function ComboBox({
@@ -49,12 +56,28 @@ export default function ComboBox({
     if (!isOpen) setSearch("");
   }, [isOpen]);
 
-  const displayText = isOpen && isSearchable ? search : value;
+  // Helper: get display label for current value
+  const getDisplayLabel = () => {
+    const selectedOption = options.find((opt) => {
+      if (typeof opt === "string") return opt === value;
+      return opt.value === value;
+    });
+
+    if (!selectedOption) return "";
+    return typeof selectedOption === "string" ? selectedOption : selectedOption.label;
+  };
+
+  const displayText = isOpen && isSearchable ? search : getDisplayLabel();
+
+  // Filter logic
   const filteredOptions = isSearchable
-    ? options.filter((opt) => opt.toLowerCase().includes(search.toLowerCase()))
+    ? options.filter((opt) => {
+        const label = typeof opt === "string" ? opt : opt.label;
+        return label.toLowerCase().includes(search.toLowerCase());
+      })
     : options;
 
-  // Size logic exactly as you provided
+  // Size classes (unchanged)
   const sizeClasses = size
     ? {
         lg: "text-[16px] gap-2 py-3 px-6",
@@ -79,6 +102,13 @@ export default function ComboBox({
     }
   };
 
+  const handleSelect = (option: ComboBoxOption) => {
+    const selectedValue = typeof option === "string" ? option : option.value;
+    onChange?.(selectedValue);
+    setSearch("");
+    setIsOpen(false);
+  };
+
   return (
     <div className={`w-full ${className}`} ref={wrapperRef}>
       {label && (
@@ -95,7 +125,7 @@ export default function ComboBox({
           value={displayText}
           onChange={handleInputChange}
           onClick={handleInputClick}
-          placeholder={value || placeholder}
+          placeholder={value ? getDisplayLabel() || placeholder : placeholder}
           disabled={disabled}
           readOnly={!isSearchable || !isOpen}
           className={`
@@ -136,11 +166,14 @@ export default function ComboBox({
                 No options found
               </div>
             ) : (
-              filteredOptions.map((option) => {
-                const isSelected = option === value;
+              filteredOptions.map((option, index) => {
+                const label = typeof option === "string" ? option : option.label;
+                const optValue = typeof option === "string" ? option : option.value;
+                const isSelected = optValue === value;
+
                 return (
                   <div
-                    key={option}
+                    key={index} // or use optValue if unique
                     className={`
                       px-4 cursor-pointer flex items-center justify-between
                       transition-colors
@@ -150,17 +183,13 @@ export default function ComboBox({
                       }
                       ${size === "lg" ? "py-3 text-base" : size === "sm" ? "py-2 text-xs" : "py-2.5 text-sm"}
                     `}
-                    onClick={() => {
-                      onChange?.(option);
-                      setSearch("");
-                      setIsOpen(false);
-                    }}
+                    onClick={() => handleSelect(option)}
                   >
-                    <span>{option}</span>
+                    <span>{label}</span>
                     {isSelected && (
                       <Check
                         size={size === "lg" ? 18 : size === "sm" ? 14 : 16}
-                        className="text-primary"
+                        className="text-current"
                       />
                     )}
                   </div>
