@@ -29,6 +29,8 @@ export { default as CategoryProgress } from "@/components/ui/CategoryProgress";
 export { default as PerformanceOverview } from "@/components/ui/PerformanceOverview";
 export { default as RecentScores } from "@/components/ui/RecentScores";
 export { default as SummaryCards } from "@/components/ui/SummaryCards";
+export { default as AddEditQuestion } from "@/components/ui/AddEditQuestion";
+export { default as DeletePopup } from "@/components/ui/DeletePopup";
 
 
 //Atom Components

@@ -28,7 +28,6 @@ const DeletePopup: React.FC<DeletePopupProps> = ({
 
     if (isOpen) {
       window.addEventListener("keydown", handleEsc);
-      // Optional: prevent background scroll
       document.body.style.overflow = "hidden";
     }
 

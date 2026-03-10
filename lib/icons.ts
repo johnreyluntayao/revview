@@ -46,6 +46,7 @@ export {
     CheckIcon as Resolve,
     ChevronDown as Dropdown,
     Check,
-    Upload as Upload
+    Upload as Upload,
+    Image,
 
 } from 'lucide-react';
