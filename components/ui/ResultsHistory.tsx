@@ -1,5 +1,5 @@
 import { Card, ComboBox } from '@/lib/client-imports';
-import React from 'react';
+import React, { useState } from 'react';
 import ScoreRecord from './ScoreRecord';
 
 // Mock data (replace with real data fetching in production)
@@ -47,6 +47,8 @@ const mockHistory = [
 ];
 
 const ResultsHistory = () => {
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedOption, setSelectedOption] = useState("");
   const categories = [
     'All Categories',
     'Numerical Ability',
@@ -81,17 +83,19 @@ const ResultsHistory = () => {
       <div className="flex flex-col lg:flex-row gap-4 p-4">
           <ComboBox
             options={categories}
+            value={selectedCategory}
+            onChange={setSelectedCategory}
             placeholder="History Category..."
             label="Category"
-            size="md"
             isSearchable={true}
           />
        
           <ComboBox
             options={sortOptions}
+            value={selectedOption}
+            onChange={setSelectedOption}
             placeholder="Sort by..."
             label="Sort"
-            size="md"
             isSearchable={false}
           />
       </div>
@@ -112,7 +116,7 @@ const ResultsHistory = () => {
       </div>
         
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6 p-4 w-full">
           {/* Average Score - highlight variant */}
           <Card
             variant="highlight"

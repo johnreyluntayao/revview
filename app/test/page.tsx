@@ -14,17 +14,12 @@ import React, { useState } from 'react'
 
 
 const page = () => {
-  const mockUser = {
-  fullName: "John Cloyd Refani",
-  username: "cloydy",
-  email: "jhnrefani@gmail.com",
-  password: "********", // you might leave password hidden by default
-};
 
   return (
     <div>
-      <ManageQuestion/>
-      
+
+      <ResultsHistory/>
+
     </div>
   )
 }
