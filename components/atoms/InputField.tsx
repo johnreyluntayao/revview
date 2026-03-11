@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { EyeOff, Eye } from "@/lib/icons";
 import { InputFieldProps } from "@/lib/types";
 
-
 const InputField: React.FC<InputFieldProps> = ({
   label,
   placeholder = "",
@@ -19,19 +18,35 @@ const InputField: React.FC<InputFieldProps> = ({
   showPasswordToggle = false,
   className = "",
   register,
-  state = "editable",   // default to editable
+  state = "editable",
   ...rest
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [internalValue, setInternalValue] = useState(value || defaultValue || "");
+
+  const isUsername = type === "username";
 
   useEffect(() => {
     setInternalValue(value || "");
   }, [value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInternalValue(e.target.value);
-    onChange?.(e);
+    let val = e.target.value;
+
+    // Prevent typing @ for username
+    if (isUsername) {
+      val = val.replace("@", "");
+    }
+
+    setInternalValue(val);
+
+    onChange?.({
+      ...e,
+      target: {
+        ...e.target,
+        value: val,
+      },
+    } as React.ChangeEvent<HTMLInputElement>);
   };
 
   const effectiveType =
@@ -39,13 +54,18 @@ const InputField: React.FC<InputFieldProps> = ({
       ? showPassword
         ? "text"
         : "password"
+      : type === "username"
+      ? "text"
       : type;
 
-  // Determine final input state
   const isDisabled = disabled || state === "disabled";
   const isReadOnly = state === "readonly" || isDisabled;
-
   const hasError = !!error;
+
+  const displayValue =
+    isUsername && state === "readonly"
+      ? `@${value ?? internalValue}`
+      : value ?? internalValue;
 
   return (
     <div className={`space-y-2 ${className}`}>
@@ -55,8 +75,17 @@ const InputField: React.FC<InputFieldProps> = ({
         </label>
       )}
 
-      <div className="relative">
-        {icon && (
+      <div className="relative flex items-center">
+
+        {/* Username @ prefix when editing */}
+        {isUsername && state !== "readonly" && (
+          <span className="absolute left-3  text-gray-500 text-sm md:text-base lg:text-lg">
+            @
+          </span>
+        )}
+
+        {/* Icon */}
+        {icon && !isUsername && (
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
             {icon}
           </div>
@@ -66,15 +95,15 @@ const InputField: React.FC<InputFieldProps> = ({
           {...(register ? register(name) : {})}
           type={effectiveType}
           name={name}
-          value={value !== undefined ? value : internalValue}
+          value={displayValue}
           defaultValue={defaultValue}
           onChange={!isReadOnly ? handleChange : undefined}
           disabled={isDisabled}
-          readOnly={isReadOnly && !isDisabled}   // readOnly + not disabled = classic readonly style
+          readOnly={isReadOnly && !isDisabled}
           placeholder={placeholder}
           className={`
             w-full px-4 py-3 rounded-xl border transition-all duration-200
-            ${icon ? "pl-10" : "pl-4"}
+            ${isUsername && state !== "readonly" ? "pl-10" : icon ? "pl-10" : "pl-4"}
             ${showPasswordToggle ? "pr-12" : "pr-4"}
             text-sm md:text-base lg:text-lg
             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
@@ -87,13 +116,14 @@ const InputField: React.FC<InputFieldProps> = ({
               isDisabled
                 ? "bg-gray-100 text-gray-500 cursor-not-allowed"
                 : state === "readonly"
-                ? "bg-gray-50 text-gray-800 cursor-default"
+                ? "bg-transparent text-gray-800 cursor-default pointer-events-none border-none focus:ring-0"
                 : "bg-white text-gray-900 cursor-text"
             }
           `}
           {...rest}
         />
 
+        {/* Password Toggle */}
         {showPasswordToggle && type === "password" && !isDisabled && (
           <button
             type="button"
@@ -101,7 +131,11 @@ const InputField: React.FC<InputFieldProps> = ({
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
             disabled={isDisabled}
           >
-            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            {showPassword ? (
+              <EyeOff className="w-5 h-5" />
+            ) : (
+              <Eye className="w-5 h-5" />
+            )}
           </button>
         )}
       </div>

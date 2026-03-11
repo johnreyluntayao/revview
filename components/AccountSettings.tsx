@@ -1,29 +1,25 @@
 "use client"
-import { Button } from '@/lib/client-imports';
+import { Button, InputField } from '@/lib/client-imports';
 import React, { useState } from 'react';
 
 interface UserFormData {
   fullName: string;
-  username: string;
+  username?: string;
   email: string;
-}
-
-interface AccountInfo {
-  createdAt: string;       // e.g. "January 15, 2024"
-  lastLogin: string;       // e.g. "Today at 2:30 PM"
-  status: 'Active' | 'Inactive' | 'Suspended' | string;
+  password: string;
 }
 
 interface AccountSettingsProps {
-  initialData: UserFormData;
-  accountInfo: AccountInfo;
-  // You can add more later (onSave callback, etc.)
+  userInfo: UserFormData;
+  role?: "user" | "admin";
 }
 
-const AccountSettings = ({ initialData, accountInfo }: AccountSettingsProps) => {
-  const [formData, setFormData] = useState<UserFormData>(initialData);
+const AccountSettings = ({ userInfo, role = "user" }: AccountSettingsProps) => {
+  const [formData, setFormData] = useState<UserFormData>(userInfo);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  const isAdmin = role === "admin";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -32,24 +28,16 @@ const AccountSettings = ({ initialData, accountInfo }: AccountSettingsProps) => 
 
   const handleSave = async () => {
     setIsSaving(true);
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1200));
-    // → Real app: call your update API here
     setIsSaving(false);
     setIsEditing(false);
     alert('Profile updated! (mock save)');
   };
 
   const handleCancel = () => {
-    setFormData(initialData); // reset to original passed values
+    setFormData(userInfo);
     setIsEditing(false);
   };
-
-  // Determine status color class
-  const statusColorClass =
-    accountInfo.status === 'Active'
-      ? 'text-success'
-      : 'text-destructive';
 
   return (
     <div className="w-full p-6">
@@ -60,7 +48,6 @@ const AccountSettings = ({ initialData, accountInfo }: AccountSettingsProps) => 
         </p>
       </div>
 
-      {/* Personal Information Section */}
       <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden mb-8">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <h2 className="text-lg font-semibold">Personal Information</h2>
@@ -97,115 +84,94 @@ const AccountSettings = ({ initialData, accountInfo }: AccountSettingsProps) => 
         </div>
 
         <div className="px-6 py-6 space-y-6">
+
           {/* Full Name */}
           <div>
-            <label
-              htmlFor="fullName"
-              className="block text-sm font-medium text-muted-foreground mb-1.5"
-            >
-              Full Name
-            </label>
             {isEditing ? (
-              <input
-                id="fullName"
+              <InputField
                 name="fullName"
-                type="text"
+                label="Full Name"
+                placeholder="Enter your full name"
                 value={formData.fullName}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
-                placeholder="Enter your full name"
               />
             ) : (
-              <p className="text-base font-medium py-2.5">{formData.fullName}</p>
+              <InputField
+                name="fullName"
+                label="Full Name"
+                value={formData.fullName}
+                onChange={handleChange}
+                state="readonly"
+              />
             )}
           </div>
 
-          {/* Username */}
-          <div>
-            <label
-              htmlFor="username"
-              className="block text-sm font-medium text-muted-foreground mb-1.5"
-            >
-              Username
-            </label>
-            {isEditing ? (
-              <div className="flex items-center gap-3">
-                <span className="text-base text-muted-foreground">@</span>
-                <input
-                  id="username"
+          {/* Username (ONLY FOR USER ROLE) */}
+          {!isAdmin && (
+            <div>
+              {isEditing ? (
+                <InputField
                   name="username"
-                  type="text"
+                  label="Username"
+                  placeholder="Enter your username"
                   value={formData.username}
                   onChange={handleChange}
-                  className="flex-1 px-4 py-2.5 border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  placeholder="username"
+                  type="username"
                 />
-              </div>
-            ) : (
-              <div className="flex items-center gap-3 py-2.5">
-                <p className="text-base font-medium">@{formData.username}</p>
-              </div>
-            )}
-          </div>
+              ) : (
+                <InputField
+                  name="username"
+                  label="Username"
+                  value={formData.username}
+                  onChange={handleChange}
+                  type="username"
+                  state="readonly"
+                />
+              )}
+            </div>
+          )}
 
           {/* Email */}
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-muted-foreground mb-1.5"
-            >
-              Email Address
-            </label>
             {isEditing ? (
-              <input
-                id="email"
+              <InputField
                 name="email"
-                type="email"
+                label="Email"
+                placeholder="Enter your email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-2.5 border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
-                placeholder="your@email.com"
               />
             ) : (
-              <p className="text-base font-medium py-2.5">{formData.email}</p>
+              <InputField
+                name="email"
+                label="Email"
+                value={formData.email}
+                onChange={handleChange}
+                state="readonly"
+              />
+            )}
+          </div>
+
+          {/* Password */}
+          <div>
+            {isEditing ? (
+              <InputField
+                name="password"
+                label="Password"
+                placeholder="Enter your password"
+                value={formData.password}
+                onChange={handleChange}
+                type="password"
+              />
+            ) : (
+             <></>
             )}
           </div>
 
           <p className="text-sm text-muted-foreground italic pt-2 border-t border-border">
             To change your password, use the Edit Profile flow or go to the Security section.
           </p>
-        </div>
-      </div>
 
-      {/* Account Information (read-only) */}
-      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-border">
-          <h2 className="text-lg font-semibold">Account Information</h2>
-        </div>
-
-        <div className="px-6 py-6">
-          <div className="border-b border-border flex justify-between items-center py-4 px-6">
-            <label className="font-medium text-muted-foreground">
-              Account Created:
-            </label>
-            <p className="py-2.5">{accountInfo.createdAt}</p>
-          </div>
-
-          <div className="border-b border-border flex justify-between items-center py-4 px-6">
-            <label className="font-medium text-muted-foreground">
-              Last Login:
-            </label>
-            <p className="py-2.5">{accountInfo.lastLogin}</p>
-          </div>
-
-          <div className="border-b border-border flex justify-between items-center py-4 px-6">
-            <label className="font-medium text-muted-foreground">
-              Account Status:
-            </label>
-            <p className={`py-2.5 font-medium ${statusColorClass}`}>
-              {accountInfo.status}
-            </p>
-          </div>
         </div>
       </div>
     </div>
