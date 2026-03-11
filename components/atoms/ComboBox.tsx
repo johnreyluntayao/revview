@@ -101,7 +101,7 @@ export default function ComboBox({
   };
 
   return (
-   <div className={`space-y-2 ${className}`}>
+   <div className={`w-full space-y-2 ${className}`}>
       {label && (
         <label className="block text-sm md:text-base lg:text-lg font-medium text-foreground">
           {label}
