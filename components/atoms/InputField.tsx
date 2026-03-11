@@ -4,7 +4,9 @@ import React, { useEffect, useState } from "react";
 import { EyeOff, Eye } from "@/lib/icons";
 import { InputFieldProps } from "@/lib/types";
 
-const InputField: React.FC<InputFieldProps> = ({
+type Size = "sm" | "md" | "lg";
+
+const InputField: React.FC<InputFieldProps & { size?: Size }> = ({
   label,
   placeholder = "",
   type = "text",
@@ -19,6 +21,7 @@ const InputField: React.FC<InputFieldProps> = ({
   className = "",
   register,
   state = "editable",
+  size = "md",
   ...rest
 }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -32,20 +35,11 @@ const InputField: React.FC<InputFieldProps> = ({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let val = e.target.value;
-
-    // Prevent typing @ for username
-    if (isUsername) {
-      val = val.replace("@", "");
-    }
-
+    if (isUsername) val = val.replace("@", "");
     setInternalValue(val);
-
     onChange?.({
       ...e,
-      target: {
-        ...e.target,
-        value: val,
-      },
+      target: { ...e.target, value: val },
     } as React.ChangeEvent<HTMLInputElement>);
   };
 
@@ -67,21 +61,29 @@ const InputField: React.FC<InputFieldProps> = ({
       ? `@${value ?? internalValue}`
       : value ?? internalValue;
 
+  // Size classes aligned with ComboBox
+  const sizeClasses = {
+    sm: "text-sm py-2 px-3",
+    md: "text-base py-2.5 px-4",
+    lg: "text-lg py-3 px-5",
+  }[size];
+
+  // Padding for icon / username prefix / password toggle
+  const paddingLeft = isUsername && state !== "readonly" ? "pl-10" : icon ? "pl-10" : "pl-4";
+  const paddingRight = showPasswordToggle ? "pr-12" : "pr-4";
+
   return (
     <div className={`space-y-2 ${className}`}>
       {label && (
-        <label className="block text-xs md:text-sm lg:text-base font-medium text-gray-700">
+        <label className="block font-medium text-gray-700 text-xs md:text-sm lg:text-base">
           {label}
         </label>
       )}
 
-      <div className="relative flex items-center">
-
-        {/* Username @ prefix when editing */}
+      <div className="relative flex items-center w-full">
+        {/* Username @ prefix */}
         {isUsername && state !== "readonly" && (
-          <span className="absolute left-3  text-gray-500 text-sm md:text-base lg:text-lg">
-            @
-          </span>
+          <span className="absolute left-3 text-gray-500 text-sm md:text-base lg:text-lg">@</span>
         )}
 
         {/* Icon */}
@@ -102,22 +104,16 @@ const InputField: React.FC<InputFieldProps> = ({
           readOnly={isReadOnly && !isDisabled}
           placeholder={placeholder}
           className={`
-            w-full px-4 py-3 rounded-xl border transition-all duration-200
-            ${isUsername && state !== "readonly" ? "pl-10" : icon ? "pl-10" : "pl-4"}
-            ${showPasswordToggle ? "pr-12" : "pr-4"}
-            text-sm md:text-base lg:text-lg
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-            ${
-              hasError
-                ? "border-red-500 ring-2 ring-red-200"
-                : "border-gray-300 hover:border-gray-400"
-            }
+            w-full rounded-lg transition-all duration-150
+            focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500
+            ${sizeClasses} ${paddingLeft} ${paddingRight}
+            ${hasError ? "border-red-500 ring-2 ring-red-200 text-red-600" : ""}
             ${
               isDisabled
-                ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                ? "bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300"
                 : state === "readonly"
-                ? "bg-transparent text-gray-800 cursor-default pointer-events-none border-none focus:ring-0"
-                : "bg-white text-gray-900 cursor-text"
+                ? "bg-transparent text-gray-800 cursor-default pointer-events-none border-none"
+                : "bg-white text-gray-900 border border-gray-300 hover:border-gray-400"
             }
           `}
           {...rest}
@@ -131,18 +127,12 @@ const InputField: React.FC<InputFieldProps> = ({
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
             disabled={isDisabled}
           >
-            {showPassword ? (
-              <EyeOff className="w-5 h-5" />
-            ) : (
-              <Eye className="w-5 h-5" />
-            )}
+            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>
         )}
       </div>
 
-      {error && (
-        <p className="text-red-500 text-xs mt-1 font-medium">{error}</p>
-      )}
+      {error && <p className="text-red-500 text-xs mt-1 font-medium">{error}</p>}
     </div>
   );
 };
