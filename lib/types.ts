@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 export interface InputFieldProps {
   label?: ReactNode;
   placeholder?: string;
-  type?: string;
+  type?: "text" | "password" | "email" | "username";
   name?: string;
   error?: string;
   value?: string;

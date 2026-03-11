@@ -15,16 +15,12 @@ const page = () => {
     fullName: "Alice Wonderland",
     username: "alice_in_chains",
     email: "alice@example.com",
+    password: "Mongrel"
   };
 
-const accountDetails = {
-  createdAt: "March 12, 2025",
-  lastLogin: "Today at 9:45 AM",
-  status: "Active",           // ← or "Inactive", "Suspended", etc.
-};
   return (
     <div>
-      <AddEditQuestion/>
+      <AccountSettings userInfo={user} role='admin'/>
     </div>
   )
 }
