@@ -20,7 +20,7 @@ const page = () => {
 
   return (
     <div>
-      <AccountSettings userInfo={user} role='admin'/>
+      <Quiz/>
     </div>
   )
 }
