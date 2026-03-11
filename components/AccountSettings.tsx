@@ -20,6 +20,7 @@ const AccountSettings = ({ userInfo, role = "user" }: AccountSettingsProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Password fields
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -29,6 +30,7 @@ const AccountSettings = ({ userInfo, role = "user" }: AccountSettingsProps) => {
   const [isGoogleUser, setIsGoogleUser] = useState(false);
 
   const supabase = createClient();
+  const isAdmin = role === "admin";
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -113,7 +115,6 @@ const AccountSettings = ({ userInfo, role = "user" }: AccountSettingsProps) => {
         }
       }
 
-      // 4️⃣ Update profile
       if (shouldUpdateProfile) {
         const { error: dbError } = await supabase
           .from("users")

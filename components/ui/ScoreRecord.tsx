@@ -58,11 +58,11 @@ const ScoreRecord = ({
 
           {/* Main content */}
           <div className="flex flex-col gap-2 flex-1 min-w-0">
-            <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground">
+            <h3 className="text-base md:text-lg lg:text-xl font-bold text-foreground">
               {title}
             </h3>
 
-            <div className="flex flex-wrap flex-col md:flex-row md:gap-x-12 lg:gap-x-18 text-sm md:text-base lg:text-lg font-medium text-foreground/80">
+            <div className="flex flex-wrap flex-col md:flex-row md:gap-x-12 lg:gap-x-18 text-xs md:text-sm lg:text-base font-medium text-foreground/80">
               <div>
                 <span className="text-foreground/60">Difficulty:</span> {difficulty}
               </div>
@@ -75,7 +75,7 @@ const ScoreRecord = ({
             </div>
 
             {/* Date */}
-            <div className="text-sm md:text-base lg:text-lg text-foreground/50 mt-1">
+            <div className="text-xs md:text-sm lg:text-base text-foreground/50 mt-1">
               {date}
             </div>
           </div>

@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, Check } from "lucide-react";
 
-type Size = "sm" | "md" | "lg" | undefined;
+type Size = "sm" | "md" | "lg";
 
 interface Option {
   value: string;
@@ -35,13 +35,14 @@ export default function ComboBox({
   className = "",
   required = false,
   isSearchable = true,
-  size,
+  size = "md",
 }: ComboBoxProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
@@ -56,37 +57,29 @@ export default function ComboBox({
     if (!isOpen) setSearch("");
   }, [isOpen]);
 
-  // Helper: get display label for current value
+  // Get display label for current value
   const getDisplayLabel = () => {
-    const selectedOption = options.find((opt) => {
-      if (typeof opt === "string") return opt === value;
-      return opt.value === value;
-    });
-
-    if (!selectedOption) return "";
-    return typeof selectedOption === "string" ? selectedOption : selectedOption.label;
+    const selected = options.find(opt =>
+      typeof opt === "string" ? opt === value : opt.value === value
+    );
+    return typeof selected === "string" ? selected : selected?.label || "";
   };
 
   const displayText = isOpen && isSearchable ? search : getDisplayLabel();
 
-  // Filter logic
   const filteredOptions = isSearchable
-    ? options.filter((opt) => {
+    ? options.filter(opt => {
         const label = typeof opt === "string" ? opt : opt.label;
         return label.toLowerCase().includes(search.toLowerCase());
       })
     : options;
 
-  // Size classes (unchanged)
-  const sizeClasses = size
-    ? {
-        lg: "text-[16px] gap-2 py-3 px-6",
-        md: "text-[14px] gap-1.5 py-2.5 px-5",
-        sm: "text-[12px] gap-1 py-2 px-4",
-      }[size]
-    : "text-[12px] gap-1 py-2 px-4 " +
-      "md:text-[14px] md:gap-1.5 md:py-2.5 md:px-5 " +
-      "lg:text-[16px] lg:gap-2 lg:py-3 lg:px-6";
+  // Size classes
+  const sizeClasses = {
+    sm: "text-sm py-2 px-3 gap-1",
+    md: "text-base py-2.5 px-4 gap-1.5",
+    lg: "text-lg py-3 px-5 gap-2",
+  }[size];
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!isSearchable) return;
@@ -97,28 +90,25 @@ export default function ComboBox({
   const handleInputClick = () => {
     if (disabled) return;
     setIsOpen(true);
-    if (isSearchable && inputRef.current) {
-      inputRef.current.focus();
-    }
+    if (isSearchable) inputRef.current?.focus();
   };
 
   const handleSelect = (option: ComboBoxOption) => {
     const selectedValue = typeof option === "string" ? option : option.value;
     onChange?.(selectedValue);
-    setSearch("");
     setIsOpen(false);
+    setSearch("");
   };
 
   return (
-    <div className={`w-full ${className}`} ref={wrapperRef}>
+   <div className={`w-full space-y-2 ${className}`}>
       {label && (
-        <label className="mb-1.5 block text-sm font-medium text-foreground">
+        <label className="block text-sm md:text-base lg:text-lg font-medium text-foreground">
           {label}
-          {required && <span className="text-destructive ml-1">*</span>}
         </label>
       )}
 
-      <div className="relative">
+      <div className="relative w-full">
         <input
           ref={inputRef}
           type="text"
@@ -126,45 +116,27 @@ export default function ComboBox({
           onChange={handleInputChange}
           onClick={handleInputClick}
           placeholder={value ? getDisplayLabel() || placeholder : placeholder}
-          disabled={disabled}
           readOnly={!isSearchable || !isOpen}
-          className={`
-            w-full pr-10
-            bg-background
-            border-2 border-input rounded-lg
-            text-foreground
-            placeholder:text-muted-foreground
-            focus:border-primary focus:ring-2 focus:ring-ring/30 focus:outline-none
-            disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-muted/40
-            transition-all duration-150
-            ${!isSearchable ? "cursor-pointer" : "cursor-text"}
-            ${sizeClasses}
-          `}
-        />
+          disabled={disabled}
+          className={`w-full pr-10 rounded-md border bg-background 
+          ${!isSearchable || !isOpen ? "cursor-pointer" : "cursor-text"}
+          border-border text-foreground placeholder-foreground 
+          focus:border-primary/75 focus:ring focus:ring-primary/30
+          disabled:cursor-not-allowed disabled:opacity-50
+          ${sizeClasses}
+        `}/>
 
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+        <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
           <ChevronDown
-            className={`text-muted-foreground transition-transform duration-200 ${
-              isOpen ? "rotate-180" : ""
-            }`}
-            size={size === "lg" ? 20 : size === "sm" ? 16 : 18}
+            size={size === "lg" ? 20 : size === "md" ? 16 : 18}
+            className={`text-foreground/40 transition-transform ${isOpen ? "rotate-180" : ""}`}
           />
         </div>
 
         {isOpen && !disabled && (
-          <div
-            className={`
-              absolute z-50 w-full mt-1.5
-              bg-popover border border-border rounded-lg
-              shadow-xl overflow-auto
-              text-popover-foreground
-              ${size === "lg" ? "max-h-72 text-base" : size === "sm" ? "max-h-52 text-xs" : "max-h-64 text-sm"}
-            `}
-          >
-            {filteredOptions.length === 0 && isSearchable ? (
-              <div className="px-4 py-3 text-muted-foreground">
-                No options found
-              </div>
+          <div className="absolute text-xs md:text-sm lg:text-base z-50 mt-1 w-full overflow-auto rounded-md border border-border/30 bg-background shadow-lg max-h-60">
+            {filteredOptions.length === 0 ? (
+              <div className="p-3 text-foreground/40">No options found</div>
             ) : (
               filteredOptions.map((option, index) => {
                 const label = typeof option === "string" ? option : option.label;
@@ -173,25 +145,14 @@ export default function ComboBox({
 
                 return (
                   <div
-                    key={index} // or use optValue if unique
-                    className={`
-                      px-4 cursor-pointer flex items-center justify-between
-                      transition-colors
-                      ${isSelected
-                        ? "bg-primary text-primary-foreground font-medium"
-                        : "hover:bg-primary hover:text-background"
-                      }
-                      ${size === "lg" ? "py-3 text-base" : size === "sm" ? "py-2 text-xs" : "py-2.5 text-sm"}
-                    `}
+                    key={index}
+                    className={`flex text-xs md:text-sm lg:text-base items-center justify-between cursor-pointer px-3 py-2 transition hover:bg-primary hover:text-primary-foreground ${
+                      isSelected ? "bg-primary text-primary-foreground font-medium" : "text-foreground"
+                    }`}
                     onClick={() => handleSelect(option)}
                   >
                     <span>{label}</span>
-                    {isSelected && (
-                      <Check
-                        size={size === "lg" ? 18 : size === "sm" ? 14 : 16}
-                        className="text-current"
-                      />
-                    )}
+                    {isSelected && <Check size={16} />}
                   </div>
                 );
               })

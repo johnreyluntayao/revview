@@ -62,7 +62,7 @@ const Card: React.FC<CardProps> = ({
         // Variant 2: Highlight / score card with big centered value
         case "highlight":
             content = (
-                <div className="p-6 text-left w-full">
+                <div className="p-4 md:p-5 lg:p-6 space-y-2 text-left w-full">
                     {title && <h1 className="text-sm md:text-base lg:text-lg font-semibold text-foreground/60">{title}</h1>}
                     <p className={`text-3xl md:text-4xl lg:text-5xl font-bold  ${textColor}`}>{value}</p>
                     {subValue && <p className="mt-2 text-sm md:text-base lg:text-lg text-foreground/60">{subValue}</p>}

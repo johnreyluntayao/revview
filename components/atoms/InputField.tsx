@@ -65,7 +65,7 @@ const InputField: React.FC<InputFieldProps & { size?: Size }> = ({
         )}
 
         {icon && !isUsername && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/50 pointer-events-none">{icon}</div>
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-border pointer-events-none">{icon}</div>
         )}
 
         <input
@@ -73,7 +73,7 @@ const InputField: React.FC<InputFieldProps & { size?: Size }> = ({
           type={effectiveType}
           name={name}
           value={displayValue}
-          onChange={!isReadOnly ? onChange : undefined}
+          onChange={!isReadOnly ? onChange : undefined} // <-- pass parent handler directly
           disabled={isDisabled}
           readOnly={isReadOnly && !isDisabled}
           placeholder={placeholder}
