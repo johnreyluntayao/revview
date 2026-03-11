@@ -94,6 +94,7 @@ const AccountSettings = ({ userInfo, role = "user" }: AccountSettingsProps) => {
                 placeholder="Enter your full name"
                 value={formData.fullName}
                 onChange={handleChange}
+                state={isEditing ? undefined : "readonly"}
               />
             ) : (
               <InputField
@@ -117,6 +118,7 @@ const AccountSettings = ({ userInfo, role = "user" }: AccountSettingsProps) => {
                   value={formData.username}
                   onChange={handleChange}
                   type="username"
+                  state={isEditing ? undefined : "readonly"}
                 />
               ) : (
                 <InputField
@@ -140,6 +142,7 @@ const AccountSettings = ({ userInfo, role = "user" }: AccountSettingsProps) => {
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={handleChange}
+                state={isEditing ? undefined : "readonly"}
               />
             ) : (
               <InputField
@@ -158,13 +161,12 @@ const AccountSettings = ({ userInfo, role = "user" }: AccountSettingsProps) => {
               <InputField
                 name="password"
                 label="Password"
-                placeholder="Enter your password"
                 value={formData.password}
                 onChange={handleChange}
                 type="password"
               />
             ) : (
-             <></>
+              <></>
             )}
           </div>
 
