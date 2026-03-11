@@ -4,6 +4,7 @@ export { default as QuizResult } from "@/components/QuizResult";
 export { default as Homepage } from "@/components/Homepage";
 export { default as CustomizeQuiz } from "@/components/CustomizeQuiz";
 export { default as ManageQuestions } from "@/components/ManageQuestion";
+export { default as AccountSettings } from "@/components/AccountSettings";
 
 
 //UI Components

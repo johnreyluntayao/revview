@@ -33,8 +33,8 @@ interface SidebarProps {
 const defaultItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: ProgressTracking, section: "main", exact: true },
   { href: "/quiz-selection", label: "Start Review", section: "main", icon: StartQuiz, exact: false },
-  { href: "/results", label: "Results History", section: "main", icon: AverageScore, exact: true },
-  { href: "/account", label: "Account Settings", icon: AccountSettings, section: "account", exact: true },
+  { href: "/results-history", label: "Results History", section: "main", icon: AverageScore, exact: true },
+  { href: "/user-account", label: "Account Settings", icon: AccountSettings, section: "account", exact: true },
 ];
 
 export default function Sidebar({
