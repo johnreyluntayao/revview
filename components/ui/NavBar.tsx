@@ -86,7 +86,7 @@ export default function Navbar({ State, title }: NavbarProps) {
     { href: "/admin", label: "Dashboard", icon: ProgressTracking },
     { href: "/feedbacks", label: "Feedback", icon: ShowFeedback },
     { href: "/manage-questions", label: "Questions", icon: Questions },
-    { href: "/account", label: "Account Settings", icon: AccountSettings },
+    { href: "/admin-account", label: "Account Settings", icon: AccountSettings },
   ];
 
   return (
