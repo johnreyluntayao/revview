@@ -11,14 +11,15 @@ import ResultsHistory from '@/components/ResultsHistory'
 import ScoreRecord from '@/components/ui/ScoreRecord'
 import { Icon } from 'lucide-react'
 import React, { useState } from 'react'
+import {NavBar} from '@/lib/client-imports'
 
 
 const page = () => {
 
   return (
     <div>
-
-      <ResultsHistory/>
+      <NavBar State="OnQuiz" title="All Categories"/>
+      <Quiz/>
 
     </div>
   )

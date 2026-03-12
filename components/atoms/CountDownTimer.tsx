@@ -47,15 +47,15 @@ const CountDownTimer: React.FC<CountdownTimerProps> = ({
     return (
         <div
             className={`
-        inline-flex flex-col items-center gap-4 p-6 rounded-2xl
+        inline-flex flex-col items-center rounded-2xl
 
         ${className}
       `}
         >
-            <div className={`w-40 rounded-full p-2 md:p-3 lg:p-4 flex gap-2 items-center text-xl md:text-2xl lg:text-3xl font-medium tracking-wider
+            <div className={`w-20 md:w-24 lg:w-28 rounded-full p-2 md:p-3 lg:p-4 flex gap-1 md:gap-1.5 lg:gap-2 items-center justify-center text-xs md:text-sm lg:text-base font-medium tracking-wider
             ${isFinished ? 'text-destructive animate-pulse bg-destructive/20' : 'text-primary bg-primary/20'}
             transition-colors duration-300`}>
-                <StudyTime className='w-8'/>
+                <StudyTime className='h-auto w-4 md:w-5 lg:w-6'/>
                 <div>
                     {formatTime(timeLeft)}
                 </div>
