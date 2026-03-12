@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
-
+import { CountDownTimer, Button } from "@/lib/client-imports"
+import { Pause } from '@/lib/icons'
 import {
   ProgressTracking,
   ShowFeedback,
@@ -45,7 +46,7 @@ function useLogout() {
 }
 
 interface NavbarProps {
-  State: "LoggedIn" | "Home" | "SignIn" | "SignUp" | "Default";
+  State: "LoggedIn" | "Home" | "SignIn" | "SignUp" | "Default" | "OnQuiz";
   title?: string;
 }
 
@@ -93,7 +94,7 @@ export default function Navbar({ State, title }: NavbarProps) {
     <nav className="fixed top-0 left-0 right-0 bg-background backdrop-blur-md border-b border-border z-50">
       <div className="max-w-screen-3xl mx-auto px-4 sm:px-6 lg:px-8 h-16 lg:h-20 flex items-center justify-between">
         {/* Logo + Brand */}
-        <Link href="/">
+        <Link href={`${State === "OnQuiz" ? "" : "/"}`} className={`${State === "OnQuiz" ? "hidden md:block" : ""}`}>
           <Image
             src="/Long-logo.svg"
             alt="RevView Logo"
@@ -128,6 +129,11 @@ export default function Navbar({ State, title }: NavbarProps) {
                 </Link>
               );
             })}
+          </div>
+        )}
+        { State === "OnQuiz" && (
+          <div className="flex items-center justify-center text-sm md:text-base lg:text-lg font-bold text-foreground">
+            {title}
           </div>
         )}
 
@@ -226,6 +232,11 @@ export default function Navbar({ State, title }: NavbarProps) {
               >
                 Sign in
               </Link>
+            </div>
+          ) : State === "OnQuiz" ? (
+            <div className="flex items-center text-muted-foreground text-base gap-2 md:gap-3 lg:gap-4">
+              <CountDownTimer minutes={30} seconds={30}/>
+              <Button leftIcon={<Pause/>} textColor="text-foreground" backgroundColor="bg-muted-foreground/25" onClick={() => alert("Quiz Paused")}/>
             </div>
           ) : (
             <div className="flex text-muted-foreground">

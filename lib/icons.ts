@@ -48,5 +48,6 @@ export {
     Check,
     Upload as Upload,
     Image,
+    Pause,
 
 } from 'lucide-react';
