@@ -5,10 +5,11 @@ import { ViewDetailedResults } from '@/lib/icons';
 interface ScoreRecordProps {
   title: string;
   difficulty: string;
-  items: number;          // total questions
-  score: number;          // correct answers
-  time: string;           // e.g. "18:45"
-  date: string;           // e.g. "Feb 3, 2024"
+  items: number;    
+  score: number;     
+  time: string;     
+  date: string;     
+  percentage: number;     
 }
 
 const ScoreRecord = ({
@@ -18,9 +19,26 @@ const ScoreRecord = ({
   score,
   time,
   date,
+  percentage,
 }: ScoreRecordProps) => {
 
-  const calculatedPercent = items > 0 ? Math.round((score / items) * 100) : 0;
+  const getScoreBgColor = (scoreVal: number) => {
+    if (scoreVal >= 80) return "bg-success/15";
+    if (scoreVal >= 60) return "bg-primary/15";
+    if (scoreVal >= 40) return "bg-warning/15";
+    return "bg-destructive/15";
+  };
+
+  const getScoreTextColor = (score: number) => {
+    if (score >= 80) return "text-success";
+    if (score >= 60) return "text-primary";
+    if (score >= 40) return "text-warning";
+    return "text-destructive";
+  };
+
+  const bgClass = getScoreBgColor(percentage);
+  const textClass = getScoreTextColor(percentage);
+
   return (
     <div className="w-full">
       <div
@@ -37,20 +55,20 @@ const ScoreRecord = ({
         <div className="p-5 flex items-start gap-4 md:gap-5 lg:gap-6 flex-wrap">
 
           <div
-            className="
+            className={`
               relative 
               w-18 h-18 md:w-20 md:h-20 lg:w-24 lg:h-24 
               shrink-0
               rounded-full 
-              bg-success/30
               shadow-inner
               self-center
-            "
+              ${bgClass}
+            `}
           >
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center leading-tight">
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-success text-nowrap">
-                  {Math.round(calculatedPercent)}<span>%</span>
+                <div className={`text-lg sm:text-xl md:text-2xl font-bold ${textClass} text-nowrap`}>
+                  {percentage}<span>%</span>
                 </div>
               </div>
             </div>
@@ -86,7 +104,6 @@ const ScoreRecord = ({
               leftIcon={<ViewDetailedResults />}
               borderColor="border-none"
               isRounded={true}
-              backgroundColor="hover:bg-primary"
               textColor="hover:text-white"
               className='h-12 w-12'
             />
