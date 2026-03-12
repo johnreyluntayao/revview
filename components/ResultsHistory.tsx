@@ -1,6 +1,7 @@
-import { Card, ComboBox } from '@/lib/client-imports';
+"use client"
+
+import { Card, ComboBox, ScoreRecord } from '@/lib/client-imports';
 import React, { useState } from 'react';
-import ScoreRecord from './ScoreRecord';
 
 // Mock data (replace with real data fetching in production)
 const mockHistory = [
@@ -68,19 +69,19 @@ const ResultsHistory = () => {
   ];
 
   return (
-    <div className="w-full px-4 py-6 md:py-8 lg:py-10 flex flex-col gap-2">
+    <div className="w-full p-4 md:p-6 lg:p-8 flex flex-col gap-4 md:gap-6 lg:gap-8">
       {/* Header */}
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+      <div className="flex flex-col gap-1 md:gap-1.5 lg:gap-2">
+        <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">
           Results History
         </h1>
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-xs md:text-sm lg:text-base">
           View your past attempts and track your progress
         </p>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col lg:flex-row gap-4 p-4">
+      <div className="flex flex-col lg:flex-row gap-4 md:gap-5 lg:gap-6 p-4 md:p-5 lg:p-6 border border-border rounded-xl">
           <ComboBox
             options={categories}
             value={selectedCategory}
@@ -101,7 +102,7 @@ const ResultsHistory = () => {
       </div>
 
       {/* Test Records */}
-      <div className="w-full">
+      <div className="flex flex-col gap-2 md:gap-4 lg:gap-6 max-h-187.5 overflow-auto">
         {mockHistory.map((record, index) => (
           <ScoreRecord
             key={index}
@@ -116,15 +117,13 @@ const ResultsHistory = () => {
       </div>
         
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-5 lg:gap-6 p-4 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 md:gap-4 lg:gap-6 w-full">
           {/* Average Score - highlight variant */}
           <Card
             variant="highlight"
             title="Average Score"
             value="82%"
-            subValue="Across all attempts"
-            textColor="text-primary"
-            className="bg-primary/5 border-primary/20"
+            textColor='text-primary'
           />
 
           {/* Quizzes Completed - data variant */}
@@ -132,7 +131,7 @@ const ResultsHistory = () => {
             variant="highlight"
             title="Quizzes Completed"
             value="7"
-            className="bg-background"
+            textColor='text-secondary'
           />
 
           {/* Best Score - highlight variant */}
@@ -140,9 +139,7 @@ const ResultsHistory = () => {
             variant="highlight"
             title="Best Score"
             value="90%"
-            subValue="Numerical Ability"
-            textColor="text-success"
-            className="bg-success/5 border-success/20"
+            textColor='text-success'
           />
         </div>
       </div>

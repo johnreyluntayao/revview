@@ -5,6 +5,7 @@ export { default as Homepage } from "@/components/Homepage";
 export { default as CustomizeQuiz } from "@/components/CustomizeQuiz";
 export { default as ManageQuestions } from "@/components/ManageQuestion";
 export { default as AccountSettings } from "@/components/AccountSettings";
+export { default as ResultsHistory } from "@/components/ResultsHistory";
 
 
 //UI Components
@@ -32,6 +33,7 @@ export { default as RecentScores } from "@/components/ui/RecentScores";
 export { default as SummaryCards } from "@/components/ui/SummaryCards";
 export { default as AddEditQuestion } from "@/components/ui/AddEditQuestion";
 export { default as DeletePopup } from "@/components/ui/DeletePopup";
+export { default as ScoreRecord } from "@/components/ui/ScoreRecord";
 
 
 //Atom Components
