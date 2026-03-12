@@ -1,8 +1,10 @@
-import React from 'react'
+import { ResultsHistory } from "@/lib/client-imports";
 
 const page = () => {
   return (
-    <div>page</div>
+    <main>
+      <ResultsHistory />
+    </main>
   )
 }
 

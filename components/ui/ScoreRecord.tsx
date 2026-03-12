@@ -1,5 +1,5 @@
-import React from 'react';
-import Button from '../atoms/Button';
+
+import { Button } from '@/lib/client-imports';
 import { ViewDetailedResults } from '@/lib/icons';
 
 interface ScoreRecordProps {
@@ -22,7 +22,7 @@ const ScoreRecord = ({
 
   const calculatedPercent = items > 0 ? Math.round((score / items) * 100) : 0;
   return (
-    <div className="w-full p-4">
+    <div className="w-full">
       <div
         className="
           relative 
