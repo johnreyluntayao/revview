@@ -49,5 +49,6 @@ export {
     Upload as Upload,
     Image,
     Pause,
+    Home,
 
 } from 'lucide-react';
