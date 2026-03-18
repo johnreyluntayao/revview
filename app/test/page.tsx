@@ -11,15 +11,31 @@ import ResultsHistory from '@/components/ResultsHistory'
 import ScoreRecord from '@/components/ui/ScoreRecord'
 import { Icon } from 'lucide-react'
 import React, { useState } from 'react'
-import {NavBar} from '@/lib/client-imports'
+import {NavBar, PauseModal} from '@/lib/client-imports'
+
 
 
 const page = () => {
+  const [isPaused, setIsPaused] = useState(true);
+
+  const handleRestartQuiz = () => {
+    // Logic to restart the quiz
+    setIsPaused(false);
+  };
+
+  const handleExitQuiz = () => {
+    // Logic to exit the quiz and navigate to the home page
+    setIsPaused(false);
+  }
 
   return (
     <div>
-      <NavBar State="OnQuiz" title="All Categories"/>
-      <Quiz/>
+      <PauseModal
+        isOpen={isPaused}
+        onClose={() => setIsPaused(false)}
+        onRestart={handleRestartQuiz}
+        onExit={handleExitQuiz}
+      />
 
     </div>
   )
