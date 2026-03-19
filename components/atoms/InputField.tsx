@@ -6,7 +6,14 @@ import { InputFieldProps } from "@/lib/types";
 
 type Size = "sm" | "md" | "lg";
 
-const InputField: React.FC<InputFieldProps & { size?: Size }> = ({
+interface ExtendedInputFieldProps extends InputFieldProps {
+  size?: Size;
+  min?: number | string;
+  max?: number | string;
+  step?: number | string;
+}
+
+const InputField: React.FC<ExtendedInputFieldProps> = ({
   label,
   placeholder = "",
   type = "text",
@@ -20,6 +27,9 @@ const InputField: React.FC<InputFieldProps & { size?: Size }> = ({
   className = "",
   state = "editable",
   size = "md",
+  min,
+  max,
+  step,
   ...rest
 }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -38,7 +48,6 @@ const InputField: React.FC<InputFieldProps & { size?: Size }> = ({
       ? "text"
       : type;
 
-  // For editable fields, we use value directly
   const displayValue =
     isUsername && state === "readonly"
       ? `@${value ?? ""}`
@@ -53,10 +62,72 @@ const InputField: React.FC<InputFieldProps & { size?: Size }> = ({
   const paddingLeft = isUsername && state !== "readonly" ? "pl-10" : icon ? "pl-10" : "pl-4";
   const paddingRight = showPasswordToggle ? "pr-12" : "pr-4";
 
+  // ── Number clamping logic ───────────────────────────────────────
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (type !== "number" || !onChange) {
+      onChange?.(e);
+      return;
+    }
+
+    const inputValue = e.target.value;
+
+    // Allow empty string (user deleting everything)
+    if (inputValue === "") {
+      onChange(e);
+      return;
+    }
+
+    // Allow only valid number input (including -, ., temporary invalid states)
+    if (!/^-?\d*\.?\d*$/.test(inputValue)) {
+      return; // ignore invalid characters
+    }
+
+    const numValue = Number(inputValue);
+
+    // If it's not a valid number yet (like "-" or "12."), allow it
+    if (isNaN(numValue)) {
+      onChange(e);
+      return;
+    }
+
+    let clamped = numValue;
+
+    // Apply min clamp
+    if (min !== undefined) {
+      const minVal = Number(min);
+      if (!isNaN(minVal) && clamped < minVal) {
+        clamped = minVal;
+      }
+    }
+
+    // Apply max clamp
+    if (max !== undefined) {
+      const maxVal = Number(max);
+      if (!isNaN(maxVal) && clamped > maxVal) {
+        clamped = maxVal;
+      }
+    }
+
+    // Create synthetic event with clamped value
+    const newEvent = {
+      ...e,
+      target: {
+        ...e.target,
+        value: clamped.toString(),
+        name: e.target.name,
+      },
+    };
+
+    onChange(newEvent as React.ChangeEvent<HTMLInputElement>);
+  };
+  // ─────────────────────────────────────────────────────────────────
+
   return (
     <div className={`space-y-2 ${className}`}>
       {label && (
-        <label className="block font-medium text-gray-700 text-xs md:text-sm">{label}</label>
+        <label className="block font-medium text-gray-700 text-xs md:text-sm">
+          {label}
+        </label>
       )}
 
       <div className="relative flex items-center w-full">
@@ -65,7 +136,9 @@ const InputField: React.FC<InputFieldProps & { size?: Size }> = ({
         )}
 
         {icon && !isUsername && (
-          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-border pointer-events-none">{icon}</div>
+          <div className="absolute left-3 top-1/2 -translate-y-1/2 text-border pointer-events-none">
+            {icon}
+          </div>
         )}
 
         <input
@@ -73,10 +146,13 @@ const InputField: React.FC<InputFieldProps & { size?: Size }> = ({
           type={effectiveType}
           name={name}
           value={displayValue}
-          onChange={!isReadOnly ? onChange : undefined} // <-- pass parent handler directly
+          onChange={!isReadOnly ? (type === "number" ? handleNumberChange : onChange) : undefined}
           disabled={isDisabled}
           readOnly={isReadOnly && !isDisabled}
           placeholder={placeholder}
+          min={type === "number" ? min : undefined}
+          max={type === "number" ? max : undefined}
+          step={type === "number" ? step : undefined}
           className={`
             w-full rounded-lg transition-all duration-150
             focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500
