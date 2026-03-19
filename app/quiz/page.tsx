@@ -1,8 +1,11 @@
-import React from 'react'
+import { Quiz, NavBar } from "@/lib/client-imports";
 
 const page = () => {
   return (
-    <div>page</div>
+    <main>
+      <NavBar State="OnQuiz" title="Category"/>
+      <Quiz />
+    </main>
   )
 }
 

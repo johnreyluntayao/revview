@@ -23,59 +23,61 @@ export default function SummaryPanel({
   handleStartQuiz,
 }: SummaryPanelProps) {
   const categoryName =
-    categories.find((c) => c.id === selectedCategory)?.name || "Not selected";
+  selectedCategory === null
+    ? "All Categories"
+    : categories.find((c) => c.id === selectedCategory)?.name || "Not selected";
 
   return (
     <div className="lg:sticky lg:top-20 h-fit w-full">
-      <div className="bg-linear-to-br from-primary/10 to-secondary/10 rounded-2xl p-6 border border-border">
-        <h3 className="text-2xl font-bold text-foreground mb-6">
+      <div className="bg-linear-to-br from-primary/10 to-secondary/10 rounded-2xl p-4 md:p-5 lg:p-6 border border-border">
+        <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground mb-4 md:mb-5 lg:mb-6">
           Quiz Summary
         </h3>
 
-        <div className="space-y-6 mb-8">
+        <div className="space-y-4 md:space-y-5 lg:space-y-6 mb-4 md:mb-6 lg:mb-8">
           {/* Category */}
           <div>
-            <p className="text-sm text-muted-foreground mb-1.5">Category</p>
-            <p className="font-semibold text-foreground text-lg">
+            <p className="text-[10px] md:text-xs lg:text-sm text-muted-foreground mb-0.5 md:mb-1 lg:mb-1.5">Category</p>
+            <p className="font-semibold text-foreground text-sm md:text-base lg:text-lg">
               {categoryName}
             </p>
           </div>
 
           {/* Questions count */}
           <div>
-            <p className="text-sm text-muted-foreground mb-1.5">Questions</p>
-            <p className="font-semibold text-foreground text-lg">
+            <p className="text-[10px] md:text-xs lg:text-sm text-muted-foreground mb-0.5 md:mb-1 lg:mb-1.5">Questions</p>
+            <p className="font-semibold text-foreground text-sm md:text-base lg:text-lg">
               {selectedQuestions} questions
             </p>
           </div>
 
           {/* Difficulty */}
           <div>
-            <p className="text-sm text-muted-foreground mb-1.5">Difficulty</p>
-            <p className="font-semibold text-foreground text-lg capitalize">
+            <p className="text-[10px] md:text-xs lg:text-sm text-muted-foreground mb-0.5 md:mb-1 lg:mb-1.5">Difficulty</p>
+            <p className="font-semibold text-foreground text-sm md:text-base lg:text-lg capitalize">
               {selectedDifficulty || "—"}
             </p>
           </div>
 
           {/* Estimated Time */}
-          <div className="border-t border-border pt-6">
-            <p className="text-sm text-muted-foreground mb-2">
+          <div className="border-t border-border pt-4 md:pt-5 lg:pt-6">
+            <p className="text-[10px] text-xs lg:text-sm text-muted-foreground mb-1 md:mb-1.5 lg:mb-2">
               Estimated Time
             </p>
-            <div className="flex items-baseline gap-2">
-              <span className="text-4xl font-bold text-primary">
+            <div className="flex items-baseline gap-1 md:gap-1.5 lg:gap-2">
+              <span className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary">
                 {totalTime}
               </span>
-              <span className="text-foreground text-xl">minutes</span>
+              <span className="text-foreground text-base md:text-lg lg:text-xl">minutes</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">
+            <p className="text-xs text-muted-foreground mt-1 md:mt-1.5 lg:mt-2">
               You can finish early by clicking "Finish Quiz" anytime.
             </p>
           </div>
         </div>
 
         {/* Actions */}
-        <div className="space-y-4 mt-2">
+        <div className="space-y-2 md:space-y-3 lg:space-y-4 mt-1 md:mt-1.5 lg:mt-2">
         <Button
             onClick={handleStartQuiz}
             isDisabled={isStarting}

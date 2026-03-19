@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 export interface InputFieldProps {
   label?: ReactNode;
   placeholder?: string;
-  type?: "text" | "password" | "email" | "username";
+  type?: "text" | "password" | "email" | "username" | "number";
   name?: string;
   error?: string;
   value?: string;
@@ -240,5 +240,5 @@ export interface RadioButtonProps {
   unselectedColor?: string;
   selectedColor?: string;
   isSelected: boolean;
-  onSelect: (value: string | number) => void;
+  onSelect: (value: string | number | null) => void;
 }

@@ -1,72 +1,70 @@
 'use client'
 
-import React, { useState } from 'react'
 import { AllCategories, Analytical, General, Numerical, Verbal } from '@/lib/icons';
 import { RadioButton } from '@/lib/client-imports';
+import { QuizCategory } from '@/lib/types';
 
-const categories = [
-    {
-        value: "numerical",
-        iconBg:"bg-blue-700",
-        label: "Numerical Ability",
-        description: "Basic operations, word problems, quick calculations",
-        icon: <Numerical/>
-    },
-    {
-        value: "analytical",
-        iconBg:"bg-violet-700",
-        label: "Analytical Ability",
-        description: "Word association, logic, data interpretation",
-        icon: <Analytical/>
-    },
-    {
-        value: "verbal",
-        iconBg:"bg-green-700",
-        label: "Verbal Ability",
-        description: "Grammar, vocabulary, reading comprehension",
-        icon: <Verbal/>
-    },
-    {
-        value: "general",
-        iconBg:"bg-orange-700",
-        label: "General Information",
-        description: "Constitution, Code of Conduct, peace & human rights",
-        icon: <General/>
-    },
-    {
-        value: "all",
-        iconBg:"bg-purple-700",
-        label: "All Categories",
-        description: "Mixed questions from all categories",
-        icon: <AllCategories/>
-    },
-];
-
-const SelectCategory = () => {
-
-    const [selected, setSelected] = useState<string | number | null>(null);
-    return (
-        <section>
-            <div className="w-full flex flex-col gap-1 md:gap-1.5 lg:gap-2 p-2 md:p-4 lg:p-6 rounded-xl border-border border">
-                <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground mb-2 md:mb-4 lg:mb-6">
-                    1. Select Category
-                </h1>
-                {categories.map((category) => (
-                    <RadioButton
-                        key={category.value}
-                        variant="boxed"
-                        value={category.value}
-                        label={category.label}
-                        description={category.description}
-                        icon={category.icon}
-                        boxedBG={category.iconBg}
-                        isSelected={selected === category.value}
-                        onSelect={setSelected}
-                    />
-                ))}
-            </div>
-        </section>
-    )
+interface Props {
+  categories: QuizCategory[];
+  selected: string | null;
+  setSelected: (value: string | null) => void;
 }
 
-export default SelectCategory
+const icons = [
+  <Numerical />,   
+  <Analytical />, 
+  <Verbal />,  
+  <General />, 
+];
+
+const backgrounds = [
+  "bg-blue-700",
+  "bg-violet-700",
+  "bg-green-700", 
+  "bg-orange-700",
+];
+
+const SelectCategory = ({ categories, selected, setSelected }: Props) => {
+  return (
+    <section>
+      <div className="w-full flex flex-col gap-1 md:gap-1.5 lg:gap-2 p-4 md:p-5 lg:p-6 rounded-xl border-border border">
+        <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground mb-2 md:mb-4 lg:mb-6">
+          1. Select Category
+        </h1>
+
+        {/* ALL */}
+        <RadioButton
+          variant="boxed"
+          value="all"
+          label="All Categories"
+          description="Mixed questions from all categories"
+          icon={<AllCategories />}
+          boxedBG="bg-purple-700"
+          isSelected={selected === null}
+          onSelect={() => setSelected(null)}
+        />
+
+        {categories.map((category, index) => {
+          const icon = icons[index] ?? null;
+          const bg = backgrounds[index] ?? "bg-gray-700";
+
+          return (
+            <RadioButton
+              key={category.id}
+              variant="boxed"
+              value={category.id}
+              label={category.name}
+              description={category.description || ""}
+              icon={icon}
+              boxedBG={bg}
+              isSelected={selected === category.id}
+              onSelect={() => setSelected(category.id)}
+            />
+          );
+        })}
+      </div>
+    </section>
+  );
+};
+
+export default SelectCategory;
