@@ -12,23 +12,26 @@ export default function RadioButton({
   hideIndicator = false,
   disabled = false,
   className = "",
-  unselectedColor, 
+  unselectedColor,
   selectedColor,
   isSelected,
   onSelect,
-}: RadioButtonProps) {
+  indicator,
+  rightIcon,
+}: RadioButtonProps & { rightIcon?: React.ReactNode }) {
   const handleClick = () => {
     if (!disabled) onSelect(value);
   };
 
-  // Default colors (Shadcn / your theme)
+  // Default colors
   const defaultUnselected = {
     bg: "bg-card",
     border: "border-border",
     text: "text-foreground",
     indicatorBorder: "border-muted-foreground/60",
     indicatorBg: "bg-card",
-    hover: "hover:border-primary/50 hover:bg-muted/40",
+    hover: "hover:border-primary hover:bg-muted/40",
+    indicatorDot: "text-foreground",
   };
 
   const defaultSelected = {
@@ -36,67 +39,63 @@ export default function RadioButton({
     border: "border-primary",
     text: "text-foreground",
     indicatorBorder: "border-primary",
-    indicatorBg: "bg-primary",
-    indicatorDot: "bg-primary-foreground",
+    indicatorBg: "bg-primary/100",
+    indicatorDot: "text-white",
   };
 
-  // Override with custom colors if provided
   const unselected = {
     bg: unselectedColor?.includes("bg-") ? unselectedColor : defaultUnselected.bg,
     border: unselectedColor?.includes("border-") ? unselectedColor : defaultUnselected.border,
-    text: unselectedColor?.includes("text-") ? unselectedColor : defaultUnselected.text,
+    text: unselectedColor
+  ?.split(" ")
+  .find((cls) => cls.startsWith("text-")) || defaultUnselected.text,
     indicatorBorder: defaultUnselected.indicatorBorder,
     indicatorBg: defaultUnselected.indicatorBg,
     hover: defaultUnselected.hover,
+    indicatorDot: defaultUnselected.indicatorDot,
   };
 
   const selected = {
     bg: selectedColor?.includes("bg-") ? selectedColor : defaultSelected.bg,
     border: selectedColor?.includes("border-") ? selectedColor : defaultSelected.border,
-    text: selectedColor?.includes("text-") ? selectedColor : defaultSelected.text,
-    indicatorBorder: selectedColor?.includes("border-") ? selectedColor : defaultSelected.indicatorBorder,
-    indicatorBg: selectedColor?.includes("bg-") ? selectedColor : defaultSelected.indicatorBg,
-    indicatorDot: selectedColor?.includes("text-") ? selectedColor.replace("text-", "bg-") : defaultSelected.indicatorDot,
+    text: selectedColor
+  ?.split(" ")
+  .find((cls) => cls.startsWith("text-")) || defaultSelected.text,
+    indicatorBorder: indicator?.includes("border-") ? indicator : defaultSelected.indicatorBorder,
+    indicatorBg: indicator?.includes("bg-") ? indicator : defaultSelected.indicatorBg,
+    indicatorDot: indicator?.includes("text-") ? indicator : defaultSelected.indicatorDot,
   };
 
-  // ────────────────────────────────────────────────
-  // Base wrapper
-  // ────────────────────────────────────────────────
+  // Wrapper
   let wrapper = `
     group w-full flex transition-all duration-200
-    ${disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}
+    ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
     rounded-xl border
     ${isSelected ? selected.border : unselected.border}
     ${className}
   `;
 
-  // ────────────────────────────────────────────────
-  // Variant-specific styles
-  // ────────────────────────────────────────────────
+  // Variants
   if (variant === "default") {
     wrapper += " items-center gap-4 py-3 px-4";
     wrapper += isSelected ? ` ${selected.bg}` : ` ${unselected.bg} ${unselected.hover}`;
-  }
-  else if (variant === "pill") {
+  } else if (variant === "pill") {
     wrapper += "flex items-center justify-center p-4 md:p-5 lg:p-6 text-sm md:text-base font-medium rounded-lg";
     wrapper += isSelected
       ? ` ${selected.bg} ${selected.text} bg-primary/100 text-white font-semibold`
       : ` ${unselected.bg} ${unselected.text} ${unselected.hover}`;
-  }
-  else if (variant === "card") {
+  } else if (variant === "card") {
     wrapper += " items-center p-4 md:p-5 lg:p-6";
     wrapper += isSelected
       ? ` ${selected.bg} ${selected.border}`
       : ` ${unselected.bg} ${unselected.hover}`;
-  }
-  else if (variant === "boxed") {
+  } else if (variant === "boxed") {
     wrapper += " items-center gap-3 md:gap-4 lg:gap-5 p-3 md:p-4 lg:p-5";
     wrapper += isSelected
       ? ` ${selected.bg} ${selected.border}`
       : ` ${unselected.bg} ${unselected.hover}`;
-  }
-  else if (variant === "choice") {
-    wrapper += " items-center gap-4 py-3 px-4 min-h-[72px]";
+  } else if (variant === "choice") {
+    wrapper += " items-center gap-2 md:gap-3 lg:gap-4 p-3 md:p-3.5 lg:p-4";
     wrapper += isSelected
       ? ` ${selected.bg} ${selected.border}`
       : ` ${unselected.bg} ${unselected.hover}`;
@@ -109,11 +108,12 @@ export default function RadioButton({
   `;
 
   const choiceIndicatorClasses = `
-    flex items-center justify-center w-10 h-10 rounded-md border-2 font-medium text-base transition-all
-    ${isSelected ? selected.border : unselected.border}
-    ${isSelected ? selected.bg : unselected.bg}
-    ${isSelected ? selected.text : unselected.text}
-  `;
+  flex items-center justify-center w-8 h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 text-xs md:text-sm lg:text-base rounded-md border-2 font-medium text-base transition-all
+  ${isSelected ? selected.indicatorBg : unselected.indicatorBg}
+  ${isSelected ? selected.text : unselected.text}
+  ${isSelected ? selected.indicatorBorder : unselected.indicatorBorder}
+  ${isSelected ? selected.indicatorDot : unselected.indicatorDot}
+`;
 
   return (
     <div
@@ -146,21 +146,25 @@ export default function RadioButton({
         )}
 
         {variant === "choice" && (
-          <div className={choiceIndicatorClasses}>
+          <div className={`${choiceIndicatorClasses}`}>
             {value}
           </div>
         )}
 
-        {!hideIndicator && variant !== "card" && variant !== "boxed" && variant !== "choice" && variant !== "pill" && (
-          <div className="relative">
-            <div className={indicatorClasses} />
-            {isSelected && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className={`w-2.5 h-2.5 rounded-full ${selected.indicatorDot}`} />
-              </div>
-            )}
-          </div>
-        )}
+        {!hideIndicator &&
+          variant !== "card" &&
+          variant !== "boxed" &&
+          variant !== "choice" &&
+          variant !== "pill" && (
+            <div className="relative">
+              <div className={indicatorClasses} />
+              {isSelected && (
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className={`w-2.5 h-2.5 rounded-full ${selected.indicatorDot}`} />
+                </div>
+              )}
+            </div>
+          )}
       </div>
 
       {/* CONTENT */}
@@ -170,7 +174,11 @@ export default function RadioButton({
         </span>
       ) : (
         <div className="flex-1 min-w-0 flex flex-col justify-center">
-          <div className={`font-medium text-sm md:text-base leading-snug ${isSelected ? selected.text : unselected.text}`}>
+          <div
+            className={`font-medium text-xs md:text-sm lg:text-base leading-snug ${
+              isSelected ? selected.text : unselected.text
+            }`}
+          >
             {label}
           </div>
           {description && (
@@ -178,6 +186,13 @@ export default function RadioButton({
               {description}
             </div>
           )}
+        </div>
+      )}
+
+      {/* RIGHT ICON (✅ NEW — for correct / wrong) */}
+      {rightIcon && (
+        <div className="ml-auto flex items-center justify-center shrink-0">
+          {rightIcon}
         </div>
       )}
 

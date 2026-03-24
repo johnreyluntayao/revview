@@ -249,16 +249,6 @@ const UserDashboard = async () => {
       {/* SUMMARY CARDS */}
       <SummaryCards cards={summaryCards} />
 
-      {/* START QUIZ BUTTON */}
-      <a href="/customize-quiz">
-        <Button
-          text="Start a New Review"
-          backgroundColor="bg-linear-to-r from-primary to-secondary"
-          textColor="text-white"
-          leftIcon={<StartQuiz />}
-        />
-      </a>
-
       {/* CATEGORY + PERFORMANCE */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
         <CategoryProgress categories={categoryProgress} />
