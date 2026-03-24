@@ -36,7 +36,7 @@ const Progress: React.FC<ProgressProps> = ({
     </div>
 
     {/* Progress bar */}
-    <div className="h-1 md:h-2 lg:h-2.5 w-full rounded-full overflow-hidden mb-1.5">
+    <div className="h-2 md:h-2.5 lg:h-3 w-full rounded-full border border-border bg-input overflow-hidden mb-1.5">
       <div
         className="h-full rounded-full bg-linear-to-r from-primary/80 to-secondary/80 transition-all duration-500 ease-out"
         style={{ width: `${fillPercent}%` }}
@@ -44,7 +44,7 @@ const Progress: React.FC<ProgressProps> = ({
     </div>
 
     {/* Sub-label or hint row – shown for any variant if subLabel exists */}
-    {(subLabel || (variant === "default" && total)) && (
+    {(subLabel) && (
       <div className="text-xs md:text-sm lg:text-base text-foreground/60 text-left">
         {subLabel || `${current} answered`}
       </div>

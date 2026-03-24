@@ -1,4 +1,3 @@
-
 import { Pause, CorrectAnswer as ResumeQuiz, RetakeQuiz, Home } from '@/lib/icons';
 
 interface PauseModalProps {
@@ -18,70 +17,60 @@ export default function PauseModal({
 
   return (
     <div
-      className="fixed inset-0 bg-foreground/50 z-50 flex items-center justify-center p-4 md:p-6 lg:p-8"
+      className="fixed inset-0 bg-foreground/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-xl shadow-2xl p-4 md:p-6 lg:p-8 max-w-md w-full animate-scale-in"
+        className="bg-background rounded-2xl shadow-2xl p-6 md:p-8 max-w-md w-full border border-border animate-in fade-in zoom-in-95"
         onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="pause-title"
       >
-        <div className="text-center mb-4 md:mb-6 lg:mb-8">
-          <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 bg-warning/25 rounded-full flex items-center justify-center mx-auto mb-2 md:mb-3 lg:mb-4">
-            <Pause className="w-4 h-4 md:w-6 md:h-6 lg:w-8 lg:h-8 text-warning" />
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 mx-auto mb-4 bg-yellow-500/10 rounded-full flex items-center justify-center">
+            <Pause className="w-8 h-8 text-yellow-600" />
           </div>
-          <h2 id="pause-title" className="text-lg md:text-xl lg:text-2xl font-bold text-foreground">
-            Quiz Paused
-          </h2>
-          <p className="text-xs md:text-sm lg:text-base text-muted-foreground mt-1 md:mt-1.5 lg:mt-2">
-            You can resume your quiz or exit and come back later.
+          <h2 className="text-2xl font-bold mb-2">Quiz Paused</h2>
+          <p className="text-muted-foreground">
+            Your timer is paused. You can resume or exit to dashboard.
           </p>
         </div>
 
-        {/* Pause Options */}
-        <div className="space-y-2 md:space-y-2.5 lg:space-y-3">
-          {/* Resume */}
+        <div className="space-y-3">
           <button
             onClick={onClose}
-            className="w-full flex items-center gap-2 md:gap-2.5 lg:gap-3 px-4 md:px-5 lg:px-6 py-3 md:py-3.5 lg:py-4 bg-success/15 text-success rounded-lg font-semibold hover:opacity-90 transition"
+            className="w-full flex items-center gap-3 p-4 bg-green-500/10 hover:bg-green-500/20 text-green-700 rounded-xl transition"
           >
-            <ResumeQuiz className="w-4 h-4 md:w-5 md:h-5" />
+            <ResumeQuiz className="w-6 h-6" />
             <div className="text-left">
-              <p className="font-semibold text-sm md:text-base">Resume Quiz</p>
-              <p className="text-[10px] md:text-xs opacity-90">Continue taking the quiz</p>
+              <div className="font-semibold">Resume Quiz</div>
+              <div className="text-sm opacity-80">Continue where you left off</div>
             </div>
           </button>
 
-          {/* Restart */}
           <button
             onClick={onRestart}
-            className="w-full flex items-center gap-2 md:gap-2.5 lg:gap-3 px-4 md:px-5 lg:px-6 py-3 md:py-3.5 lg:py-4 bg-primary/15 text-primary rounded-lg font-semibold hover:bg-muted/80 transition"
+            className="w-full flex items-center gap-3 p-4 bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 rounded-xl transition"
           >
-            <RetakeQuiz className="w-4 h-4 md:w-5 md:h-5" />
+            <RetakeQuiz className="w-6 h-6" />
             <div className="text-left">
-              <p className="font-semibold text-sm md:text-base">Restart Quiz</p>
-              <p className="text-[10px] md:text-xs opacity-90">Start over with new questions</p>
+              <div className="font-semibold">Restart Quiz</div>
+              <div className="text-sm opacity-80">Start over with new questions</div>
             </div>
           </button>
 
-          {/* Exit */}
           <button
             onClick={onExit}
-            className="w-full flex items-center gap-2 md:gap-2.5 lg:gap-3 px-4 md:px-5 lg:px-6 py-3 md:py-3.5 lg:py-4 bg-destructive/15 text-destructive rounded-lg font-semibold hover:bg-muted/80 transition"
+            className="w-full flex items-center gap-3 p-4 bg-red-500/10 hover:bg-red-500/20 text-red-700 rounded-xl transition"
           >
-            <Home className="w-4 h-4 md:w-5 md:h-5" />
+            <Home className="w-6 h-6" />
             <div className="text-left">
-              <p className="font-semibold text-sm md:text-base">Exit to Dashboard</p>
-              <p className="text-[10px] md:text-xs opacity-90">Go home (progress will be lost)</p>
+              <div className="font-semibold">Exit to Dashboard</div>
+              <div className="text-sm opacity-80">Progress will NOT be saved</div>
             </div>
           </button>
         </div>
 
-        {/* Small note */}
-        <p className="text-[10px] md:text-xs text-muted-foreground text-center mt-4 md:mt-5 lg:mt-6">
-          Timer is paused while you're away
+        <p className="text-center text-xs text-muted-foreground mt-6">
+          Timer remains paused while this window is open
         </p>
       </div>
     </div>

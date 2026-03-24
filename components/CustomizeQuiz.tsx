@@ -10,9 +10,11 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { QuizCategory, DifficultyLevel } from "@/lib/types";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const CustomizeQuiz = () => {
   const supabase = createClient();
+  const router = useRouter();
 
   const [categories, setCategories] = useState<QuizCategory[]>([]);
   const [difficultyLevels, setDifficultyLevels] = useState<DifficultyLevel[]>([]);
@@ -29,26 +31,20 @@ const CustomizeQuiz = () => {
       const { data: diffData } = await supabase.from("difficulty_levels").select("*");
 
       if (catData) setCategories(catData);
-      if (diffData) {
-        const mapped = diffData.map((d) => ({
-          ...d
-        }));
-        setDifficultyLevels(mapped);
-      }
+      if (diffData) setDifficultyLevels(diffData);
     };
 
     fetchData();
   }, []);
 
-const selectedDifficultyObj = difficultyLevels.find(
-  (d) => String(d.id) === String(selectedDifficulty)
-);
+  const selectedDifficultyObj = difficultyLevels.find(
+    (d) => String(d.id) === String(selectedDifficulty)
+  );
 
-const totalTime =
-  selectedDifficultyObj && selectedQuestions
-    ? (Number(selectedDifficultyObj.minutes_per_question) || 0) *
-      Number(selectedQuestions)
-    : 0;
+  const totalTime =
+    selectedDifficultyObj && selectedQuestions
+      ? Number(selectedDifficultyObj.minutes_per_question) * selectedQuestions
+      : 0;
 
   const handleStartQuiz = async () => {
     if (!selectedDifficulty || !selectedQuestions) {
@@ -65,19 +61,47 @@ const totalTime =
 
       if (!user) throw new Error("User not authenticated");
 
-      const { error } = await supabase.from("quiz_sessions").insert({
-        user_id: user.id,
-        category_id: selectedCategory,
-        difficulty_id: selectedDifficulty,
-        total_questions: selectedQuestions,
-        total_time_seconds: Number(totalTime) * 60,
-      });
+      // ✅ Use your SQL function (random + category-safe)
+      const { data: randomQuestions, error: qError } = await supabase.rpc(
+        "get_random_questions",
+        {
+          p_limit: selectedQuestions,
+          p_category_id: selectedCategory,
+        }
+      );
 
-      if (error) throw error;
+      if (qError) throw qError;
 
-      toast.success("Quiz session created!");
+      if (!randomQuestions || randomQuestions.length < selectedQuestions) {
+        throw new Error("Not enough questions available.");
+      }
+
+      const questionIds = randomQuestions.map((q: any) => q.id);
+
+      // ✅ Insert session
+      const { data: newSession, error: insertError } = await supabase
+        .from("quiz_sessions")
+        .insert({
+          user_id: user.id,
+          category_id: selectedCategory,
+          difficulty_id: selectedDifficulty,
+          total_questions: selectedQuestions,
+          total_time_seconds: totalTime * 60,
+          question_ids: questionIds,
+        })
+        .select("id")
+        .single();
+
+      if (insertError) throw insertError;
+      if (!newSession) throw new Error("Failed to create session");
+
+      toast.success("Quiz started!");
+
+      // ✅ redirect AFTER insert
+      router.push(`/quiz/${newSession.id}`);
     } catch (err: any) {
-      toast.error(err.message);
+      console.error(err);
+      toast.error(err.message || "Failed to start quiz");
     } finally {
       setIsStarting(false);
     }
@@ -95,7 +119,7 @@ const totalTime =
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-        <div className="col-span-1 md:col-span-2 flex flex-col gap-4 md:gap-6 lg:gap-8">
+        <div className="col-span-2 flex flex-col gap-4 md:gap-6 lg:gap-8">
           <SelectCategory
             categories={categories}
             selected={selectedCategory}
@@ -119,9 +143,7 @@ const totalTime =
             categories={categories}
             selectedCategory={selectedCategory}
             selectedQuestions={selectedQuestions}
-            selectedDifficulty={
-              selectedDifficultyObj?.label || ""
-            }
+            selectedDifficulty={selectedDifficultyObj?.label || ""}
             totalTime={totalTime}
             isStarting={isStarting}
             handleStartQuiz={handleStartQuiz}

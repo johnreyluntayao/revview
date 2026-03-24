@@ -241,4 +241,5 @@ export interface RadioButtonProps {
   selectedColor?: string;
   isSelected: boolean;
   onSelect: (value: string | number | null) => void;
+  indicator?: string;
 }
