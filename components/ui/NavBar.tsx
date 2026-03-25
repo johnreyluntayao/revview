@@ -324,7 +324,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                 </Link>
               </div>
             ) : (
-              <div className="text-muted-foreground">{title}</div>
+              <div className="text-xs md:text-sm lg:text-base text-muted-foreground">{title}</div>
             )}
           </div>
         </div>

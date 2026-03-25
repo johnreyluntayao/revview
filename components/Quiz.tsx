@@ -262,7 +262,7 @@ const submitQuiz = useCallback(
       toast.success(
         timedOut ? "Time's up — quiz submitted!" : "Quiz completed!"
       );
-      router.push("/dashboard?quiz=completed");
+      router.push(`/quiz-result/${sessionId}`);
     } catch (err: any) {
       console.error("Finish quiz error:", err);
       toast.error("Failed to submit quiz.");

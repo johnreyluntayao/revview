@@ -14,7 +14,7 @@ interface Question {
 
 interface Answer {
   questionId: string | number;
-  selectedOption: string;
+  selectedOption: string |null;
   isCorrect: boolean;
 }
 
@@ -46,24 +46,24 @@ export default function QuizAccordion({
               onClick={() =>
                 setExpandedQuestion(isExpanded ? null : idx)
               }
-              className="w-full p-5 sm:p-6 hover:bg-muted/40 transition-colors text-left flex items-start gap-4"
+              className="w-full p-4 md:p-5 lg:p-6 hover:bg-muted/40 transition-colors text-left flex items-start gap-2 md:gap-3 lg:gap-4"
             >
               <div
-                className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                className={`w-8 h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 rounded-lg flex items-center justify-center shrink-0 ${
                   answer?.isCorrect
                     ? "bg-success/10"
                     : "bg-destructive/10"
                 }`}
               >
                 {answer?.isCorrect ? (
-                  <CorrectAnswer className="w-6 h-6 text-success" />
+                  <CorrectAnswer className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-success" />
                 ) : (
-                  <IncorrectAnswer className="w-6 h-6 text-destructive" />
+                  <IncorrectAnswer className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-destructive" />
                 )}
               </div>
 
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-foreground mb-1.5">
+              <div className="flex-1 min-w-0 text-xs md:text-sm lg:text-base">
+                <p className="font-semibold text-foreground mb-0.5 md:mb-1 lg:mb-1.5">
                   Question {idx + 1}
                 </p>
                 <p className="text-foreground">
@@ -87,11 +87,11 @@ export default function QuizAccordion({
               `}
             >
               <div className="overflow-hidden">
-                <div className="border-t border-border p-5 sm:p-6 bg-muted/30">
+                <div className="border-t border-border p-4 md:p-5 lg:p-6 bg-muted/30">
                   <div className="space-y-6">
                     {/* Options */}
                     <div>
-                      <p className="text-sm font-semibold text-muted-foreground mb-3">
+                      <p className="text-[10px] md:text-xs lg:text-sm font-semibold text-muted-foreground mb-1 md:mb-2 lg:mb-3">
                         All Options:
                       </p>
                       <div className="space-y-2.5">
@@ -113,7 +113,7 @@ export default function QuizAccordion({
                                   : "border-border/60 bg-background/40"
                               }`}
                             >
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-1 md:gap-2 lg:gap-3 text-xs md:text-sm lg:text-base">
                                 <span className="font-semibold text-foreground min-w-6">
                                   {letter}.
                                 </span>
@@ -138,10 +138,10 @@ export default function QuizAccordion({
                     {/* Explanation */}
                     {question.explanation && (
                       <div>
-                        <p className="text-sm font-semibold text-muted-foreground mb-2.5">
+                        <p className="text-[10px] md:text-xs lg:text-sm font-semibold text-muted-foreground mb-1 md:mb-2 lg:mb-3">
                           Explanation:
                         </p>
-                        <div className="prose prose-neutral dark:prose-invert text-foreground text-[15px] leading-relaxed">
+                        <div className="prose prose-neutral dark:prose-invert text-foreground text-xs md:text-sm lg:text-base leading-relaxed">
                           {question.explanation}
                         </div>
                       </div>

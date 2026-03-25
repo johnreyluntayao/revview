@@ -74,8 +74,8 @@ const Card: React.FC<CardProps> = ({
         case "overview":
             content = (
                 <div className="p-4 md:p-6 lg:p-8 text-left w-full">
-                    {title && <h3 className={`text-xs md:text-sm lg:text-base font-medium text-muted-foreground mb-1`}>{title}</h3>}
-                    <p className={`text-lg md:text-xl lg:text-2xl font-semibold text-foreground capitalize ${textColor}`}>{value}</p>
+                    {title && <h3 className={`text-[10px] md:text-xs lg:text-sm font-medium text-muted-foreground mb-1`}>{title}</h3>}
+                    <p className={`text-base md:text-lg lg:text-xl font-semibold text-foreground capitalize ${textColor}`}>{value}</p>
                 </div>
             );
             break;
