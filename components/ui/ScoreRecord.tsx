@@ -1,6 +1,5 @@
-
 import { Button } from '@/lib/client-imports';
-import { ViewDetailedResults } from '@/lib/icons';
+import { Eye } from 'lucide-react';   // ← Eye icon
 
 interface ScoreRecordProps {
   title: string;
@@ -10,6 +9,8 @@ interface ScoreRecordProps {
   time: string;     
   date: string;     
   percentage: number;     
+  quizSessionId: string;
+  onViewDetail: () => void;
 }
 
 const ScoreRecord = ({
@@ -20,6 +21,8 @@ const ScoreRecord = ({
   time,
   date,
   percentage,
+  quizSessionId,
+  onViewDetail,
 }: ScoreRecordProps) => {
 
   const getScoreBgColor = (scoreVal: number) => {
@@ -41,18 +44,22 @@ const ScoreRecord = ({
 
   return (
     <div className="w-full">
-      <div
+      <button
+        onClick={onViewDetail}
         className="
+          w-full group
           relative 
           rounded-lg 
           overflow-hidden
           bg-white
-          shadow-sm
+          hover:shadow-md
           border border-border/40
-          self-center
+          hover:border-primary/60
+          transition-all duration-200
+          text-left
         "
       >
-        <div className="p-5 flex items-start gap-4 md:gap-5 lg:gap-6 flex-wrap">
+        <div className="p-4 md:p-5 lg:p-6 flex items-start gap-4 md:gap-5 lg:gap-6 flex-wrap">
 
           <div
             className={`
@@ -67,7 +74,7 @@ const ScoreRecord = ({
           >
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center leading-tight">
-                <div className={`text-lg sm:text-xl md:text-2xl font-bold ${textClass} text-nowrap`}>
+                <div className={`text-lg md:text-xl lg:text-2xl font-bold ${textClass} text-nowrap`}>
                   {percentage}<span>%</span>
                 </div>
               </div>
@@ -75,8 +82,8 @@ const ScoreRecord = ({
           </div>
 
           {/* Main content */}
-          <div className="flex flex-col gap-2 flex-1 min-w-0">
-            <h3 className="text-base md:text-lg lg:text-xl font-bold text-foreground">
+          <div className="flex flex-col gap-1 md:gap-1.5 lg:gap-2 flex-1 min-w-0">
+            <h3 className="text-sm md:text-base lg:text-lg font-bold text-foreground">
               {title}
             </h3>
 
@@ -98,18 +105,14 @@ const ScoreRecord = ({
             </div>
           </div>
 
-          {/* Right arrow / detail button */}
-          <div className="self-center ml-auto items-center">
-            <Button
-              leftIcon={<ViewDetailedResults />}
-              borderColor="border-none"
-              isRounded={true}
-              textColor="hover:text-white"
-              className='h-12 w-12'
-            />
+          {/* Eye icon - visible only on hover */}
+          <div className="self-center ml-auto items-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="h-10 w-10 md:h-11 md:w-11 lg:h-12 lg:w-12 flex items-center justify-center group-hover:bg-primary/10 transition-colors rounded-xl">
+              <Eye className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-muted-foreground group-hover:text-primary" />
+            </div>
           </div>
         </div>
-      </div>
+      </button>
     </div>
   );
 };
