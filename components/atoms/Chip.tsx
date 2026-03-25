@@ -49,7 +49,7 @@ const Chip: React.FC<ChipProps> = ({
 }) => {
   const style = variantStyles[variant] || variantStyles.default
 
-    const baseClasses = `inline-flex items-center font-medium gap-2 px-3 py-1 text-xs md:text-sm lg:text-base ${className} ${style.background} ${style.text} rounded-full`
+    const baseClasses = `inline-flex items-center font-medium gap-2 px-3 py-1 text-[10px] md:text-xs lg:text-sm ${className} ${style.background} ${style.text} rounded-full`
   return (
 
     <div className={baseClasses}>
