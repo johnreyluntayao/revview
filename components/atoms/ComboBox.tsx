@@ -103,7 +103,7 @@ export default function ComboBox({
   return (
    <div className={`w-full space-y-2 ${className}`}>
       {label && (
-        <label className="block text-sm md:text-base lg:text-lg font-medium text-foreground">
+        <label className="block text-[10px] md:text-xs lg:text-sm font-medium text-foreground">
           {label}
         </label>
       )}
@@ -118,7 +118,7 @@ export default function ComboBox({
           placeholder={value ? getDisplayLabel() || placeholder : placeholder}
           readOnly={!isSearchable || !isOpen}
           disabled={disabled}
-          className={`w-full pr-10 rounded-md border bg-background 
+          className={`w-full text-xs md:text-sm lg:text-base rounded-md border bg-background 
           ${!isSearchable || !isOpen ? "cursor-pointer" : "cursor-text"}
           border-border text-foreground placeholder-foreground 
           focus:border-primary/75 focus:ring focus:ring-primary/30
