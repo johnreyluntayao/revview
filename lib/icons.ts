@@ -50,5 +50,6 @@ export {
     Image,
     Pause,
     Home,
+    CircleUserRound as User2,
 
 } from 'lucide-react';
