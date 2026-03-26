@@ -3,24 +3,28 @@ import React from 'react'
 
  const variantStyles = {
   default: {
-    background: '',
-    text: '',
+    background: 'bg-amber-800/70',
+    text: 'text-white',
   },
   numerical: {
-    background: 'bg-primary/10',
-    text: 'text-primary',
+    background: 'bg-primary/70',
+    text: 'text-white',
   },
   verbal: {
-    background: 'bg-success/10',
-    text: 'text-success',
+    background: 'bg-success/70',
+    text: 'text-white',
   },
   general: {
-    background: 'bg-secondary/10',
-    text: 'text-secondary',
+    background: 'bg-warning/70',
+    text: 'text-white',
   },
   analytical: {
-    background: 'bg-amber-100',
-    text: 'text-amber-800',
+    background: 'bg-secondary/70',
+    text: 'text-white',
+  },
+  all: {
+    background: 'bg-linear-to-r from-primary/70 to-secondary/70',
+    text: 'text-white',
   },
   correct: {
     background: 'bg-success/10',
