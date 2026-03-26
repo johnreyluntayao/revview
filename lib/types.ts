@@ -160,7 +160,11 @@ export interface ChipProps {
     | 'incorrect'
     | 'resolved'
     | 'score'
+    | 'all'
     | 'default'
+    | 'easy'
+    | 'medium'
+    | 'hard'
 }
 
 export interface CardProps {
@@ -175,6 +179,8 @@ export interface CardProps {
     trend?: "up" | "down" | null;
     className?: string;
     iconSize?: number;
+    subColor?: string;
+    subColor2?: string;
 }
 
 

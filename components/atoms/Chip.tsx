@@ -39,9 +39,22 @@ import React from 'react'
     text: 'text-success',
   },
   score: {
-    background: 'bg-indigo-50',
-    text: 'text-indigo-800 font-medium',
+    background: 'bg-primary',
+    text: 'text-white font-medium',
   },
+  easy: {
+    background: 'bg-success',
+    text: 'text-white font-medium',
+  },
+  medium: {
+    background: 'bg-warning',
+    text: 'text-white font-medium',
+  },
+  hard: {
+    background: 'bg-destructive',
+    text: 'text-white font-medium',
+  },
+  
 }
 
 const Chip: React.FC<ChipProps> = ({
