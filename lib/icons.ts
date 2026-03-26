@@ -51,5 +51,6 @@ export {
     Pause,
     Home,
     CircleUserRound as User2,
+    Calendar,
 
 } from 'lucide-react';

@@ -25,7 +25,7 @@ const Card: React.FC<CardProps> = ({
     switch (variant) {
         case "stat":
             content = (
-                <div className="p-5 w-full">
+                <div className="p-4 md:p-5 lg:p-6 w-full bg-linear-to-br from-primary/70 to-secondary/70 text-white">
                     <div className="flex items-center justify-between">
                         {title && (
                             <h3 className={`text-xs md:text-sm lg:text-base font-medium ${textColor}`}>{title}</h3>
@@ -44,17 +44,17 @@ const Card: React.FC<CardProps> = ({
                         )}
                     </div>
                     <div className="flex items-baseline">
-                        <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground text-right">{value}</p>
+                        <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-right text-white">{value}</p>
                         {trend && (
                             <span
-                                className={`text-xs md:text-sm lg:text-base text-right font-medium ${trend === "up" ? "text-green-600" : "text-red-600"
+                                className={`text-xs md:text-sm lg:text-base text-right font-medium ${trend === "up" ? "text-success" : "text-destructive"
                                     }`}
                             >
                                 {trend === "up" ? "↑" : "↓"}
                             </span>
                         )}
                     </div>
-                    {subValue && <p className="mt-1 text-xs md:text-sm lg:text-base text-gray-500">{subValue}</p>}
+                    {subValue && <p className="mt-1 text-xs md:text-sm lg:text-base text-white">{subValue}</p>}
                 </div>
             );
             break;
