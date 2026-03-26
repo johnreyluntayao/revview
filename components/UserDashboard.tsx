@@ -8,11 +8,19 @@ import {
 import { AverageScore, BestCategory, StudyTime, StartQuiz, TotalTests } from '@/lib/icons';
 import { createClient } from "@/lib/supabase/server"
 
-const formatTime = (seconds: number) => {
-  const h = Math.floor(seconds / 3600)
-  const m = Math.floor((seconds % 3600) / 60)
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`
-}
+const formatTime = (seconds: number): string => {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = Math.floor(seconds % 60);
+
+  if (h > 0) {
+    return `${h}hr & ${m}min`;
+  } else if (m > 0) {
+    return `${m}min & ${s}secs`;
+  } else {
+    return `${s}secs`;
+  }
+};
 
 const formatDate = (date: string) => {
   const d = new Date(date)
@@ -71,7 +79,7 @@ const UserDashboard = async () => {
 
   const studyTime = formatTime(totalTimeSeconds)
 
-  //for best category, by grouping results by category and find the one with highest average score
+  //for best category
   const categoryGroups: Record<string, number[]> = {}
 
   quizResults.forEach((r) => {
@@ -103,7 +111,7 @@ const UserDashboard = async () => {
     bestCategory = data?.name ?? "N/A"
   }
 
-  //for categoru progress
+  //for category progress
   const { data: categories } = await supabase
     .from("categories")
     .select("id,name")
@@ -148,7 +156,7 @@ const UserDashboard = async () => {
     testCount: allCount
   })
 
- // for performance overview
+  // PERFORMANCE OVERVIEW
   const percentages = quizResults.map((r) => Number(r.percentage))
 
   const overallScore =
@@ -164,7 +172,24 @@ const UserDashboard = async () => {
   const lowestScore =
     percentages.length > 0 ? Math.min(...percentages).toFixed(2) + "%" : "0%"
 
-  //for recent scores, limited to 10
+  // ✅ NEW: SCORE IMPROVEMENT
+  let scoreImprovement = "0%"
+
+  if (quizResults.length >= 2) {
+    const sorted = [...quizResults].sort(
+      (a, b) => new Date(b.date_taken).getTime() - new Date(a.date_taken).getTime()
+    )
+
+    const latest = Number(sorted[0].percentage)
+    const previous = Number(sorted[1].percentage)
+
+    const diff = latest - previous
+
+    scoreImprovement =
+      (diff > 0 ? "+" : "") + diff.toFixed(2) + "%"
+  }
+
+  // RECENT SCORES
   const { data: recentResults } = await supabase
     .from("quiz_results")
     .select(`
@@ -210,7 +235,7 @@ const UserDashboard = async () => {
       date: formatDate(r.date_taken)
     })) ?? []
 
-  //for summary cards data
+  // SUMMARY CARDS
   const summaryCards = [
     {
       icon: <TotalTests />,
@@ -258,6 +283,7 @@ const UserDashboard = async () => {
           overallScoreSub={String(totalTests)}
           bestScore={bestScore}
           lowestScore={lowestScore}
+          scoreImprovement={scoreImprovement}
         />
       </div>
 
