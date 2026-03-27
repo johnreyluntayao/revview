@@ -126,9 +126,9 @@ useEffect(() => {
   }
 
   return (
-    <main className="p-4 md:p-6 lg:p-8 bg-linear-to-br from-blue-50 via-white to-purple-50 min-h-screen">
-      <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold">Manage Feedbacks</h1>
-      <p className="text-sm md:text-base font-medium lg:text-lg text-muted-foreground mt-1 md:mt-2 lg:mt-3">
+    <main className="px-4 md:px-6 lg:px-8 py-20 md:py-24 lg:py-28 bg-primary/3 min-h-screen">
+      <h1 className="text-xl md:text-2xl lg:text-3xl font-bold">Manage Feedbacks</h1>
+      <p className="text-xs md:text-sm font-medium lg:text-base text-muted-foreground mt-1">
         Overview of user feedbacks
       </p>
 

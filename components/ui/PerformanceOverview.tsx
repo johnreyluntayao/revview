@@ -28,7 +28,7 @@ const PerformanceOverview = ({
 
   return (
     <section>
-      <div className="w-full h-full flex flex-col gap-1 md:gap-1.5 lg:gap-2 p-4 md:p-5 lg:p-6 rounded-xl border-border border">
+      <div className="w-full h-full flex flex-col gap-1 md:gap-1.5 lg:gap-2 p-4 md:p-5 lg:p-6 rounded-xl border-border border bg-card">
         <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground mb-2 md:mb-4 lg:mb-6">
           Performance Overview
         </h1>
@@ -71,7 +71,7 @@ const PerformanceOverview = ({
             value={scoreImprovement}
             textColor={improvementTextColor} 
             bg={improvementBg}         
-            subValue={`Compared from your last quiz`}
+            subValue={`Compared to your last quiz`}
             className="col-span-1 md:col-span-2"
             subColor="text-foreground"
             subColor2="text-muted-foreground"

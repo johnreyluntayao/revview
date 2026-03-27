@@ -148,49 +148,20 @@ const AccountSettings = ({ userInfo, role = "user" }: AccountSettingsProps) => {
   };
 
   return (
-    <div className="w-full p-6">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">Account Settings</h1>
-        <p className="text-muted-foreground mt-1">
+    <div className="w-full p-4 md:p-6 lg:p-8 bg-primary/3 min-h-screen">
+      <div className="mb-4 md:mb-6 lg:mb-8">
+        <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">Account Settings</h1>
+        <p className="text-xs md:text-sm lg:text-base text-muted-foreground mt-1">
           Manage your account information and security settings
         </p>
       </div>
 
-      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden mb-8">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <h2 className="text-lg font-semibold">Personal Information</h2>
-          {!isEditing ? (
-            <Button
-              text="Edit Profile"
-              size="md"
-              backgroundColor="bg-primary"
-              textColor="text-primary-foreground"
-              onClick={() => setIsEditing(true)}
-            />
-          ) : (
-            <div className="flex gap-3">
-              <Button
-                text="Cancel"
-                size="md"
-                backgroundColor=""
-                borderColor="border-border"
-                textColor="text-foreground"
-                onClick={handleCancel}
-                isDisabled={isSaving}
-              />
-              <Button
-                text={isSaving ? "Saving..." : "Save Changes"}
-                size="md"
-                backgroundColor="bg-primary"
-                textColor="text-primary-foreground"
-                onClick={handleSave}
-                isDisabled={isSaving}
-              />
-            </div>
-          )}
+      <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden mb-4 md:mb-6 lg:mb-8">
+        <div className={`px-4 md:px-5 lg:px-6 py-2 md:p-3 lg:py-4 border-b border-border`}>
+          <h2 className="text-sm md:text-base lg:text-lg font-semibold">Personal Information</h2>
         </div>
 
-        <div className="px-6 py-6 space-y-6">
+        <div className="p-4 md:p-5 lg:p-6 space-y-6">
           <InputField
             name="fullName"
             label="Full Name"
@@ -242,7 +213,7 @@ const AccountSettings = ({ userInfo, role = "user" }: AccountSettingsProps) => {
               />
 
               {sameAsCurrentWarning && newPassword && (
-                <p className="text-amber-600 text-sm -mt-2">
+                <p className="text-warning text-[10px] md:text-xs lg:text-sm -mt-2">
                   New password is the same as current password
                 </p>
               )}
@@ -265,10 +236,41 @@ const AccountSettings = ({ userInfo, role = "user" }: AccountSettingsProps) => {
 
           {/* Info message for Google users */}
           {isEditing && isGoogleUser && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-[10px] md:text-xs lg:text-sm text-muted-foreground">
               Password cannot be changed for Google login accounts.
             </p>
           )}
+
+          {!isEditing ? (
+            <div className="flex justify-end">
+              <Button
+              text="Edit Profile"
+              backgroundColor="bg-primary"
+              textColor="text-primary-foreground"
+              onClick={() => setIsEditing(true)}
+            />
+            </div>
+            
+          ) : (
+            <div className="flex flex-wrap gap-1 md:gap-2 lg:gap-3 justify-end">
+              <Button
+                text="Cancel"
+                backgroundColor=""
+                borderColor="border-border"
+                textColor="text-foreground"
+                onClick={handleCancel}
+                isDisabled={isSaving}
+              />
+              <Button
+                text={isSaving ? "Saving..." : "Save Changes"}
+                backgroundColor="bg-primary"
+                textColor="text-primary-foreground"
+                onClick={handleSave}
+                isDisabled={isSaving}
+              />
+            </div>
+          )}
+
         </div>
       </div>
     </div>

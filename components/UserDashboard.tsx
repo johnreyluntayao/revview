@@ -260,13 +260,13 @@ const UserDashboard = async () => {
   ]
 
   return (
-    <div className="m-4 md:m-6 lg:m-8 gap-4 md:gap-6 lg:gap-8 flex flex-col">
+    <div className="p-4 md:p-6 lg:p-8 gap-4 md:gap-6 lg:gap-8 flex flex-col bg-primary/3">
 
       <div className="">
         <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">
-          Welcome Back {name}!
+          Welcome Back, {name}!
         </h1>
-        <p className="text-xs md:text-sm lg:text-base text-foreground/70">
+        <p className="text-xs md:text-sm lg:text-base text-muted-foreground">
           Here is your learning progress and recent quiz scores
         </p>
       </div>

@@ -56,9 +56,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         `}
         {...rest}
       >
-        {leftIcon && <span className="shrink-0">{leftIcon}</span>}
+        {leftIcon && <span className="">{leftIcon}</span>}
         {children ? children : text}
-        {rightIcon && <span className="shrink-0">{rightIcon}</span>}
+        {rightIcon && <span className="">{rightIcon}</span>}
       </button>
     );
   }

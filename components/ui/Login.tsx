@@ -77,13 +77,13 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex flex-col w-full">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex flex-col w-full px-4 md:px-6 lg:px-8 py-20 lg:py-24">
       {/* Form Card */}
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-border p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Welcome Back</h1>
-            <p className="text-muted-foreground">Sign in to continue to your dashboard</p>
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-full max-w-md bg-white rounded-xl shadow-xl border border-border p-4 md:p-6 lg:p-8">
+          <div className="text-center mb-4 md:mb-6 lg:mb-8">
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-1 md:mb-1.5 lg:mb-2">Welcome Back</h1>
+            <p className="text-xs md:text-sm lg:text-base text-muted-foreground">Sign in to continue to your dashboard</p>
           </div>
 
           <Button
@@ -114,21 +114,21 @@ export default function Login() {
             Continue with Google
           </Button>
 
-          <div className="relative mb-6">
+          <div className="relative mb-4 md:mb-5 lg:mb-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border" />
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-muted-foreground">Or continue with email</span>
+            <div className="relative flex justify-center text-[10px] md:text-xs lg:text-sm">
+              <span className="px-1 md:px-1.5 lg:px-2 bg-white text-muted-foreground">Or continue with email</span>
             </div>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <form onSubmit={handleLogin} className="space-y-3 md:space-y-4 lg:space-y-5">
             <InputField
               label="Email Address"
               type="email"
               placeholder="you@example.com"
-              icon={<Email className="w-5 h-5" />}
+              icon={<Email />}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -138,21 +138,21 @@ export default function Login() {
               label="Password"
               type="password"
               placeholder="••••••••"
-              icon={<Password className="w-5 h-5" />}
+              icon={<Password />}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               showPasswordToggle
               required
             />
 
-            {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+            {error && <p className="text-destructive text-[10px] md:text-xs lg:text-sm text-center">{error}</p>}
 
             <Button
               type="submit"
               isDisabled={isLoading}
               backgroundColor="bg-primary text-primary-foreground"
               className="w-full"
-              rightIcon={<LogIn className="w-5 h-5" />}
+              rightIcon={<LogIn />}
             >
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>

@@ -156,12 +156,12 @@ export default async function AdminDashboard() {
   }
 
   return (
-    <main className="px-4 md:px-6 lg:px-8 py-20 lg:py-24 space-y-4 md:space-y-6 lg:space-y-8 bg-linear-to-br from-primary/5 to-secondary/5 min-h-screen">
+    <main className="px-4 md:px-6 lg:px-8 py-20 md:py-24 lg:py-28 space-y-4 md:space-y-6 lg:space-y-8 bg-primary/3 min-h-screen">
       <div>
-        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold">
+        <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">
           Welcome Back, {adminName}!
         </h1>
-        <p className="text-sm md:text-base font-medium lg:text-lg text-muted-foreground mt-0.5">
+        <p className="text-xs md:text-sm lg:text-base font-medium text-muted-foreground mt-0.5">
           Here's the overview of your dashboard.
         </p>
       </div>

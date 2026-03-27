@@ -3,7 +3,7 @@ import { UserDashboard } from '@/lib/server-imports'
 
 const page = () => {
   return (
-    <main>
+    <main className='min-h-screen'>
       <UserDashboard />
       <SubmitFeedback />
     </main>
