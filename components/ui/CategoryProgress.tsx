@@ -13,7 +13,7 @@ interface CategoryProgressProps {
 const CategoryProgress = ({ categories }: CategoryProgressProps) => {
   return (
     <section>
-      <div className="w-full flex flex-col gap-2 md:gap-3 lg:gap-4 p-4 md:p-5 lg:p-6 rounded-xl border-border border">
+      <div className="w-full flex flex-col gap-2 md:gap-3 lg:gap-4 p-4 md:p-5 lg:p-6 rounded-xl border-border border bg-card">
         <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground mb-2 md:mb-4 lg:mb-6">
           Category Progress
         </h1>

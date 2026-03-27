@@ -35,7 +35,7 @@ const RecentScores = ({ scores }: RecentScoresProps) => {
   };
 
   return (
-    <div className="w-full flex flex-col gap-1 md:gap-1.5 lg:gap-2 p-4 md:p-5 lg:p-6 rounded-xl border-border border overflow-hidden">
+    <div className="w-full flex flex-col gap-1 md:gap-1.5 lg:gap-2 p-4 md:p-5 lg:p-6 rounded-xl border-border border overflow-hidden bg-card">
 
       {/* Header */}
       <div className="mb-2 md:mb-4 lg:mb-6">

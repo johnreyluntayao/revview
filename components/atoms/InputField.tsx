@@ -125,14 +125,14 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
   return (
     <div className={`space-y-2 ${className}`}>
       {label && (
-        <label className="block font-medium text-gray-700 text-xs md:text-sm">
+        <label className="block font-medium text-gray-700 text-[10px] md:text-xs lg:text-sm">
           {label}
         </label>
       )}
 
       <div className="relative flex items-center w-full">
         {isUsername && state !== "readonly" && (
-          <span className="absolute left-3 text-gray-500 text-sm md:text-base">@</span>
+          <span className="absolute left-3 text-gray-500 text-xs md:text-sm lg:text-base">@</span>
         )}
 
         {icon && !isUsername && (
@@ -154,7 +154,7 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
           max={type === "number" ? max : undefined}
           step={type === "number" ? step : undefined}
           className={`
-            w-full rounded-lg transition-all duration-150
+            w-full rounded-lg transition-all duration-150 text-xs md:text-sm lg:text-base
             focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500
             ${sizeClasses} ${paddingLeft} ${paddingRight}
             ${hasError ? "border-destructive ring-2 ring-red-200 text-destructive" : ""}
@@ -163,7 +163,7 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
                 ? "bg-background text-foreground/50 cursor-not-allowed border-border"
                 : state === "readonly"
                 ? "bg-transparent text-foreground/80 cursor-default pointer-events-none border-none"
-                : "bg-white text-foreground border border-border hover:border-border"
+                : " text-foreground border border-border hover:border-border"
             }
           `}
         />
@@ -175,12 +175,12 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
             className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground/70"
             disabled={isDisabled}
           >
-            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            {showPassword ? <EyeOff className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" /> : <Eye className="w-5 h-5" />}
           </button>
         )}
       </div>
 
-      {error && <p className="text-destructive text-xs mt-1 font-medium">{error}</p>}
+      {error && <p className="text-destructive text-[10px] md:text-xs lg:text-sm mt-1 font-medium">{error}</p>}
     </div>
   );
 };

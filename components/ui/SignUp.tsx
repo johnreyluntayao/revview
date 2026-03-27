@@ -80,17 +80,17 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex flex-col w-full">
-      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-border p-8 relative">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex flex-col w-full px-4 md:px-6 lg:px-8 py-20 md:py-24">
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-full max-w-md bg-card rounded-xl shadow-xl border border-border p-4 md:p-6 lg:p-8 relative">
 
           {/* Success Toast / Banner */}
           {success && (
-            <div className="absolute -top-20 left-0 right-0 mx-4 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg shadow-md animate-fade-in">
+            <div className="absolute -top-20 left-0 right-0 mx-4 bg-success/15 border border-success text-success px-2 md:px-3 lg:px-4 py-2 md:py-2.5 py-3 rounded-lg shadow-md animate-fade-in">
               <div className="flex items-center justify-between">
                 <div>
-                  <strong className="font-semibold">Account created!</strong>
-                  <p className="text-sm mt-1">
+                  <strong className="text-sm md:text-base lg:text-lg font-semibold">Account created!</strong>
+                  <p className="text-[10px] md:text-sm lg:text-sm mt-1">
                     Please check your email (including spam/junk folder) to confirm your account before logging in.
                   </p>
                 </div>
@@ -99,7 +99,7 @@ export default function SignUp() {
                     setSuccess(false);
                     router.push("/login?registered=true");
                   }}
-                  className="ml-4 text-green-700 hover:text-green-900 font-medium"
+                  className="ml-2 md:ml-3 lg:ml-4 text-success font-medium"
                 >
                   Go to login →
                 </button>
@@ -107,12 +107,12 @@ export default function SignUp() {
             </div>
           )}
 
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-foreground mb-2">Get Started</h1>
-            <p className="text-muted-foreground">Create your account to begin reviewing</p>
+          <div className="text-center mb-4 md:mb-6 lg:mb-8">
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-1 md:mb-1.5 lg:mb-2">Get Started</h1>
+            <p className="text-xs md:text-sm lg:text-base text-muted-foreground">Create your account to begin reviewing</p>
           </div>
 
-          <form onSubmit={handleSignUp} className="space-y-5">
+          <form onSubmit={handleSignUp} className="space-y-3 md:space-y-4 lg:space-y-5">
             <InputField
               label="Full Name"
               placeholder="John Doe"
@@ -135,7 +135,7 @@ export default function SignUp() {
               label="Email Address"
               type="email"
               placeholder="you@example.com"
-              icon={<Email className="w-5 h-5" />}
+              icon={<Email />}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -145,7 +145,7 @@ export default function SignUp() {
               label="Password"
               type="password"
               placeholder="••••••••"
-              icon={<Password className="w-5 h-5" />}
+              icon={<Password />}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               showPasswordToggle
@@ -156,14 +156,14 @@ export default function SignUp() {
               label="Confirm Password"
               type="password"
               placeholder="••••••••"
-              icon={<Password className="w-5 h-5" />}
+              icon={<Password />}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               showPasswordToggle
               required
             />
 
-            {error && <p className="text-red-600 text-sm text-center bg-red-50 py-2 rounded">{error}</p>}
+            {error && <p className="text-destructive text-[10px] md:text-xs lg:text-sm text-center bg-destructive/15 py-2 rounded">{error}</p>}
 
             <Button
               type="submit"
