@@ -158,12 +158,6 @@ const ResultsHistory = () => {
       year: "numeric",
     });
 
-  const getScoreTextColor = (score: number) => {
-    if (score >= 80) return "text-success";
-    if (score >= 60) return "text-primary";
-    if (score >= 40) return "text-warning";
-    return "text-destructive";
-  };
 
   if (loading) return <div className="p-8 text-center">Loading results...</div>;
   if (error) return <div className="p-8 text-center text-destructive">Error: {error}</div>;
@@ -178,9 +172,9 @@ const ResultsHistory = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 md:gap-3 lg:gap-4 w-full">
-        <Card variant="highlight" title="Average Score" value={`${stats.avg}%`} textColor={getScoreTextColor(stats.avg)} />
-        <Card variant="highlight" title="Quizzes Completed" value={stats.count.toString()} textColor="text-secondary" />
-        <Card variant="highlight" title="Best Score" value={`${stats.best}%`} textColor={getScoreTextColor(stats.best)} />
+        <Card variant="highlight" title="Average Score" value={`${stats.avg}%`} bg='bg-linear-to-br from-primary/70 to-secondary/70' textColor="text-white" subColor='text-white'/>
+        <Card variant="highlight" title="Quizzes Completed" value={stats.count.toString()} bg='bg-linear-to-br from-primary/70 to-secondary/70' textColor="text-white" subColor='text-white'/>
+        <Card variant="highlight" title="Best Score" value={`${stats.best}%`}  bg='bg-linear-to-br from-primary/70 to-secondary/70'textColor="text-white" subColor='text-white'/>
       </div>
 
       {/* Filters */}
