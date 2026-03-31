@@ -234,7 +234,7 @@ export interface ProgressProps {
 }
 
 export interface RadioButtonProps {
-  variant?: "default" | "pill" | "card" | "boxed" | "choice";
+  variant?: "default" | "pill" | "card" | "boxed" | "choice" | "image";
   value: string | number;
   label?: ReactNode;
   description?: ReactNode;
