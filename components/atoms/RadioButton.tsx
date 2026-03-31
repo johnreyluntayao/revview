@@ -18,7 +18,8 @@ export default function RadioButton({
   onSelect,
   indicator,
   rightIcon,
-}: RadioButtonProps & { rightIcon?: React.ReactNode }) {
+  image, // ✅ NEW
+}: RadioButtonProps & { rightIcon?: React.ReactNode; image?: string | React.ReactNode }) {
   const handleClick = () => {
     if (!disabled) onSelect(value);
   };
@@ -46,9 +47,10 @@ export default function RadioButton({
   const unselected = {
     bg: unselectedColor?.includes("bg-") ? unselectedColor : defaultUnselected.bg,
     border: unselectedColor?.includes("border-") ? unselectedColor : defaultUnselected.border,
-    text: unselectedColor
-  ?.split(" ")
-  .find((cls) => cls.startsWith("text-")) || defaultUnselected.text,
+    text:
+      unselectedColor
+        ?.split(" ")
+        .find((cls) => cls.startsWith("text-")) || defaultUnselected.text,
     indicatorBorder: defaultUnselected.indicatorBorder,
     indicatorBg: defaultUnselected.indicatorBg,
     hover: defaultUnselected.hover,
@@ -58,9 +60,10 @@ export default function RadioButton({
   const selected = {
     bg: selectedColor?.includes("bg-") ? selectedColor : defaultSelected.bg,
     border: selectedColor?.includes("border-") ? selectedColor : defaultSelected.border,
-    text: selectedColor
-  ?.split(" ")
-  .find((cls) => cls.startsWith("text-")) || defaultSelected.text,
+    text:
+      selectedColor
+        ?.split(" ")
+        .find((cls) => cls.startsWith("text-")) || defaultSelected.text,
     indicatorBorder: indicator?.includes("border-") ? indicator : defaultSelected.indicatorBorder,
     indicatorBg: indicator?.includes("bg-") ? indicator : defaultSelected.indicatorBg,
     indicatorDot: indicator?.includes("text-") ? indicator : defaultSelected.indicatorDot,
@@ -80,7 +83,8 @@ export default function RadioButton({
     wrapper += " items-center gap-4 py-3 px-4";
     wrapper += isSelected ? ` ${selected.bg}` : ` ${unselected.bg} ${unselected.hover}`;
   } else if (variant === "pill") {
-    wrapper += "flex items-center justify-center p-4 md:p-5 lg:p-6 text-sm md:text-base font-medium rounded-lg";
+    wrapper +=
+      "flex items-center justify-center p-4 md:p-5 lg:p-6 text-sm md:text-base font-medium rounded-lg";
     wrapper += isSelected
       ? ` ${selected.bg} ${selected.text} bg-primary/100 text-white font-semibold`
       : ` ${unselected.bg} ${unselected.text} ${unselected.hover}`;
@@ -99,6 +103,12 @@ export default function RadioButton({
     wrapper += isSelected
       ? ` ${selected.bg} ${selected.border}`
       : ` ${unselected.bg} ${unselected.hover}`;
+  } else if (variant === "image") {
+    // ✅ NEW IMAGE VARIANT
+    wrapper += " flex-col items-center p-3 md:p-4 lg:p-5 gap-3";
+    wrapper += isSelected
+      ? ` ${selected.bg} ${selected.border}`
+      : ` ${unselected.bg} ${unselected.hover}`;
   }
 
   const indicatorClasses = `
@@ -108,12 +118,12 @@ export default function RadioButton({
   `;
 
   const choiceIndicatorClasses = `
-  flex items-center justify-center w-8 h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 text-xs md:text-sm lg:text-base rounded-md border-2 font-medium text-base transition-all
-  ${isSelected ? selected.indicatorBg : unselected.indicatorBg}
-  ${isSelected ? selected.text : unselected.text}
-  ${isSelected ? selected.indicatorBorder : unselected.indicatorBorder}
-  ${isSelected ? selected.indicatorDot : unselected.indicatorDot}
-`;
+    flex items-center justify-center w-8 h-8 md:w-9 md:h-9 lg:w-10 lg:h-10 text-xs md:text-sm lg:text-base rounded-md border-2 font-medium transition-all
+    ${isSelected ? selected.indicatorBg : unselected.indicatorBg}
+    ${isSelected ? selected.text : unselected.text}
+    ${isSelected ? selected.indicatorBorder : unselected.indicatorBorder}
+    ${isSelected ? selected.indicatorDot : unselected.indicatorDot}
+  `;
 
   return (
     <div
@@ -130,14 +140,14 @@ export default function RadioButton({
       }}
       className={wrapper.trim()}
     >
-      {/* LEFT AREA */}
+      {/* TOP / LEFT AREA */}
       <div className="flex items-center gap-4 shrink-0">
         {(variant === "boxed" || variant === "default") && icon && (
           <div
             className={`
               flex items-center justify-center rounded-lg w-11 h-11
               text-lg md:text-xl lg:text-2xl font-bold transition-all duration-200
-              [&>svg]:size-[1em] [&>svg]:block   
+              [&>svg]:size-[1em] [&>svg]:block
               ${boxedBG} text-white
             `}
           >
@@ -145,9 +155,19 @@ export default function RadioButton({
           </div>
         )}
 
-        {variant === "choice" && (
-          <div className={`${choiceIndicatorClasses}`}>
-            {value}
+        {variant === "choice" && <div className={choiceIndicatorClasses}>{value}</div>}
+
+        {variant === "image" && image && (
+          <div className="w-full h-32 md:h-40 lg:h-48 overflow-hidden rounded-lg border bg-muted flex items-center justify-center">
+            {typeof image === "string" ? (
+              <img
+                src={image}
+                  alt={label ? String(label) : "Option Image"}  
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              image
+            )}
           </div>
         )}
 
@@ -155,7 +175,8 @@ export default function RadioButton({
           variant !== "card" &&
           variant !== "boxed" &&
           variant !== "choice" &&
-          variant !== "pill" && (
+          variant !== "pill" &&
+          variant !== "image" && ( // ✅ exclude image
             <div className="relative">
               <div className={indicatorClasses} />
               {isSelected && (
@@ -172,6 +193,21 @@ export default function RadioButton({
         <span className="text-sm md:text-base font-medium text-center w-full">
           {label}
         </span>
+      ) : variant === "image" ? (
+        <div className="w-full text-center">
+          <div
+            className={`font-medium text-sm md:text-base ${
+              isSelected ? selected.text : unselected.text
+            }`}
+          >
+            {label}
+          </div>
+          {description && (
+            <div className="text-xs md:text-sm text-muted-foreground mt-1">
+              {description}
+            </div>
+          )}
+        </div>
       ) : (
         <div className="flex-1 min-w-0 flex flex-col justify-center">
           <div
@@ -189,7 +225,7 @@ export default function RadioButton({
         </div>
       )}
 
-      {/* RIGHT ICON (✅ NEW — for correct / wrong) */}
+      {/* RIGHT ICON */}
       {rightIcon && (
         <div className="ml-auto flex items-center justify-center shrink-0">
           {rightIcon}
