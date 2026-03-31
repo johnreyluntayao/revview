@@ -3,9 +3,16 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Add, Delete, Edit, Search, Image as ImageIcon } from "@/lib/icons";
-import { Button, Chip, ComboBox, InputField, AddEditQuestion, DeletePopup } from "@/lib/client-imports";
+import {
+  Button,
+  Chip,
+  ComboBox,
+  InputField,
+  AddEditQuestion,
+  DeletePopup,
+} from "@/lib/client-imports";
 import { createClient } from "@/lib/supabase/client";
-import { ChipProps } from '@/lib/types';
+import { ChipProps } from "@/lib/types";
 
 type QuestionRow = {
   id: string;
@@ -22,8 +29,15 @@ type QuestionRow = {
 };
 
 export default function ManageQuestions() {
+  const [viewOpen, setViewOpen] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState<QuestionRow | null>(
+    null,
+  );
+
   const [questions, setQuestions] = useState<QuestionRow[]>([]);
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -62,11 +76,26 @@ export default function ManageQuestions() {
 
   const formatDate = (iso: string): string => {
     const d = new Date(iso);
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
   };
 
-  const getDateRange = (filter: string): { from: string | null; to: string | null } => {
+  const getDateRange = (
+    filter: string,
+  ): { from: string | null; to: string | null } => {
     const now = new Date();
     let from = null;
     let to = null;
@@ -92,13 +121,13 @@ export default function ManageQuestions() {
         from = new Date();
         from.setFullYear(now.getFullYear() - 1);
         to = new Date();
-        to.setMonth(now.getMonth() - 6); 
+        to.setMonth(now.getMonth() - 6);
         break;
 
       case "Last 1 year and 6 months":
         from = new Date();
         from.setFullYear(now.getFullYear() - 1);
-        from.setMonth(now.getMonth() - 6); 
+        from.setMonth(now.getMonth() - 6);
         to = new Date();
         to.setFullYear(now.getFullYear() - 1);
         break;
@@ -136,11 +165,14 @@ export default function ManageQuestions() {
 
     let query = supabase
       .from("questions")
-      .select(`
+      .select(
+        `
         id, text, img_url, category_id, options, option_images, correct_answer,
         explanation, explanation_img_url, date_added,
         categories!inner (name)
-      `, { count: 'exact' })
+      `,
+        { count: "exact" },
+      )
       .order("date_added", { ascending: false })
       .range(start, end);
 
@@ -213,7 +245,9 @@ export default function ManageQuestions() {
   const extractPath = (url: string) => {
     try {
       const u = new URL(url);
-      const parts = u.pathname.split("/storage/v1/object/public/revview-files/");
+      const parts = u.pathname.split(
+        "/storage/v1/object/public/revview-files/",
+      );
       return parts[1] || null;
     } catch {
       return null;
@@ -313,10 +347,7 @@ export default function ManageQuestions() {
       if (editQuestion) {
         const pathsToDelete: string[] = [];
 
-        if (
-          editQuestion.img_url &&
-          editQuestion.img_url !== payload.img_url
-        ) {
+        if (editQuestion.img_url && editQuestion.img_url !== payload.img_url) {
           const p = extractPath(editQuestion.img_url);
           if (p) pathsToDelete.push(p);
         }
@@ -338,9 +369,7 @@ export default function ManageQuestions() {
         });
 
         if (pathsToDelete.length > 0) {
-          await supabase.storage
-            .from("revview-files")
-            .remove(pathsToDelete);
+          await supabase.storage.from("revview-files").remove(pathsToDelete);
         }
 
         const { error } = await supabase
@@ -352,9 +381,7 @@ export default function ManageQuestions() {
 
         toast.success("Question updated");
       } else {
-        const { error } = await supabase
-          .from("questions")
-          .insert([payload]);
+        const { error } = await supabase.from("questions").insert([payload]);
 
         if (error) throw error;
 
@@ -380,22 +407,22 @@ export default function ManageQuestions() {
     "Last 3 years and on",
   ];
 
-  const getCategoryVariant = (categoryName: string): ChipProps['variant'] => {
-    if (!categoryName) return 'default';
+  const getCategoryVariant = (categoryName: string): ChipProps["variant"] => {
+    if (!categoryName) return "default";
 
     const firstWord = categoryName.trim().split(/\s+/)[0].toLowerCase();
 
     switch (firstWord) {
-      case 'general':
-        return 'general';
-      case 'analytical':
-        return 'analytical';
-      case 'numerical':
-        return 'numerical';
-      case 'verbal':
-        return 'verbal';
+      case "general":
+        return "general";
+      case "analytical":
+        return "analytical";
+      case "numerical":
+        return "numerical";
+      case "verbal":
+        return "verbal";
       default:
-        return 'default';
+        return "default";
     }
   };
 
@@ -412,7 +439,8 @@ export default function ManageQuestions() {
             Manage Questions
           </h1>
           <p className="text-xs md:text-sm lg:text-base text-muted-foreground mt-1">
-            Add, Edit, and Delete your quiz questions here. Use the filters to find specific questions or view all of them.
+            Add, Edit, and Delete your quiz questions here. Use the filters to
+            find specific questions or view all of them.
           </p>
         </div>
 
@@ -432,7 +460,10 @@ export default function ManageQuestions() {
             <ComboBox
               label="Category"
               placeholder="All Categories"
-              options={[{ value: "all", label: "All Categories" }, ...categories.map(c => ({ value: c.id, label: c.name }))]}
+              options={[
+                { value: "all", label: "All Categories" },
+                ...categories.map((c) => ({ value: c.id, label: c.name })),
+              ]}
               value={selectedCategoryId}
               onChange={setSelectedCategoryId}
               isSearchable={false}
@@ -443,7 +474,7 @@ export default function ManageQuestions() {
             <ComboBox
               label="Date Added"
               placeholder="All Time"
-              options={timeOptions.map(t => ({ value: t, label: t }))}
+              options={timeOptions.map((t) => ({ value: t, label: t }))}
               value={selectedTime}
               onChange={setSelectedTime}
               isSearchable={false}
@@ -462,59 +493,100 @@ export default function ManageQuestions() {
         </div>
 
         {loading ? (
-          <div className="text-center py-12 text-muted-foreground">Loading...</div>
+          <div className="text-center py-12 text-muted-foreground">
+            Loading...
+          </div>
         ) : questions.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">No questions found</div>
+          <div className="text-center py-12 text-muted-foreground">
+            No questions found
+          </div>
         ) : (
           <>
+            {/* Table */}
             <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
-              <div className="grid grid-cols-[3fr_1fr_100px_1fr_120px] divide-y divide-border">
+              <div className="min-w-full grid grid-cols-[1fr_100px] md:grid-cols-[3fr_1fr_100px_160px] lg:grid-cols-[3fr_1fr_100px_1fr_180px] divide-y divide-border">
+                {/* Header */}
                 <div className="contents text-xs md:text-sm lg:text-base">
-                  <div className="bg-muted/40 font-semibold text-foreground py-3.5 px-5 flex items-center">Question</div>
-                  <div className="bg-muted/40 font-semibold text-foreground py-3.5 px-5 flex items-center">Category</div>
-                  <div className="bg-muted/40 font-semibold text-foreground py-3.5 px-5 flex items-center">Answer</div>
-                  <div className="bg-muted/40 font-semibold text-foreground py-3.5 px-5 flex items-center">Added</div>
-                  <div className="bg-muted/40 font-semibold text-foreground px-5 flex text-left items-center">Actions</div>
-                </div>
+                  <div className="bg-muted/40 font-semibold py-3 px-4">
+                    Question
+                  </div>
 
-                {questions.map(q => (
-                  <div key={q.id} className="contents group hover:bg-muted/20 transition-colors">
-                    <div className="py-4 px-5 text-sm text-foreground flex items-center gap-2 line-clamp-2">
-                      {q.text || "Image only"}
+                  {/* Category (hidden on mobile only) */}
+                  <div className="hidden md:flex bg-muted/40 font-semibold py-3 px-4 items-center text-center">
+                    Category
+                  </div>
+
+                  {/* Answer (hidden on mobile only) */}
+                  <div className="hidden md:flex bg-muted/40 font-semibold py-3 px-4 items-center justify-center">
+                    Answer
+                  </div>
+
+                  {/* Added (ONLY desktop) */}
+                  <div className="hidden lg:flex bg-muted/40 font-semibold py-3 px-4 items-center">
+                    Added
+                  </div>
+
+                  <div className="bg-muted/40 font-semibold py-3 px-4 text-center">
+                    Actions
+                  </div>
+                </div>
+                {/* Rows */}
+                {questions.map((q) => (
+                  <div
+                    key={q.id}
+                    className="contents group hover:bg-muted/20 transition-colors cursor-pointer"
+                    onClick={() => {
+                      setSelectedQuestion(q);
+                      setViewOpen(true);
+                    }}
+                  >
+                    {/* Question */}
+                    <div className="py-3 px-4 text-xs md:text-sm flex items-center gap-2 whitespace-normal break-words">
+                      <span className="line-clamp-2">
+                        {q.text || "Image only"}
+                      </span>
+
                       {(q.img_url || q.explanation_img_url) && (
-                        <button
-                          type="button"
-                          className="text-primary hover:text-primary/80"
-                          title="View image(s)"
-                          onClick={() => {
-                            const url = q.img_url || q.explanation_img_url;
-                            if (url) window.open(url, "_blank");
-                          }}
-                        >
-                          <ImageIcon size={16} />
-                        </button>
+                        <ImageIcon size={14} className="text-primary" />
                       )}
                     </div>
-                    <div className="py-4 px-5 flex items-center">
-                      <Chip text={q.category_name} variant={getCategoryVariant(q.category_name)} />
+
+                    {/* Category */}
+                    <div className="hidden md:flex py-3 px-4 items-center">
+                      <Chip
+                        text={q.category_name}
+                        variant={getCategoryVariant(q.category_name)}
+                        className="text-xs"
+                      />
                     </div>
-                    <div className="py-4 px-5 text-center text-sm font-semibold text-primary flex items-center justify-center">
+
+                    {/* Answer */}
+                    <div className="hidden md:flex py-3 px-4 text-sm font-semibold text-primary items-center justify-center">
                       {q.correct_answer}
                     </div>
-                    <div className="py-4 px-5 text-sm text-muted-foreground flex items-center">
+
+                    {/* Added (ONLY desktop) */}
+                    <div className="hidden lg:flex py-3 px-4 text-xs text-muted-foreground items-center">
                       {q.date_added}
                     </div>
-                    <div className="py-4 px-5 flex items-center justify-end gap-2">
+
+                    {/* Actions */}
+                    <div
+                      className="py-3 px-4 flex items-center justify-end gap-1 md:gap-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <Button
-                        leftIcon={<Edit size={16} />}
-                        backgroundColor="bg-primary/25"
+                        leftIcon={<Edit size={14} />}
+                        backgroundColor="bg-primary/20"
                         textColor="text-primary"
+                        className="p-1 md:p-2"
                         onClick={() => handleEdit(q)}
                       />
                       <Button
-                        leftIcon={<Delete size={16} />}
-                        backgroundColor="bg-destructive/25"
+                        leftIcon={<Delete size={14} />}
+                        backgroundColor="bg-destructive/20"
                         textColor="text-destructive"
+                        className="p-1 md:p-2"
                         onClick={() => handleDeleteClick(q.id, q.text)}
                       />
                     </div>
@@ -527,7 +599,9 @@ export default function ManageQuestions() {
             {totalPages > 1 && (
               <div className="flex items-center justify-between mt-4 px-2">
                 <div className="text-sm text-muted-foreground">
-                  Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, totalCount)} of {totalCount} questions
+                  Showing {(page - 1) * pageSize + 1} to{" "}
+                  {Math.min(page * pageSize, totalCount)} of {totalCount}{" "}
+                  questions
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -553,8 +627,14 @@ export default function ManageQuestions() {
                         key={pageNum}
                         text={pageNum.toString()}
                         onClick={() => goToPage(pageNum)}
-                        backgroundColor={page === pageNum ? "bg-primary text-white" : "bg-transparent border border-border"}
-                        textColor={page === pageNum ? "text-white" : "text-foreground"}
+                        backgroundColor={
+                          page === pageNum
+                            ? "bg-primary text-white"
+                            : "bg-transparent border border-border"
+                        }
+                        textColor={
+                          page === pageNum ? "text-white" : "text-foreground"
+                        }
                         className="min-w-10"
                       />
                     );
@@ -609,6 +689,59 @@ export default function ManageQuestions() {
         onConfirm={confirmDelete}
         onCancel={() => setDeleteOpen(false)}
       />
+
+      {viewOpen && selectedQuestion && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-xl w-full max-w-lg p-4 md:p-6 space-y-4 shadow-lg">
+            {/* Title */}
+            <h2 className="text-lg md:text-xl font-bold">Question Details</h2>
+
+            {/* Question */}
+            <div className="text-sm md:text-base">
+              <p className="font-medium">Question:</p>
+              <p className="text-muted-foreground mt-1">
+                {selectedQuestion.text || "Image only"}
+              </p>
+            </div>
+
+            {/* Category */}
+            <div>
+              <p className="font-medium text-sm">Category:</p>
+              <Chip
+                text={selectedQuestion.category_name}
+                variant={getCategoryVariant(selectedQuestion.category_name)}
+                className="mt-1"
+              />
+            </div>
+
+            {/* Answer */}
+            <div>
+              <p className="font-medium text-sm">Correct Answer:</p>
+              <p className="text-primary font-semibold">
+                {selectedQuestion.correct_answer}
+              </p>
+            </div>
+
+            {/* Date */}
+            <div>
+              <p className="font-medium text-sm">Added:</p>
+              <p className="text-muted-foreground text-sm">
+                {selectedQuestion.date_added}
+              </p>
+            </div>
+
+            {/* Close */}
+            <div className="flex justify-end">
+              <Button
+                text="Close"
+                onClick={() => setViewOpen(false)}
+                backgroundColor="bg-primary"
+                textColor="text-white"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
