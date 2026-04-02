@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from "react";
 import { InputField, Button, ComboBox, InsertImage } from "@/lib/client-imports";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
+import { Add, Edit } from "@/lib/icons";
 
 interface QuestionData {
   questionText?: string;
@@ -54,6 +56,8 @@ export default function AddEditQuestion({
   const [optionDImage, setOptionDImage] = useState("");
   const [optionEImage, setOptionEImage] = useState("");
 
+  const [optionType, setOptionType] = useState<"text" | "image">("text");
+
   const [correctAnswer, setCorrectAnswer] = useState("");
   const [category, setCategory] = useState("");
 
@@ -64,34 +68,31 @@ export default function AddEditQuestion({
   const [loadingCats, setLoadingCats] = useState(true);
 
   const supabase = createClient();
-
   const modalRef = useRef<HTMLDivElement>(null);
+  const initializedRef = useRef(false);
 
-  // Load categories
+  const hasAnyText = [optionA, optionB, optionC, optionD, optionE].some(v => v.trim());
+  const hasAnyImage = [optionAImage, optionBImage, optionCImage, optionDImage, optionEImage].some(v => v.trim());
+
   useEffect(() => {
     if (!isOpen) return;
 
     async function loadCategories() {
       setLoadingCats(true);
-
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("categories")
         .select("id, name")
         .order("name");
 
-      if (!error && data) {
-        setCategories(data);
-      }
-
+      if (data) setCategories(data);
       setLoadingCats(false);
     }
 
     loadCategories();
   }, [isOpen]);
 
-  // Reset form when modal opens
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !initializedRef.current) {
       setQuestionText(initialData.questionText || "");
       setQuestionImage(initialData.questionImage || "");
 
@@ -112,59 +113,74 @@ export default function AddEditQuestion({
 
       setExplanationText(initialData.explanationText || "");
       setExplanationImage(initialData.explanationImage || "");
+
+      initializedRef.current = true;
     }
+
+    if (!isOpen) initializedRef.current = false;
   }, [isOpen]);
-
-  // ESC close
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-
-    if (isOpen) window.addEventListener("keydown", handleEsc);
-
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [isOpen, onClose]);
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === modalRef.current) onClose();
   };
 
+  const hasValue = (text: string, image: string) =>
+    (text?.trim() || image?.trim());
+
   const handleSave = () => {
-    if (!questionText.trim() || !correctAnswer || !category) {
-      alert("Please fill in all required fields (*)");
+    if (!questionText.trim()) {
+      toast.error("Question is required");
       return;
     }
 
-    if (!optionA.trim() || !optionB.trim() || !optionC.trim() || !optionD.trim()) {
-      alert("Options A–D are required");
+    if (!hasValue(optionA, optionAImage)) {
+      toast.error("Option A is required");
       return;
     }
 
-    const data: QuestionData = {
-      questionText: questionText.trim() || undefined,
-      questionImage: questionImage.trim() || undefined,
+    if (!hasValue(optionB, optionBImage)) {
+      toast.error("Option B is required");
+      return;
+    }
 
-      optionA: optionA.trim() || undefined,
-      optionB: optionB.trim() || undefined,
-      optionC: optionC.trim() || undefined,
-      optionD: optionD.trim() || undefined,
-      optionE: optionE.trim() || undefined,
+    if (!hasValue(optionC, optionCImage)) {
+      toast.error("Option C is required");
+      return;
+    }
 
-      optionAImage: optionAImage.trim() || undefined,
-      optionBImage: optionBImage.trim() || undefined,
-      optionCImage: optionCImage.trim() || undefined,
-      optionDImage: optionDImage.trim() || undefined,
-      optionEImage: optionEImage.trim() || undefined,
+    if (!hasValue(optionD, optionDImage)) {
+      toast.error("Option D is required");
+      return;
+    }
 
+    if (!correctAnswer || !category) {
+      toast.error("Please select correct answer and category");
+      return;
+    }
+
+    if (!hasValue(explanationText, explanationImage)) {
+      toast.error("Explanation is required");
+      return;
+    }
+
+    onSave?.({
+      questionText,
+      questionImage,
+      optionA,
+      optionB,
+      optionC,
+      optionD,
+      optionE,
+      optionAImage,
+      optionBImage,
+      optionCImage,
+      optionDImage,
+      optionEImage,
       correctAnswer,
       category,
-
-      explanationText: explanationText.trim() || undefined,
-      explanationImage: explanationImage.trim() || undefined,
-    };
-
-    onSave?.(data);
+      explanationText,
+      explanationImage,
+    });
   };
 
   if (!isOpen) return null;
@@ -172,37 +188,31 @@ export default function AddEditQuestion({
   return (
     <div
       ref={modalRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 md:p-6 lg:p-8"
       onClick={handleBackdropClick}
     >
+      <div className="w-full max-w-5xl bg-background rounded-2xl shadow-2xl overflow-hidden">
 
-      <div
-        className="
-        flex flex-col w-full max-w-5xl max-h-[95vh] mx-4 md:mx-8
-        bg-background rounded-xl border border-border
-        shadow-2xl overflow-hidden
-      "
-      >
-
-        <div className="px-6 pt-6 pb-4 border-b border-border">
-          <h2 className="text-2xl font-bold">
+        <div className="flex justify-center items-center gap-1 md:gap-1.5 lg:gap-2 px-4 md:px-5 lg:px-6 py-3 md:py-4 lg:py-5 border-b">
+          {
+            isEdit ? ( <Edit className="text-secondary"/> ) : (<Add className="text-primary"/>)
+          }
+          <h2 className="text-base md:text-lg lg:text-xl font-semibold">
             {isEdit ? "Edit Question" : "Add New Question"}
           </h2>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
+        <div className="p-4 md:p-5 lg:p-6 space-y-8 h-[70vh] overflow-y-auto">
 
           {/* Question */}
-          <div className="space-y-5">
+          <div className="space-y-2 md:space-y-4 lg:space-y-4">
             <InputField
               label="Question Text *"
               value={questionText}
               onChange={(e) => setQuestionText(e.target.value)}
-              placeholder="Enter the full question here..."
             />
-
             <InsertImage
-              label="Question Image (optional)"
+              label="Question Image"
               value={questionImage}
               onChange={setQuestionImage}
               folder="img_question"
@@ -210,129 +220,104 @@ export default function AddEditQuestion({
           </div>
 
           {/* Options */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Options</h3>
+          <div className="space-y-3 md:space-y-4 lg:space-y-5 border-y border-foreground/15 p-2 md:p-3 lg:p-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm md:text-base lg:text-lg font-semibold">Options</h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <div className="flex bg-muted rounded-lg p-1">
+                <button
+                  onClick={() => {
+                    if (hasAnyImage) {
+                      toast.warning("Remove all images first before switching to text");
+                      return;
+                    }
+                    setOptionType("text");
+                  }}
+                  className={`px-3 md:px-3.5 lg:px-4 py-1 md:py-1.5 lg:py-2 text-[10px] md:text-xs lg:text-sm rounded-md transition
+                    ${optionType === "text" ? "bg-primary text-white" : ""}
+                  `}
+                >
+                  Texts
+                </button>
 
-              {/* Option A */}
-              <div className="space-y-2">
-                <InputField
-                  label="Option A *"
-                  value={optionA}
-                  onChange={(e) => setOptionA(e.target.value)}
-                />
-                <InsertImage
-                  label="Option A Image"
-                  value={optionAImage}
-                  onChange={setOptionAImage}
-                  folder="img_options"
-                  variant="compact"
-                />
+                <button
+                  onClick={() => {
+                    if (hasAnyText) {
+                      toast.warning("Remove all texts first before switching to images");
+                      return;
+                    }
+                    setOptionType("image");
+                  }}
+                  className={`px-3 md:px-3.5 lg:px-4 py-1 md:py-1.5 lg:py-2 text-[10px] md:text-xs lg:text-sm rounded-md transition
+                    ${optionType === "image" ? "bg-primary text-white" : ""}
+                  `}
+                >
+                  Images
+                </button>
               </div>
+            </div>
 
-              {/* Option B */}
-              <div className="space-y-2">
-                <InputField
-                  label="Option B *"
-                  value={optionB}
-                  onChange={(e) => setOptionB(e.target.value)}
-                />
-                <InsertImage
-                  label="Option B Image"
-                  value={optionBImage}
-                  onChange={setOptionBImage}
-                  folder="img_options"
-                  variant="compact"
-                />
-              </div>
+            <div className="grid md:grid-cols-2 gap-2 md:gap-3 lg:gap-4">
+              {["A", "B", "C", "D", "E"].map((label, i) => {
+                const texts = [optionA, optionB, optionC, optionD, optionE];
+                const setters = [setOptionA, setOptionB, setOptionC, setOptionD, setOptionE];
+                const imgs = [optionAImage, optionBImage, optionCImage, optionDImage, optionEImage];
+                const imgSetters = [setOptionAImage, setOptionBImage, setOptionCImage, setOptionDImage, setOptionEImage];
 
-              {/* Option C */}
-              <div className="space-y-2">
-                <InputField
-                  label="Option C *"
-                  value={optionC}
-                  onChange={(e) => setOptionC(e.target.value)}
-                />
-                <InsertImage
-                  label="Option C Image"
-                  value={optionCImage}
-                  onChange={setOptionCImage}
-                  folder="img_options"
-                  variant="compact"
-                />
-              </div>
+                return (
+                  <div key={label} className="border rounded-xl  p-2 md:p-3 lg:p-4 space-y-2 md:space-y-2.5 lg:space-y-3">
 
-              {/* Option D */}
-              <div className="space-y-2">
-                <InputField
-                  label="Option D *"
-                  value={optionD}
-                  onChange={(e) => setOptionD(e.target.value)}
-                />
-                <InsertImage
-                  label="Option D Image"
-                  value={optionDImage}
-                  onChange={setOptionDImage}
-                  folder="img_options"
-                  variant="compact"
-                />
-              </div>
-
-              {/* Option E */}
-              <div className="space-y-2">
-                <InputField
-                  label="Option E"
-                  value={optionE}
-                  onChange={(e) => setOptionE(e.target.value)}
-                />
-                <InsertImage
-                  label="Option E Image (optional)"
-                  value={optionEImage}
-                  onChange={setOptionEImage}
-                  folder="img_options"
-                  variant="compact"
-                />
-              </div>
-
+                    {optionType === "text" ? (
+                      <InputField
+                        label={`Option ${label}`}
+                        value={texts[i]}
+                        onChange={(e) => setters[i](e.target.value)}
+                        placeholder="Enter option text..."
+                      />
+                    ) : (
+                      <InsertImage
+                        label={`Option ${label}`}
+                        value={imgs[i]}
+                        onChange={imgSetters[i]}
+                        folder="img_options"
+                        variant="compact"
+                      />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
 
           {/* Answer + Category */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
+          <div className="grid md:grid-cols-2 gap-2 md:gap-3 lg:gap-4 border-b pb-2 md:pb-3 lg:pb-4">
             <ComboBox
               label="Correct Answer *"
               options={["A", "B", "C", "D", "E"]}
               value={correctAnswer}
               onChange={setCorrectAnswer}
             />
-
             <ComboBox
               label="Category *"
               options={
                 loadingCats
-                  ? [{ value: "", label: "Loading categories..." }]
+                  ? [{ value: "", label: "Loading..." }]
                   : categories.map((c) => ({ value: c.id, label: c.name }))
               }
               value={category}
               onChange={setCategory}
-              placeholder="Select category"
             />
-
           </div>
 
           {/* Explanation */}
-          <div className="space-y-5">
+          <div className="space-y-2 md:space-y-3 lg:space-y-4">
             <InputField
-              label="Explanation Text *"
+              label="Explanation"
               value={explanationText}
               onChange={(e) => setExplanationText(e.target.value)}
-              placeholder="Explain why this is the correct answer..."
             />
-
             <InsertImage
-              label="Explanation Image (optional)"
+              label="Explanation Image"
               value={explanationImage}
               onChange={setExplanationImage}
               folder="img_explanation"
@@ -341,20 +326,9 @@ export default function AddEditQuestion({
 
         </div>
 
-        {/* Footer */}
-        <div className="px-6 py-5 border-t border-border flex justify-end gap-4">
-          <Button
-            text="Cancel"
-            textColor="text-foreground"
-            onClick={onClose}
-          />
-
-          <Button
-            text={isEdit ? "Update Question" : "Save Question"}
-            backgroundColor="bg-primary"
-            textColor="text-white"
-            onClick={handleSave}
-          />
+        <div className="flex justify-end gap-2 md:gap-2.5 lg:gap-3 px-4 md:px-5 lg:px-6 py-2 md:py-3 lg:py-4 border-t">
+          <Button text="Cancel" onClick={onClose} textColor="text-foreground" backgroundColor="bg-white" borderColor="border-foreground/50" className="w-full"/>
+          <Button text={isEdit ? "Update" : "Save"} onClick={handleSave} textColor="text-white" backgroundColor={isEdit ? "bg-secondary" : "bg-primary"} className="w-full"/>
         </div>
 
       </div>
