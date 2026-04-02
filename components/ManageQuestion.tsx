@@ -29,7 +29,6 @@ type QuestionRow = {
 };
 
 export default function ManageQuestions() {
-  const [viewOpen, setViewOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<QuestionRow | null>(
     null,
   );
@@ -504,7 +503,7 @@ export default function ManageQuestions() {
           <>
             {/* Table */}
             <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
-              <div className="min-w-full grid grid-cols-[1fr_100px] md:grid-cols-[3fr_1fr_100px_160px] lg:grid-cols-[3fr_1fr_100px_1fr_180px] divide-y divide-border">
+              <div className="min-w-full grid grid-cols-[1fr_100px] md:grid-cols-[3.2fr_1.5fr_100px_160px] lg:grid-cols-[3fr_1fr_100px_1fr_180px] divide-y divide-border">
                 {/* Header */}
                 <div className="contents text-xs md:text-sm lg:text-base">
                   <div className="bg-muted/40 font-semibold py-3 px-4">
@@ -512,7 +511,7 @@ export default function ManageQuestions() {
                   </div>
 
                   {/* Category (hidden on mobile only) */}
-                  <div className="hidden md:flex bg-muted/40 font-semibold py-3 px-4 items-center text-center">
+                  <div className="hidden md:flex bg-muted/40 font-semibold py-3 px-4 items-center justify-center">
                     Category
                   </div>
 
@@ -537,7 +536,6 @@ export default function ManageQuestions() {
                     className="contents group hover:bg-muted/20 transition-colors cursor-pointer"
                     onClick={() => {
                       setSelectedQuestion(q);
-                      setViewOpen(true);
                     }}
                   >
                     {/* Question */}
@@ -597,7 +595,7 @@ export default function ManageQuestions() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="flex items-center justify-between mt-4 px-2">
+              <div className="w-full flex flex-col md:flex-row items-center space-y-2 justify-between mt-4 px-2 md:px-4 lg:px-6">
                 <div className="text-sm text-muted-foreground">
                   Showing {(page - 1) * pageSize + 1} to{" "}
                   {Math.min(page * pageSize, totalCount)} of {totalCount}{" "}
@@ -690,96 +688,6 @@ export default function ManageQuestions() {
         onCancel={() => setDeleteOpen(false)}
       />
 
-      {viewOpen && selectedQuestion && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-xl w-full max-w-lg p-4 md:p-6 space-y-4 shadow-lg overflow-y-auto max-h-[90vh]">
-            {/* Title */}
-            <h2 className="text-sm lg:text-lg md:text-base font-bold">Question Details</h2>
-
-            {/* Question Text */}
-            <div>
-              <p className="font-medium text-xs lg:text-base md:text-sm">Question:</p>
-              <p className="text-muted-foreground mt-1">
-                {selectedQuestion.text || "Image only"}
-              </p>
-            </div>
-
-            {/* Question Image */}
-            {selectedQuestion.img_url && (
-              <div className="mt-2 w-full h-60 border border-dashed border-border rounded-md flex items-center justify-center bg-muted/20 overflow-hidden">
-                <img
-                  src={selectedQuestion.img_url}
-                  alt="Question"
-                  className="max-w-full max-h-full object-contain cursor-pointer"
-                  onClick={() =>
-                    window.open(selectedQuestion.img_url!, "_blank")
-                  }
-                />
-              </div>
-            )}
-
-            {/* Category */}
-            <div>
-              <p className="font-medium text-xs lg:text-base md:text-sm">Category:</p>
-              <Chip
-                text={selectedQuestion.category_name}
-                variant={getCategoryVariant(selectedQuestion.category_name)}
-                className="mt-1"
-              />
-            </div>
-
-            {/* Answer */}
-            <div>
-              <p className="font-medium text-xs lg:text-base md:text-sm">Correct Answer:</p>
-              <p className="text-primary font-semibold">
-                {selectedQuestion.correct_answer}
-              </p>
-            </div>
-
-            {/* Explanation */}
-            {selectedQuestion.explanation && (
-              <div>
-                <p className="font-medium text-xs lg:text-base md:text-sm">Explanation:</p>
-                <p className="text-muted-foreground text-sm mt-1">
-                  {selectedQuestion.explanation}
-                </p>
-              </div>
-            )}
-
-            {/* Explanation Image */}
-            {selectedQuestion.explanation_img_url && (
-              <div className="mt-2 w-full h-60 border border-dashed border-border rounded-md flex items-center justify-center bg-muted/20 overflow-hidden">
-                <img
-                  src={selectedQuestion.explanation_img_url}
-                  alt="Explanation"
-                  className="max-w-full max-h-full object-contain cursor-pointer"
-                  onClick={() =>
-                    window.open(selectedQuestion.explanation_img_url!, "_blank")
-                  }
-                />
-              </div>
-            )}
-
-            {/* Date */}
-            <div>
-              <p className="font-medium text-xs lg:text-base md:text-sm">Added:</p>
-              <p className="text-muted-foreground text-xs lg:text-base md:text-sm">
-                {selectedQuestion.date_added}
-              </p>
-            </div>
-
-            {/* Close */}
-            <div className="flex justify-end">
-              <Button
-                text="Close"
-                onClick={() => setViewOpen(false)}
-                backgroundColor="bg-primary"
-                textColor="text-white"
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
