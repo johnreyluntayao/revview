@@ -503,49 +503,43 @@ export default function ManageQuestions() {
           <>
             {/* Table */}
             <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
-              <div className="min-w-full grid grid-cols-[1fr_100px] md:grid-cols-[3.2fr_1.5fr_100px_160px] lg:grid-cols-[3fr_1fr_100px_1fr_180px] divide-y divide-border">
-                {/* Header */}
+              <div className="min-w-full grid 
+                              grid-cols-[1fr_100px] 
+                              md:grid-cols-[3.2fr_1.5fr_160px] 
+                              lg:grid-cols-[3fr_1fr_100px_1fr_180px] 
+                              divide-y divide-border">
+
                 <div className="contents text-xs md:text-sm lg:text-base">
                   <div className="bg-muted/40 font-semibold py-3 px-4">
                     Question
                   </div>
-
-                  {/* Category (hidden on mobile only) */}
-                  <div className="hidden md:flex bg-muted/40 font-semibold py-3 px-4 items-center justify-center">
+                  <div className="hidden md:flex bg-muted/40 font-semibold py-3 px-4 items-center justify-start">
                     Category
                   </div>
-
-                  {/* Answer (hidden on mobile only) */}
-                  <div className="hidden md:flex bg-muted/40 font-semibold py-3 px-4 items-center justify-center">
+                  <div className="hidden lg:flex bg-muted/40 font-semibold py-3 px-4 items-center justify-center">
                     Answer
                   </div>
-
-                  {/* Added (ONLY desktop) */}
                   <div className="hidden lg:flex bg-muted/40 font-semibold py-3 px-4 items-center">
                     Added
                   </div>
-
-                  <div className="bg-muted/40 font-semibold py-3 px-4 text-center">
+                  <div className="bg-muted/40 font-semibold py-3 px-4 flex justify-center items-center">
                     Actions
                   </div>
                 </div>
-                {/* Rows */}
+
                 {questions.map((q) => (
                   <div
                     key={q.id}
                     className="contents group hover:bg-muted/20 transition-colors cursor-pointer"
-                    onClick={() => {
-                      setSelectedQuestion(q);
-                    }}
+                    onClick={() => setSelectedQuestion(q)}
                   >
                     {/* Question */}
-                    <div className="py-3 px-4 text-xs md:text-sm flex items-center gap-2 whitespace-normal break-words">
+                    <div className="py-3 px-4 text-xs md:text-sm lg:text-base flex items-center gap-2 whitespace-normal wrap-break-word">
                       <span className="line-clamp-2">
                         {q.text || "Image only"}
                       </span>
-
                       {(q.img_url || q.explanation_img_url) && (
-                        <ImageIcon size={14} className="text-primary" />
+                        <ImageIcon size={14} className="text-primary shrink-0" />
                       )}
                     </div>
 
@@ -554,17 +548,16 @@ export default function ManageQuestions() {
                       <Chip
                         text={q.category_name}
                         variant={getCategoryVariant(q.category_name)}
-                        className="text-xs"
                       />
                     </div>
 
                     {/* Answer */}
-                    <div className="hidden md:flex py-3 px-4 text-sm font-semibold text-primary items-center justify-center">
+                    <div className="hidden lg:flex py-3 px-4 font-semibold text-primary items-center justify-center">
                       {q.correct_answer}
                     </div>
 
-                    {/* Added (ONLY desktop) */}
-                    <div className="hidden lg:flex py-3 px-4 text-xs text-muted-foreground items-center">
+                    {/* Added */}
+                    <div className="hidden lg:flex py-3 px-4 text-muted-foreground items-center">
                       {q.date_added}
                     </div>
 
@@ -577,14 +570,12 @@ export default function ManageQuestions() {
                         leftIcon={<Edit size={14} />}
                         backgroundColor="bg-primary/20"
                         textColor="text-primary"
-                        className="p-1 md:p-2"
                         onClick={() => handleEdit(q)}
                       />
                       <Button
                         leftIcon={<Delete size={14} />}
                         backgroundColor="bg-destructive/20"
                         textColor="text-destructive"
-                        className="p-1 md:p-2"
                         onClick={() => handleDeleteClick(q.id, q.text)}
                       />
                     </div>
@@ -595,7 +586,7 @@ export default function ManageQuestions() {
 
             {/* Pagination Controls */}
             {totalPages > 1 && (
-              <div className="w-full flex flex-col md:flex-row items-center space-y-2 justify-between mt-4 px-2 md:px-4 lg:px-6">
+              <div className="w-full flex flex-col md:flex-row items-center space-y-2 justify-between mt-2 md:mt-3 lg:mt-4 px-2 md:px-4 lg:px-6">
                 <div className="text-sm text-muted-foreground">
                   Showing {(page - 1) * pageSize + 1} to{" "}
                   {Math.min(page * pageSize, totalCount)} of {totalCount}{" "}
@@ -607,43 +598,54 @@ export default function ManageQuestions() {
                     text="Previous"
                     onClick={() => goToPage(page - 1)}
                     isDisabled={page === 1}
-                    backgroundColor="bg-card border border-border"
-                    textColor="text-foreground"
+                    backgroundColor="bg-primary"
+                    textColor="text-white"
                   />
+                  <div className="hidden md:flex items-center gap-2">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum = i + 1;
 
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum = i + 1;
-                    if (totalPages > 5) {
-                      if (page > 3 && page < totalPages - 2) {
-                        pageNum = page - 2 + i;
-                      } else if (page >= totalPages - 2) {
-                        pageNum = totalPages - 4 + i;
+                      if (totalPages > 5) {
+                        if (page > 3 && page < totalPages - 2) {
+                          pageNum = page - 2 + i;
+                        } else if (page >= totalPages - 2) {
+                          pageNum = totalPages - 4 + i;
+                        }
                       }
-                    }
-                    return (
-                      <Button
-                        key={pageNum}
-                        text={pageNum.toString()}
-                        onClick={() => goToPage(pageNum)}
-                        backgroundColor={
-                          page === pageNum
-                            ? "bg-primary text-white"
-                            : "bg-transparent border border-border"
-                        }
-                        textColor={
-                          page === pageNum ? "text-white" : "text-foreground"
-                        }
-                        className="min-w-10"
-                      />
-                    );
-                  })}
+
+                      return (
+                        <Button
+                          key={pageNum}
+                          text={pageNum.toString()}
+                          onClick={() => goToPage(pageNum)}
+                          backgroundColor={
+                            page === pageNum
+                              ? "bg-card border border-primary"
+                              : "bg-card border border-border"
+                          }
+                          textColor={
+                            page === pageNum ? "text-primary font-medium" : "text-foreground/75"
+                          }
+                          className="min-w-10"
+                        />
+                      );
+                    })}
+                  </div>
+                  <div className="md:hidden">
+                    <Button
+                      text={`${page} / ${totalPages}`}
+                      backgroundColor="bg-card border border-primary"
+                      textColor="text-primary font-medium"
+                      className="min-w-16 cursor-default pointer-events-none"
+                    />
+                  </div>
 
                   <Button
                     text="Next"
                     onClick={() => goToPage(page + 1)}
                     isDisabled={page === totalPages}
-                    backgroundColor="bg-card border border-border"
-                    textColor="text-foreground"
+                    backgroundColor="bg-primary"
+                    textColor="text-white"
                   />
                 </div>
               </div>
