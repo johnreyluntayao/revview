@@ -9,6 +9,7 @@ import { useHybridQuizTimer } from "@/lib/hooks/useHybridQuizTimer";
 import { CorrectAnswer, IncorrectAnswer } from "@/lib/icons";
 
 type Question = {
+  option_images: (string | null)[];
   id: string;
   text: string;
   options: string[];
@@ -383,15 +384,15 @@ export default function Quiz({ sessionId }: QuizProps) {
             }
 
             // ✅ Detect if image exists → use image variant
-            const hasImage = !!currentQuestion.img_url;
+            const optionImage = currentQuestion.option_images?.[idx] || null;
 
             return (
               <RadioButton
                 key={value}
-                variant={hasImage ? "image" : "choice"} // ✅ AUTO SWITCH
+                variant={optionImage ? "image" : "choice"} // ✅ AUTO SWITCH
                 value={value}
                 label={optionText}
-                image={hasImage ? currentQuestion.img_url! : undefined} // ✅ pass image
+                image={optionImage || (currentQuestion.img_url && !optionImage ? currentQuestion.img_url! : undefined)} // ✅ pass image
                 isSelected={isSelected || isConfirmed || isCorrectAnswer}
                 onSelect={handleChoice}
                 disabled={answerSubmitted || isPaused}
