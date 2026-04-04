@@ -36,6 +36,7 @@ export { default as AddEditQuestion } from "@/components/ui/AddEditQuestion";
 export { default as DeletePopup } from "@/components/ui/DeletePopup";
 export { default as ScoreRecord } from "@/components/ui/ScoreRecord";
 export { default as PauseModal } from "@/components/ui/PauseQuiz";
+export { default as RecentTestsInfinite } from "@/components/ui/RecentTests";
 
 
 //Atom Components
