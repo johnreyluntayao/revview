@@ -248,6 +248,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
               width={40}
               height={40}
               className="w-30 h-18 lg:w-40 lg:h-28"
+              loading="eager"
             />
           </Link>
 

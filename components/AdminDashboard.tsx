@@ -1,6 +1,6 @@
-import { Card, Chip } from "@/lib/client-imports";
-import { Verbal, AverageScore, TotalTests, Calendar } from "@/lib/icons";
-import { createClient } from "@/lib/supabase/server";
+import { Card, RecentTestsInfinite } from "@/lib/client-imports";
+import { Verbal, AverageScore, TotalTests } from "@/lib/icons";
+import { createClient as createServerClient } from "@/lib/supabase/server";
 
 interface StatCardProps {
   title: string;
@@ -22,52 +22,8 @@ const StatCard = ({ title, value, subValue, icon, iconColor }: StatCardProps) =>
   />
 );
 
-function formatTimestamp(date: string | Date): string {
-  const d = new Date(date);
-
-  return new Intl.DateTimeFormat("en-US", {
-    month: "long",       
-    day: "numeric",      
-    year: "numeric",    
-    hour: "numeric",      
-    minute: "2-digit", 
-    hour12: true, 
-  })
-    .format(d)
-    .replace(", ", ", "); 
-}
-
-const getCategoryVariant = (categoryName: string): string => {
-  const name = categoryName?.toLowerCase() || "";
-
-  if (name.includes("all") || name === "") {
-    return "all";
-  }
-  if (name.includes("verbal")) {
-    return "verbal";
-  }
-  if (name.includes("numerical")) {
-    return "numerical";
-  }
-  if (name.includes("analytical")) {
-    return "analytical";
-  }
-  if (name.includes("general") || name.includes("information")) {
-    return "general";
-  }
-
-  return "default";
-};
-
-const getScoreTextColor = (score: number) => {
-  if (score >= 80) return "text-success";
-  if (score >= 60) return "text-primary";
-  if (score >= 40) return "text-warning";
-  return "text-destructive";
-};
-
 export default async function AdminDashboard() {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
 
   const {
     data: { user },
@@ -85,30 +41,26 @@ export default async function AdminDashboard() {
 
   const adminName = adminProfile?.name ?? "Admin";
 
+  // Stats fetching (unchanged)
   const { count: totalUsers } = await supabase
     .from("users")
     .select("*", { count: "exact", head: true })
     .eq("is_admin", false);
 
-  const { data: activeUsersData } = await supabase
-    .rpc("get_active_users_last_30_days");
-
+  const { data: activeUsersData } = await supabase.rpc("get_active_users_last_30_days");
   const activeUsers = activeUsersData ?? 0;
 
   const { count: totalQuizzes } = await supabase
     .from("quiz_results")
     .select("*", { count: "exact", head: true });
 
-  const { data: avgData } = await supabase
-    .from("quiz_results")
-    .select("percentage");
-
+  const { data: avgData } = await supabase.from("quiz_results").select("percentage");
   const avgScore =
     avgData && avgData.length > 0
       ? (avgData.reduce((sum, r) => sum + (r.percentage || 0), 0) / avgData.length).toFixed(1) + "%"
       : "—";
 
-  const { data: recentResultsRaw, error: recentError } = await supabase
+  const { data: recentResultsRaw } = await supabase
     .from("quiz_results")
     .select(`
       id,
@@ -120,16 +72,11 @@ export default async function AdminDashboard() {
       percentage,
       categories!left (name)
     `)
-    .order("date_taken", { ascending: false })
-    .limit(10);
+    .order("date_taken", { ascending: false });
 
-  if (recentError) {
-    console.error("Error fetching recent results:", recentError);
-  }
+  let initialTests: any[] = [];
 
-  let recentTests: any[] = [];
-
-  if (recentResultsRaw && recentResultsRaw.length > 0) {
+  if (recentResultsRaw?.length) {
     const userIds = [...new Set(recentResultsRaw.map((r: any) => r.user_id))];
 
     const { data: usersData } = await supabase
@@ -139,18 +86,18 @@ export default async function AdminDashboard() {
 
     const userMap = new Map(usersData?.map((u: any) => [u.id, u.name]) || []);
 
-    recentTests = recentResultsRaw.map((r: any) => {
+    initialTests = recentResultsRaw.map((r: any) => {
       const categoryName = r.categories?.name || (r.category_id ? "Unknown Category" : "All Categories");
-
       return {
         id: r.id,
         userName: userMap.get(r.user_id) || "Unknown User",
         category: categoryName,
-        categoryVariant: getCategoryVariant(categoryName),
-        score: Math.round(r.score || 0),
-        percentage: r.percentage,
+        percentage: r.percentage || 0,
         totalQuestions: r.total_questions || 0,
-        timestamp: formatTimestamp(r.date_taken),
+        timestamp: new Intl.DateTimeFormat("en-US", {
+          month: "long", day: "numeric", year: "numeric",
+          hour: "numeric", minute: "2-digit", hour12: true,
+        }).format(new Date(r.date_taken)).replace(", ", ", "),
       };
     });
   }
@@ -166,72 +113,25 @@ export default async function AdminDashboard() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5 lg:gap-6 mt-6">
-        <StatCard 
-          title="Total Users" 
-          value={totalUsers ?? 0} 
-          subValue="Registered Accounts" 
-          icon={<Verbal />} 
-          iconColor="text-primary"
-        />
-        <StatCard 
-          title="Active Users" 
-          value={activeUsers} 
-          subValue="Last 30 Days" 
-          icon={<Verbal />} 
-          iconColor="text-success" 
-        />
-        <StatCard 
-          title="Quizzes Taken" 
-          value={totalQuizzes ?? 0} 
-          subValue="Total Attempts" 
-          icon={<AverageScore />} 
-          iconColor="text-secondary" 
-        />
-        <StatCard 
-          title="Avg Score" 
-          value={avgScore} 
-          subValue="Across All Users" 
-          icon={<TotalTests />} 
-          iconColor="text-warning" 
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3 lg:gap-4 mt-4 md:mt-5 lg:mt-6">
+        <StatCard title="Total Users" value={totalUsers ?? 0} subValue="Registered Accounts" icon={<Verbal />} iconColor="text-primary" />
+        <StatCard title="Active Users" value={activeUsers} subValue="Last 30 Days" icon={<Verbal />} iconColor="text-success" />
+        <StatCard title="Quizzes Taken" value={totalQuizzes ?? 0} subValue="Total Attempts" icon={<AverageScore />} iconColor="text-secondary" />
+        <StatCard title="Avg Score" value={avgScore} subValue="Across All Users" icon={<TotalTests />} iconColor="text-warning" />
       </div>
 
       <div className="rounded-xl border border-border p-4 md:p-6 lg:p-8 bg-card">
-        <h3 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-          <TotalTests className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
+        <h3 className="text-base md:text-lg lg:text-xl font-bold text-foreground mb-5 flex items-center gap-2">
+          <div className="bg-linear-to-r from-primary/15 to-secondary/15 p-1 md:p-1.5 lg:p-2 rounded-md">
+            <AverageScore className="w-3 h-3 md:w-4 md:h-4 lg:w-5 lg:h-5 text-primary" />
+          </div>
           Recent Tests Taken
         </h3>
 
-        {recentTests.length === 0 ? (
-          <p className="text-muted-foreground">No recent quiz taken yet.</p>
+        {initialTests.length === 0 ? (
+          <p className="text-xs md:text-sm lg:text-base text-muted-foreground">No recent quiz taken yet.</p>
         ) : (
-          <div className="space-y-3">
-            {recentTests.map((test) => (
-              <div
-                key={test.id}
-                className="flex items-center justify-between shadow-sm p-2 md:p-3 lg:p-4 rounded-lg hover:bg-primary/5 transition border border-transparent hover:border-primary/15 hover:shadow-none"
-              >
-                <div className="flex flex-wrap gap-2 md:gap-3 lg:gap-4">
-                  <p className="text-sm md:text-base lg:text-lg font-semibold text-foreground/70">{test.userName}</p>
-                  
-                  <Chip 
-                    variant={test.categoryVariant} 
-                    text={test.category} 
-                  />
-                  <p className="flex items-center justify-center gap-1 md:gap-1.5 lg:gap-2 text-muted-foreground text-xs md:text-sm lg:text-base"><Calendar className="text-success w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 hidden md:block"/>{ test.timestamp}</p>
-                </div>
-                <div className="text-right w-full md:w-auto">
-                  <p className={`text-lg md:text-xl lg:text-2xl font-bold ${getScoreTextColor(test.percentage)}`}>
-                    {test.percentage}%
-                  </p>
-                  <p className="text-[10px] md:text-xs lg:text-sm text-muted-foreground">
-                    {test.totalQuestions} questions
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+          <RecentTestsInfinite initialTests={initialTests} />
         )}
       </div>
     </main>
