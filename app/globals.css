@@ -41,6 +41,10 @@
   /* Simple hex fallback (used in body) */
   --background-simple: #ffffff;
   --foreground-simple: #171717;
+
+  --gray-900: 220.9 39.3% 11%;
+  --blue-900: 224.4 64.3% 32.9%;
+  --cyan-500: 183.2 100% 43%;
 }
 
 .dark {
@@ -121,6 +125,11 @@
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
   --radius: var(--radius);
+
+  /* Gradients */
+  --color-image-heroGradient: linear-gradient(to bottom right, hsl(var(--color-gray-900)), hsl(var(--color-blue-900)), hsl(var(--color-gray-900)));
+  --color-image-textGradient: linear-gradient(to right, hsl(var(--color-blue-400)), hsl(var(--color-cyan-300)), hsl(var(--color-purple-400))); /* for Board Exam text */
+  --color-image-countdownGradient: linear-gradient(to bottom right, hsl(var(--color-primary/20)), hsl(var(--color-secondary/20)));
 }
 
 /* =============================================
