@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useHybridQuizTimer } from "@/lib/hooks/useHybridQuizTimer";
 import { CorrectAnswer, IncorrectAnswer } from "@/lib/icons";
+import Image from "next/image";
 
 type Question = {
   option_images: (string | null)[];
@@ -72,35 +73,35 @@ export default function Quiz({ sessionId }: QuizProps) {
   });
 
   useEffect(() => {
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if (answerSubmitted || isPaused) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (answerSubmitted || isPaused) return;
 
-    const key = e.key.toLowerCase();
+      const key = e.key.toLowerCase();
 
-    let selectedValue: string | null = null;
+      let selectedValue: string | null = null;
 
-    // A–E support
-    if (["a", "b", "c", "d", "e"].includes(key)) {
-      selectedValue = key.toUpperCase();
-    }
+      // A–E support
+      if (["a", "b", "c", "d", "e"].includes(key)) {
+        selectedValue = key.toUpperCase();
+      }
 
-    // 1–5 support (1=A, 2=B, ...)
-    const num = parseInt(key);
-    if (!isNaN(num) && num >= 1 && num <= 5) {
-      selectedValue = String.fromCharCode(64 + num);
-    }
+      // 1–5 support (1=A, 2=B, ...)
+      const num = parseInt(key);
+      if (!isNaN(num) && num >= 1 && num <= 5) {
+        selectedValue = String.fromCharCode(64 + num);
+      }
 
-    if (selectedValue) {
-      setSelectedOption(selectedValue);
-    }
-  };
+      if (selectedValue) {
+        setSelectedOption(selectedValue);
+      }
+    };
 
-  window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
 
-  return () => {
-    window.removeEventListener("keydown", handleKeyDown);
-  };
-}, [answerSubmitted, isPaused]);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [answerSubmitted, isPaused]);
 
   useEffect(() => {
     async function fetchQuizData() {
@@ -328,6 +329,8 @@ export default function Quiz({ sessionId }: QuizProps) {
   const confirmedAnswer = userAnswers[currentQuestion.id] ?? null;
   const isCorrect = confirmedAnswer === currentQuestion.correct_answer;
 
+  const optionImage = currentQuestion.option_images?.some((img) => img !== null);
+
   return (
     <div className="px-4 md:px-6 lg:px-8 py-20 lg:py-24 place-self-center max-w-4xl w-full transition-all">
       <Progress
@@ -338,22 +341,31 @@ export default function Quiz({ sessionId }: QuizProps) {
       />
 
       <div className="flex flex-col gap-4 md:gap-6 lg:gap-8 mt-4 md:mt-5 lg:mt-6 p-4 md:p-6 lg:p-8 border border-border rounded-xl bg-card shadow-sm overflow-hidden transition-all">
-        <div className="">
-          <h2 className="text-sm md:text-base lg:text-lg font-semibold leading-tight">
-            Question {currentIndex + 1}: {currentQuestion.text}
+        <div className="pb-4 md:pb-5 lg:pb-6 border-b border-border">
+          <h2 className="text-sm md:text-base lg:text-lg font-semibold leading-tight text-muted-foreground">
+            Question {currentIndex + 1}: <span className="text-foreground">{currentQuestion.text}</span>
           </h2>
           {currentQuestion.img_url && (
-            <div className="mt-2 md:mt-3 lg:mt-4 flex justify-center">
-              <img
+            <div className="mt-2 md:mt-3 lg:mt-4 flex justify-center border border-border w-full h-56 md:h-60 lg:h-64 p-2 md:p-3 lg:p-4 bg-linear-to-br from-primary/15 to-secondary/15 rounded-lg">
+              <Image
                 src={currentQuestion.img_url}
                 alt="Question illustration"
-                className="max-h-64 object-contain rounded"
+                className="object-contain rounded-lg w-full h-full"
+                width={1000}
+                height={1000}
               />
             </div>
           )}
         </div>
 
-        <div className="space-y-2 md:space-y-3 lg:space-y-4">
+        <div
+          className={`${
+            optionImage
+              ? "grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 lg:gap-4"
+              : "space-y-2 md:space-y-3 lg:space-y-4"
+          } pb-4 md:pb-5 lg:pb-6 border-b border-border`}
+        >
+
           {currentQuestion.options.map((optionText, idx) => {
             const value = String.fromCharCode(65 + idx);
             const isSelected = selectedOption === value;
@@ -383,60 +395,64 @@ export default function Quiz({ sessionId }: QuizProps) {
               }
             }
 
-            // ✅ Detect if image exists → use image variant
-            const optionImage = currentQuestion.option_images?.[idx] || null;
+            const individualOptionImage =
+              currentQuestion.option_images?.[idx] || null;
 
             return (
-              <RadioButton
-                key={value}
-                variant={optionImage ? "image" : "choice"} // ✅ AUTO SWITCH
-                value={value}
-                label={optionText}
-                image={optionImage || (currentQuestion.img_url && !optionImage ? currentQuestion.img_url! : undefined)} // ✅ pass image
-                isSelected={isSelected || isConfirmed || isCorrectAnswer}
-                onSelect={handleChoice}
-                disabled={answerSubmitted || isPaused}
-                indicator={indicator}
-                selectedColor={selectedColor}
-                rightIcon={rightIcon}
-              />
+                <RadioButton
+                  key={idx}
+                  variant={individualOptionImage ? "image" : "choice"}
+                  value={value}
+                  label={optionText}
+                  image={
+                    individualOptionImage ||
+                    (currentQuestion.img_url && !individualOptionImage
+                      ? currentQuestion.img_url!
+                      : undefined)
+                  }
+                  isSelected={isSelected || isConfirmed || isCorrectAnswer}
+                  onSelect={handleChoice}
+                  disabled={answerSubmitted || isPaused}
+                  indicator={indicator}
+                  selectedColor={selectedColor}
+                  rightIcon={rightIcon}
+                />
             );
           })}
         </div>
 
         {answerSubmitted && (
-  <div className="p-4 md:p-5 lg:p-6 border border-primary/25 rounded-xl bg-primary/5 transition-all space-y-3 md:space-y-4">
-    
-    {/* RESULT HEADER */}
-    <div className="flex items-center gap-2 md:gap-2.5 lg:gap-3">
-      {isCorrect ? (
-        <CorrectAnswer className="text-success" />
-      ) : (
-        <IncorrectAnswer className="text-destructive" />
-      )}
-      <span className="text-sm md:text-base lg:text-lg font-bold text-foreground">
-        {isCorrect ? "Correct!" : "Incorrect"}
-      </span>
-    </div>
+          <div className="p-4 md:p-5 lg:p-6 border border-primary/25 rounded-xl bg-primary/5 transition-all space-y-3 md:space-y-4">
+            {/* RESULT HEADER */}
+            <div className="flex items-center gap-2 md:gap-2.5 lg:gap-3">
+              {isCorrect ? (
+                <CorrectAnswer className="text-success" />
+              ) : (
+                <IncorrectAnswer className="text-destructive" />
+              )}
+              <span className="text-sm md:text-base lg:text-lg font-bold text-foreground">
+                {isCorrect ? "Correct!" : "Incorrect"}
+              </span>
+            </div>
 
-    {/* EXPLANATION TEXT */}
-    <p className="text-muted-foreground leading-relaxed text-xs md:text-sm lg:text-base">
-      {currentQuestion.explanation}
-    </p>
+            {/* EXPLANATION TEXT */}
+            <p className="text-muted-foreground leading-relaxed text-xs md:text-sm lg:text-base">
+              {currentQuestion.explanation}
+            </p>
 
-    {/* ✅ NEW: EXPLANATION IMAGE */}
-    {currentQuestion.img_url && (
-      <div className="flex justify-center">
-        <img
-          src={currentQuestion.img_url}
-          alt="Explanation illustration"
-          className="max-h-64 md:max-h-72 lg:max-h-80 w-auto object-contain rounded-lg border"
-        />
-      </div>
-    )}
-    
-  </div>
-)}
+            {currentQuestion.img_url && (
+              <div className="flex justify-center">
+                <Image
+                  src={currentQuestion.img_url}
+                  alt="Explanation illustration"
+                  className="h-44 md:h-48 lg:h-52 w-auto object-contain rounded-lg border border-border"
+                  width={1000}
+                  height={1000}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="mt-4 md:mt-6 lg:mt-8 flex justify-end items-center gap-2 md:gap-3 lg:gap-4">

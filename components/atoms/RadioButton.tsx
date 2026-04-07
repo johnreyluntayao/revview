@@ -1,6 +1,7 @@
 "use client";
 
 import { RadioButtonProps } from "@/lib/types";
+import Image from "next/image";
 
 export default function RadioButton({
   variant = "default",
@@ -18,7 +19,7 @@ export default function RadioButton({
   onSelect,
   indicator,
   rightIcon,
-  image, // ✅ NEW
+  image,
 }: RadioButtonProps & { rightIcon?: React.ReactNode; image?: string | React.ReactNode }) {
   const handleClick = () => {
     if (!disabled) onSelect(value);
@@ -71,6 +72,7 @@ export default function RadioButton({
 
   // Wrapper
   let wrapper = `
+    relative
     group w-full flex transition-all duration-200
     ${disabled ? "cursor-not-allowed" : "cursor-pointer"}
     rounded-xl border
@@ -105,7 +107,7 @@ export default function RadioButton({
       : ` ${unselected.bg} ${unselected.hover}`;
   } else if (variant === "image") {
     // ✅ NEW IMAGE VARIANT
-    wrapper += " flex-col items-center p-3 md:p-4 lg:p-5 gap-3";
+    wrapper += " flex-col items-center p-2 md:p-3 lg:p-4";
     wrapper += isSelected
       ? ` ${selected.bg} ${selected.border}`
       : ` ${unselected.bg} ${unselected.hover}`;
@@ -157,17 +159,30 @@ export default function RadioButton({
 
         {variant === "choice" && <div className={choiceIndicatorClasses}>{value}</div>}
 
-        {variant === "image" && image && (
-          <div className="w-full h-32 md:h-40 lg:h-48 overflow-hidden rounded-lg border bg-muted flex items-center justify-center">
-            {typeof image === "string" ? (
-              <img
-                src={image}
-                  alt={label ? String(label) : "Option Image"}  
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              image
-            )}
+        { variant === "image" && image && (
+          <div className=" w-full h-32 md:h-40 lg:h-48 overflow-hidden rounded-lg border flex items-center justify-center">
+            <div className="relative w-full h-full">
+              {typeof image === "string" ? (
+                <Image
+                  src={image}
+                  alt={label ? String(label) : "Option Image"}
+                  className="object-cover w-full h-full"
+                  width={1000}
+                  height={1000}
+                />
+              ) : (
+                image
+              )}
+
+              {isSelected && (
+                <div className="absolute inset-0 bg-linear-to-t from-white/60 to-transparent transition-all duration-200" />
+              )}
+            </div>
+
+            <div className={`${choiceIndicatorClasses} absolute top-2 left-2 md:top-3 md:left-3 lg:top-4 lg:left-4 z-10`}>
+              {value}
+            </div>
+
           </div>
         )}
 
@@ -200,7 +215,7 @@ export default function RadioButton({
               isSelected ? selected.text : unselected.text
             }`}
           >
-            {label}
+            {label}  
           </div>
           {description && (
             <div className="text-xs md:text-sm text-muted-foreground mt-1">
@@ -215,7 +230,7 @@ export default function RadioButton({
               isSelected ? selected.text : unselected.text
             }`}
           >
-            {label}
+            {label} 
           </div>
           {description && (
             <div className="text-xs md:text-sm text-muted-foreground mt-0.5 md:mt-1">
@@ -227,7 +242,7 @@ export default function RadioButton({
 
       {/* RIGHT ICON */}
       {rightIcon && (
-        <div className="ml-auto flex items-center justify-center shrink-0">
+        <div className={`${variant === "image" ? "absolute right-2 bottom-2 md:right-3 md:bottom-3 lg:right-4 lg:bottom-4" : "ml-auto flex items-center justify-center shrink-0"} `}>
           {rightIcon}
         </div>
       )}
