@@ -102,16 +102,16 @@ const Card: React.FC<CardProps> = ({
     // Variant 3: Overall score with best/lowest (third screenshot style)
     case "overview":
       content = (
-        <div className="p-4 md:p-6 lg:p-8 text-left w-full">
+        <div className="p-4 md:p-6 lg:p-8 text-left w-full bg-linear-to-br from-primary/70 to-secondary/70 text-white">
           {title && (
             <h3
-              className={`text-[10px] md:text-xs lg:text-sm font-medium text-muted-foreground mb-1`}
+              className={`text-[10px] md:text-xs lg:text-sm font-medium mb-1`}
             >
               {title}
             </h3>
           )}
           <p
-            className={`text-base md:text-lg lg:text-xl font-semibold text-foreground capitalize ${textColor}`}
+            className={`text-base md:text-lg lg:text-xl font-semibold text-white capitalize ${textColor}`}
           >
             {value}
           </p>

@@ -9,8 +9,11 @@ type Question = {
   id: string;
   text: string;
   options: string[];
+  option_images?: string[] | null;  
   correctAnswer: string;
   explanation: string;
+  img_url?: string | null;    
+  explanation_img_url?: string | null;
 };
 
 type Answer = {
@@ -105,7 +108,16 @@ const QuizResult = ({ sessionId }: QuizResultProps) => {
 
         const { data: qData, error: qError } = await supabase
           .from("questions")
-          .select("id, text, options, correct_answer, explanation")
+          .select(`
+            id, 
+            text, 
+            options, 
+            option_images, 
+            correct_answer, 
+            explanation, 
+            img_url, 
+            explanation_img_url
+          `)
           .in("id", sessionFull.question_ids);
 
         if (qError) throw qError;
@@ -113,9 +125,12 @@ const QuizResult = ({ sessionId }: QuizResultProps) => {
         const formattedQuestions: Question[] = qData.map((q: any) => ({
           id: q.id,
           text: q.text,
-          options: q.options,
+          options: q.options || [],
+          option_images: q.option_images,        
           correctAnswer: q.correct_answer,
-          explanation: q.explanation,
+          explanation: q.explanation || "",
+          img_url: q.img_url,               
+          explanation_img_url: q.explanation_img_url,
         }));
 
         setQuestions(formattedQuestions);
@@ -154,7 +169,7 @@ const QuizResult = ({ sessionId }: QuizResultProps) => {
   }
 
   return (
-    <div className="px-4 md:px-6 lg:px-8 py-20 lg:py-24 space-y-4 md:space-y-6 lg:space-y-8 bg-linear-to-br from-primary/5 to-secondary/5">
+    <div className="px-4 md:px-6 lg:px-40 py-20 lg:py-24 space-y-4 md:space-y-6 lg:space-y-8 bg-linear-to-br from-primary/5 to-secondary/5">
       <div>
         <ScoreCard
           score={score}
@@ -171,7 +186,7 @@ const QuizResult = ({ sessionId }: QuizResultProps) => {
       </div>
 
       <div className="rounded-xl border border-border p-4 md:p-6 lg:p-8 bg-white">
-        <h2 className="text-lg md:text-xl lg:text-2xl font-bold mb-4 md:mb-5 lg:mb-6 text-foreground">
+        <h2 className="text-base md:text-lg lg:text-xl font-bold mb-4 md:mb-5 lg:mb-6 text-foreground">
           Answer Review
         </h2>
         <QuizAccordion questions={questions} answers={answers} />

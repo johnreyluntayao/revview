@@ -158,6 +158,8 @@ export interface ChipProps {
     | 'analytical'
     | 'correct'
     | 'incorrect'
+    | 'correct2'
+    | 'incorrect2'
     | 'resolved'
     | 'score'
     | 'all'

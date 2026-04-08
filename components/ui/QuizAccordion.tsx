@@ -3,18 +3,22 @@
 import { IncorrectAnswer, CorrectAnswer } from "@/lib/icons";
 import { Chip } from "@/lib/client-imports";
 import { useState } from "react";
+import Image from "next/image";
 
 interface Question {
   id: string | number;
   text: string;
   options: string[];
-  correctAnswer: string; 
+  option_images?: string[] | null;    
+  correctAnswer: string;
   explanation: string;
+  img_url?: string | null;      
+  explanation_img_url?: string | null; 
 }
 
 interface Answer {
   questionId: string | number;
-  selectedOption: string |null;
+  selectedOption: string | null;
   isCorrect: boolean;
 }
 
@@ -32,7 +36,7 @@ export default function QuizAccordion({
   const [expandedQuestion, setExpandedQuestion] = useState<number | null>(null);
 
   return (
-    <div className="space-y-4 w-full">
+    <div className="space-y-2 md:space-y-3 lg:space-y-4 w-full">
       {questions.map((question, idx) => {
         const answer = answers.find((a) => a.questionId === question.id);
         const isExpanded = expandedQuestion === idx;
@@ -63,12 +67,29 @@ export default function QuizAccordion({
               </div>
 
               <div className="flex-1 min-w-0 text-xs md:text-sm lg:text-base">
-                <p className="font-semibold text-foreground mb-0.5 md:mb-1 lg:mb-1.5">
+                <div className="flex-1 space-y-4 md:space-y-0 md:flex justify-start items-start gap-0 md:gap-5 lg:gap-6">
+                  <div>
+                    <p className="font-semibold text-foreground mb-0.5 md:mb-1 lg:mb-1.5">
                   Question {idx + 1}
                 </p>
-                <p className="text-foreground">
-                  {question.text}
-                </p>
+                <p className="text-foreground">{question.text}</p>
+                  </div>
+                   {question.img_url && (
+                  <div className="">
+                    <Image
+                      src={question.img_url}
+                      alt={`Question ${idx + 1} image`}
+                      width={1000}
+                      height={1000}
+                      className="rounded-lg border border-border max-w-full w-auto  h-36 md:h-48 lg:h-56"
+                      priority={idx === 0}
+                    />
+                  </div>
+                )}
+                </div>
+               
+
+                
               </div>
 
               <div className="hidden md:block">
@@ -77,7 +98,6 @@ export default function QuizAccordion({
                   text={answer?.isCorrect ? "Correct" : "Incorrect"}
                 />
               </div>
-              
             </button>
 
             <div
@@ -89,21 +109,22 @@ export default function QuizAccordion({
               <div className="overflow-hidden">
                 <div className="border-t border-border p-4 md:p-5 lg:p-6 bg-muted/30">
                   <div className="space-y-6">
-                    {/* Options */}
                     <div>
                       <p className="text-[10px] md:text-xs lg:text-sm font-semibold text-muted-foreground mb-1 md:mb-2 lg:mb-3">
                         All Options:
                       </p>
-                      <div className="space-y-2.5">
+                      <div className="space-y-1 md:space-y-2 lg:space-y-3">
                         {question.options.map((option, optIdx) => {
                           const letter = optionLetters[optIdx] ?? String(optIdx + 1);
                           const isCorrect = letter === question.correctAnswer;
                           const isSelected = letter === answer?.selectedOption;
 
+                          const optionImage = question.option_images?.[optIdx];
+
                           return (
                             <div
                               key={optIdx}
-                              className={`p-3.5 rounded-lg border transition-colors ${
+                              className={`p-2 md:p-3 lg:p-4 rounded-lg border transition-colors ${
                                 isCorrect && isSelected
                                   ? "border-success/50 bg-success/5"
                                   : isCorrect
@@ -113,20 +134,37 @@ export default function QuizAccordion({
                                   : "border-border/60 bg-background/40"
                               }`}
                             >
-                              <div className="flex items-center gap-1 md:gap-2 lg:gap-3 text-xs md:text-sm lg:text-base">
-                                <span className="font-semibold text-foreground min-w-6">
+                              <div className="relative flex items-center gap-1 md:gap-2 lg:gap-3 text-xs md:text-sm lg:text-base">
+                                <span className="font-semibold text-foreground">
                                   {letter}.
                                 </span>
-                                <span className="text-foreground flex-1">
-                                  {option}
-                                </span>
-
-                                {isCorrect && (
-                                  <Chip variant="correct" text="Correct" />
+                                {optionImage ? (
+                                  <div className="flex-1">
+                                    <Image
+                                      src={optionImage}
+                                      alt={`Option ${letter} image`}
+                                      width={1000}
+                                      height={1000}
+                                      className="rounded-md border border-border w-auto h-20 md:h-24 lg:h-28"
+                                    />
+                                  </div>
+                                ) : (
+                                  <span className="text-foreground flex-1">
+                                    {option}
+                                  </span>
                                 )}
 
-                                {isSelected && !answer?.isCorrect && (
-                                  <Chip variant="incorrect" text="Your Answer" />
+                                {isCorrect && (
+                                  <div className={`${optionImage ? "absolute bottom-0 right-0" : ""}`}>
+                                  <Chip variant={`${optionImage ? "correct2" : "correct"}`} text="Correct Answer" />
+                                   </div>
+                                )}
+
+                                {isSelected && !isCorrect && (
+                                  <div className={`${optionImage ? "absolute bottom-0 right-0" : ""}`}>
+                                    <Chip variant={`${optionImage ? "incorrect2" : "incorrect"}`} text="Your Answer" />
+                                  </div>
+                                  
                                 )}
                               </div>
                             </div>
@@ -135,15 +173,29 @@ export default function QuizAccordion({
                       </div>
                     </div>
 
-                    {/* Explanation */}
-                    {question.explanation && (
+                    {(question.explanation || question.explanation_img_url) && (
                       <div>
                         <p className="text-[10px] md:text-xs lg:text-sm font-semibold text-muted-foreground mb-1 md:mb-2 lg:mb-3">
                           Explanation:
                         </p>
-                        <div className="prose prose-neutral dark:prose-invert text-foreground text-xs md:text-sm lg:text-base leading-relaxed">
-                          {question.explanation}
-                        </div>
+
+                        {question.explanation && (
+                          <div className="prose prose-neutral dark:prose-invert text-foreground text-xs md:text-sm lg:text-base leading-relaxed mb-2 md:mb-3 lg:mb-4">
+                            {question.explanation}
+                          </div>
+                        )}
+
+                        {question.explanation_img_url && (
+                          <div>
+                            <Image
+                              src={question.explanation_img_url}
+                              alt="Explanation image"
+                              width={1000}
+                              height={1000}
+                              className="rounded-lg border border-border w-auto h-36 md:h-48 lg:h-56"
+                            />
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
