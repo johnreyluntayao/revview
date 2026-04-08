@@ -34,6 +34,14 @@ const variantStyles = {
     background: "bg-destructive/10",
     text: "text-destructive",
   },
+  correct2: {
+    background: "bg-success",
+    text: "text-white",
+  },
+  incorrect2: {
+    background: "bg-destructive",
+    text: "text-white",
+  },
   resolved: {
     background: "bg-success/10",
     text: "text-success",
