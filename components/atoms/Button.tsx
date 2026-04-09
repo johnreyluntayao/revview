@@ -8,7 +8,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     {
       textColor = "text-foreground",
       backgroundColor = "",
-      borderColor = "border-border",
+      borderColor = "",
       leftIcon,
       rightIcon,
       text,
@@ -23,7 +23,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    const baseClasses = `flex items-center justify-center rounded-[8px] transition-colors duration-200 hover:brightness-90 cursor-pointer ${
+    const baseClasses = `flex py-2 md:py-3 lg:py-4 items-center justify-center rounded-[8px] transition-colors duration-200 hover:brightness-90 cursor-pointer ${
     isDisabled ? "opacity-50 cursor-not-allowed" : ""
   }`;
 
