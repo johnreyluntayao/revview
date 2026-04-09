@@ -45,9 +45,10 @@ const RecentScores = ({ scores }: RecentScoresProps) => {
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto -mx-2 md:mx-0">
+      <div className="max-h-[75vh]">
         <table className="w-full min-w-auto text-xs md:text-sm lg:text-base">
-          <thead>
+          
+          <thead className="table w-full table-fixed">
             <tr className="border-border text-foreground">
               <th className="px-4 py-3.5 text-left font-medium">Category</th>
               <th className="px-3 py-3.5 text-center font-medium">Score</th>
@@ -57,18 +58,15 @@ const RecentScores = ({ scores }: RecentScoresProps) => {
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-border">
+          <tbody className="block max-h-[65vh] overflow-auto divide-y divide-border">
             {scores.map((score) => (
-              <tr key={score.key}>
-                <td className="px-4 py-4 whitespace-nowrap">
+              <tr key={score.key} className="table w-full table-fixed">
+                <td className="px-4 py-4 whitespace-nowrap ">
                   {score.category}
                 </td>
 
                 <td className="px-3 py-4 text-center font-medium">
-                  <Chip
-                    text={score.score}
-                    variant='score'
-                  />
+                  <Chip text={score.score} variant="score" />
                 </td>
 
                 <td className="px-3 py-4 text-center hidden md:table-cell">
@@ -88,6 +86,7 @@ const RecentScores = ({ scores }: RecentScoresProps) => {
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
     </div>
