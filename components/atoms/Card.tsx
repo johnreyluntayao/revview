@@ -122,21 +122,21 @@ const Card: React.FC<CardProps> = ({
     // Variant 4: Compact / minimal
     case "compact":
       content = (
-        <div className="p-3 md:p-4 lg:p-5 flex flex-col items-start w-full gap-2 md:gap-3 lg:gap-4">
+        <div className="p-4 md:p-5 lg:p-6 flex flex-col items-start w-full gap-4 md:gap-5 lg:gap-6">
           {icon && (
             <div
-              className={`${iconColor} text-4xl md:text-5xl lg:text-6xl`}
+              className={`${iconColor} text-[40px] md:text-[50px] lg:text-6xl`}
             >
               {icon}
             </div>
           )}
 
-          <div className="flex flex-col flex-1 w-full gap-4 md:gap-5 lg:gap-6">
+          <div className="flex flex-col flex-1 w-full gap-3 md:gap-3.5 lg:gap-4">
             {/* Title - Single line only, with ellipsis if too long */}
             {title && (
               <div className="flex items-center">
                 <p
-                  className={`font-semibold ${textColor} text-base md:text-lg lg:text-xl 
+                  className={`font-bold ${textColor} text-base md:text-lg lg:text-xl 
                        whitespace-nowrap overflow-hidden text-ellipsis`}
                 >
                   {title}
@@ -148,9 +148,9 @@ const Card: React.FC<CardProps> = ({
             {value && (
               <div className="flex-1">
                 <p
-                  className={`text-foreground/50 ${textColor} 
-                       text-sm md:text-base lg:text-lg 
-                       line-clamp-3 md:line-clamp-4 lg:line-clamp-6 leading-relaxed`}
+                  className={`${textColor} 
+                       text-xs md:text-sm lg:text-base 
+                      leading-relaxed`}
                 >
                   {value}
                 </p>
