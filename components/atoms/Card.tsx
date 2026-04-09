@@ -122,26 +122,40 @@ const Card: React.FC<CardProps> = ({
     // Variant 4: Compact / minimal
     case "compact":
       content = (
-        <div className="p-3 md:p-4 lg:p-5 gap-2 md:gap-3 lg:gap-4 flex flex-col items-start w-full h-full justify-between">
+        <div className="p-3 md:p-4 lg:p-5 flex flex-col items-start w-full h-full gap-2 md:gap-3 lg:gap-4">
           {icon && (
-            <div className={`${iconColor} text-xl md:text-4xl lg:text-6xl`}>
+            <div
+              className={`${iconColor} text-4xl md:text-5xl lg:text-6xl`}
+            >
               {icon}
             </div>
           )}
-          <div className="flex flex-col w-full h-full justify-start">
-            <div className="min-h-[2rem] md:min-h-[2.5rem] lg:min-h-[3rem]">
-              {title && (
-                <p className={`font-semibold ${textColor} line-clamp-2`}>
+
+          <div className="flex flex-col flex-1 w-full gap-4 md:gap-5 lg:gap-6">
+            {/* Title - Single line only, with ellipsis if too long */}
+            {title && (
+              <div className="flex items-center">
+                <p
+                  className={`font-semibold ${textColor} text-base md:text-lg lg:text-xl 
+                       whitespace-nowrap overflow-hidden text-ellipsis`}
+                >
                   {title}
                 </p>
-              )}
-            </div>
+              </div>
+            )}
 
-            <div className="min-h-[2rem] md:min-h-[2.5rem] lg:min-h-[3rem]">
-              <p className={`text-foreground/50 ${textColor} line-clamp-4 text-start`}>
-                {value}
-              </p>
-            </div>
+            {/* Description - Multi-line with proper clamping and consistent spacing */}
+            {value && (
+              <div className="flex-1">
+                <p
+                  className={`text-foreground/50 ${textColor} 
+                       text-sm md:text-base lg:text-lg 
+                       line-clamp-3 md:line-clamp-4 lg:line-clamp-6 leading-relaxed`}
+                >
+                  {value}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       );

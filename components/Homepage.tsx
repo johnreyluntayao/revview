@@ -2,7 +2,7 @@ import { HeroSection, HowItWorks, ComprehensiveCoverage, WhyChoose } from "@/lib
 
 const Homepage = () => {
   return (
-    <div className="w-full px-4 md:px-6 lg:px-8 overflow-hidden">
+    <div className="w-full overflow-hidden">
       <HeroSection />
       <WhyChoose />
       <ComprehensiveCoverage />

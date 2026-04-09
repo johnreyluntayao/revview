@@ -29,7 +29,7 @@ const howItWorks = [
 const HowItWorks = () => {
     return (
         <section>
-            <div className='w-full flex flex-col items-center justify-center text-pretty gap-4 md:gap-6 lg:gap-8 py-4 md:py-6 lg:py-8 min-h-screen'>
+            <div className='w-full flex flex-col items-center justify-center text-pretty gap-4 md:gap-6 lg:gap-8  p-4 md:p-6 lg:p-8 min-h-screen'>
                 <h2 className='text-2xl md:text-3xl lg:text-4xl font-bold text-foreground'>
                     How It Works
                 </h2>

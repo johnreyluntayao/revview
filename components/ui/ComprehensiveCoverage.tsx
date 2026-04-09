@@ -13,7 +13,7 @@ const categoryCoverage = [
   {
     title: "Numerical Ability",
     icon: <Numerical />,
-    background: "bg-gradient-to-r from-primary/90 to-primary/60",
+    background: "bg-primary/70",
     items: [
       { label: "Basic operations" },
       { label: "Word problems" },
@@ -23,7 +23,7 @@ const categoryCoverage = [
   {
     title: "Analytical Ability",
     icon: <Analytical />,
-    background: "bg-violet-700",
+    background: "bg-secondary/70",
     items: [
       { label: "Word association" },
       { label: "Logic & reasoning" },
@@ -33,7 +33,7 @@ const categoryCoverage = [
   {
     title: "Verbal Ability",
     icon: <Verbal />,
-    background: "bg-green-700",
+    background: "bg-success/70",
     items: [
       { label: "Grammar & usage" },
       { label: "Vocabulary" },
@@ -43,7 +43,7 @@ const categoryCoverage = [
   {
     title: "General Information",
     icon: <General />,
-    background: "bg-orange-700",
+    background: "bg-warning/70",
     items: [
       { label: "Philippine Constitution" },
       { label: "Code of Conduct" },
@@ -55,10 +55,15 @@ const categoryCoverage = [
 const ComprehensiveCoverage = () => {
   return (
     <section>
-      <div className="w-full flex flex-col justify-center text-pretty gap-4 md:gap-6 lg:gap-8">
-        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-10 text-center">
-          Comprehensive Coverage
-        </h1>
+      <div className="w-full h-screen flex flex-col justify-center text-pretty p-4 md:p-6 lg:p-8 gap-4 md:gap-6 lg:gap-8 bg-primary/5">
+        <div className="flex flex-col items-center gap-2 md:gap-3 lg:gap-4">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">
+            Comprehensive Coverage
+          </h1>
+          <p className="text-base md:text-lg lg:text-xl text-muted-foreground">
+            Master all four exam categories with detailed content and practice
+          </p>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-4 lg:gap-6 px-0 lg:px-16">
           {categoryCoverage.map((category) => (
