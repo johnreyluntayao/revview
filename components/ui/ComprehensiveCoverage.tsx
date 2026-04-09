@@ -55,7 +55,7 @@ const categoryCoverage = [
 const ComprehensiveCoverage = () => {
   return (
     <section>
-      <div className="w-full h-screen flex flex-col justify-center text-pretty p-4 md:p-6 lg:p-8 gap-4 md:gap-6 lg:gap-8 bg-primary/5">
+      <div className="w-full flex flex-col justify-center text-pretty py-22.5 px-4 md:px-6 lg:px-8 gap-4 md:gap-6 lg:gap-8 bg-primary/5">
         <div className="flex flex-col items-center gap-2 md:gap-3 lg:gap-4">
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">
             Comprehensive Coverage

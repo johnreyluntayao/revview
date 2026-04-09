@@ -56,17 +56,17 @@ const featureCards = [
 const WhyChoose = () => {
   return (
     <section>
-      <div className="w-full h-[75vh] flex flex-col items-center justify-center p-4 md:p-6 lg:p-8 gap-4 md:gap-6 lg:gap-8">
+      <div className="w-full flex flex-col items-center justify-center py-22.5 px-4 md:px-6 lg:px-28 gap-4 md:gap-6 lg:gap-8">
         <div className="flex flex-col items-center gap-2 md:gap-3 lg:gap-4">
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">
-            Why Choose <span className="text-primary">RevView</span>?
+            Why Choose RevView?
           </h1>
-          <p className="text-base md:text-lg lg:text-xl text-muted-foreground">
+          <p className="text-base md:text-lg lg:text-xl text-muted-foreground text-center">
             Everything you need for successful exam preparation in one platform
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-12 ">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 lg:gap-6 ">
           {featureCards.map((feature, idx) => (
             <Card
               key={idx}
@@ -74,7 +74,7 @@ const WhyChoose = () => {
               icon={feature.icon}
               title={feature.title}
               value={feature.description}
-              className="h-auto lg:h-64 flex flex-col justify-between items-start"
+              className="h-auto flex flex-col justify-between items-start"
               bg="bg-linear-to-br from-primary/70 to-secondary/70"
               textColor="text-white"
               iconColor="text-white"

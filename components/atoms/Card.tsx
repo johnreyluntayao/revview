@@ -122,7 +122,7 @@ const Card: React.FC<CardProps> = ({
     // Variant 4: Compact / minimal
     case "compact":
       content = (
-        <div className="p-3 md:p-4 lg:p-5 flex flex-col items-start w-full h-full gap-2 md:gap-3 lg:gap-4">
+        <div className="p-3 md:p-4 lg:p-5 flex flex-col items-start w-full gap-2 md:gap-3 lg:gap-4">
           {icon && (
             <div
               className={`${iconColor} text-4xl md:text-5xl lg:text-6xl`}
