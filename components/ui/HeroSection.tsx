@@ -7,7 +7,8 @@ const HeroSection = () => {
         flex flex-col 
         items-center justify-center
         text-center text-pretty 
-        gap-4 md:gap-6 lg:gap-8 px-4 md:px-6 lg:px-8'>
+        gap-4 md:gap-6 lg:gap-8 p-4 md:p-6 lg:p-8
+        bg-heroGradient'>
         <div>
           <h1 className='text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-2 md:mb-4 lg:mb-6'>
           Master your Exam at <span className='text-primary'>RevView</span>
