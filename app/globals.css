@@ -43,9 +43,43 @@
   --foreground-simple: #171717;
 
   --gray-900: 220.9 39.3% 11%;
-  --blue-900: 224.4 64.3% 32.9%;
-  --cyan-500: 183.2 100% 43%;
-}
+
+  --blue-50:   214.3  94.6%  92.7%;
+  --blue-100:  214.3  94.6%  87.3%; 
+  --blue-200:  213.3  96.9%  87.3%;
+  --blue-300:  211.7  96.4%  78.4%;
+  --blue-400:  213.1  93.9%  67.8%;
+  --blue-500:  217.2  91.2%  59.8%;
+  --blue-600:  221.2  83.2%  53.3%;
+  --blue-700:  224.0  76.3%  48.0%;
+  --blue-800:  226.0  70.7%  40.2%;
+  --blue-900:  224.4  64.3%  32.9%; 
+  --blue-950:  226.0  71.0%  24.0%; 
+
+  --cyan-50:   183.2  100%  96.5%;
+  --cyan-100:  184.5   95%   91.0%;
+  --cyan-200:  185.0   92%   82.0%;
+  --cyan-300:  185.5   90%   68.0%;
+  --cyan-400:  184.0   88%   55.0%;
+  --cyan-500:  183.2  100%   43.0%; 
+  --cyan-600:  185.0   92%   36.5%;
+  --cyan-700:  187.0   82%   30.0%;
+  --cyan-800:  190.0   72%   25.0%;
+  --cyan-900:  193.0   65%   20.5%;
+  --cyan-950:  196.0   75%   14.0%;
+
+  --purple-50:   263.2  100%  96.5%;
+  --purple-100:  262.5   95%   91.0%;
+  --purple-200:  263.0   92%   84.0%;
+  --purple-300:  263.5   90%   72.0%;
+  --purple-400:  264.0   88%   58.0%;
+  --purple-500:  265.0   85%   48.5%;
+  --purple-600:  266.0   78%   41.0%;
+  --purple-700:  267.5   70%   34.5%;
+  --purple-800:  269.0   65%   28.0%;
+  --purple-900:  270.5   62%   22.5%;
+  --purple-950:  272.0   68%   15.5%;
+  }
 
 .dark {
   --background: 222.2 84% 4.9%;
@@ -127,9 +161,15 @@
   --radius: var(--radius);
 
   /* Gradients */
-  --color-image-heroGradient: linear-gradient(to bottom right, hsl(var(--color-gray-900)), hsl(var(--color-blue-900)), hsl(var(--color-gray-900)));
-  --color-image-textGradient: linear-gradient(to right, hsl(var(--color-blue-400)), hsl(var(--color-cyan-300)), hsl(var(--color-purple-400))); /* for Board Exam text */
-  --color-image-countdownGradient: linear-gradient(to bottom right, hsl(var(--color-primary/20)), hsl(var(--color-secondary/20)));
+  --color-hero2: hsl(var(--gray-900));
+  --color-hero1: hsl(var(--blue-900));
+
+  --color-text1: hsl(var(--blue-400));
+  --color-text2: hsl(var(--cyan-300));
+  --color-text3: hsl(var(--purple-400));
+
+  --color-countdown1: hsl(var(--color-primary/20));
+  --color-countdown2: hsl(var(--color-secondary/20));
 }
 
 /* =============================================
