@@ -251,3 +251,9 @@ export interface RadioButtonProps {
   onSelect: (value: string | number | null) => void;
   indicator?: string;
 }
+
+export interface CountdownCardProps {
+  minutes: number;
+  seconds: number;
+  className?: string;
+}
