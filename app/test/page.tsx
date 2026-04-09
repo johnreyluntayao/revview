@@ -12,6 +12,7 @@ import ScoreRecord from '@/components/ui/ScoreRecord'
 import { Icon } from 'lucide-react'
 import React, { useState } from 'react'
 import {NavBar, PauseModal} from '@/lib/client-imports'
+import CountdownCard from '@/components/ui/CountdownCard'
 
 
 
@@ -30,12 +31,14 @@ const page = () => {
 
   return (
     <div>
-      <PauseModal
+      {/* <PauseModal
         isOpen={isPaused}
         onClose={() => setIsPaused(false)}
         onRestart={handleRestartQuiz}
         onExit={handleExitQuiz}
-      />
+      /> */}
+
+      <CountdownCard />
 
     </div>
   )
