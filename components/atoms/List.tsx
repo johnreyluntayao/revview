@@ -1,5 +1,4 @@
 import { ListProps } from "@/lib/types";
-import { ReactNode } from "react";
 
 const List = ({
   items,
@@ -35,9 +34,9 @@ const List = ({
   }
 
   return (
-    <Tag className={`space-y-2 md:space-y-3 lg:space-y-4 ${className}`}>
+    <Tag className={`${className}`}>
       {items.map((item, i) => (
-        <div key={i} className="flex items-center justify-start gap-2 md:gap-3 lg:gap-4">
+        <div key={i} className="flex items-center justify-start gap-2 md:gap-2.5 lg:gap-3">
           <div className="shrink-0">
             {isCustomIcon ? (
               sharedIcon
@@ -47,11 +46,11 @@ const List = ({
           </div>
 
           <div className="flex-1">
-            <h3 className="font-medium text-gray-900 text-sm md:text-base lg:text-lg">
+            <h3 className="text-foreground text-xs md:text-sm lg:text-base">
               {item.label}
             </h3>
             {item.description && (
-              <p className="mt-1 text-xs md:text-sm lg:text-base text-gray-600">
+              <p className="mt-1 text-xs md:text-sm lg:text-base text-muted-foreground">
                 {item.description}
               </p>
             )}
