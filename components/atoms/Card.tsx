@@ -1,6 +1,7 @@
 // components/Card.tsx
 import { CardProps } from "@/lib/types";
 import React, { JSX } from "react";
+import Image from "next/image";
 
 const Card: React.FC<CardProps> = ({
   variant = "stat",
@@ -15,10 +16,11 @@ const Card: React.FC<CardProps> = ({
   className = "",
   subColor,
   subColor2,
+  image, // new
+  imageAlt = "", // new
 }) => {
-  // Base styles shared across variants
   const baseClasses = `
-    rounded-xl shadow-sm border border-border overflow-hidden
+    rounded-3xl shadow-sm border border-border overflow-hidden
     ${bg} ${className}
   `;
 
@@ -28,6 +30,7 @@ const Card: React.FC<CardProps> = ({
     case "stat":
       content = (
         <div className="p-4 md:p-5 lg:p-6 w-full bg-linear-to-br from-primary/70 to-secondary/70 text-white">
+          {/* ... your existing stat content ... */}
           <div className="flex items-center justify-between">
             {title && (
               <h3
@@ -38,12 +41,7 @@ const Card: React.FC<CardProps> = ({
             )}
             {icon && (
               <div
-                className={`
-                                p-2 rounded-lg ${iconColor}
-                                text-xl md:text-2xl lg:text-3xl           // font-size here still controls icon
-                                [&>svg]:size-[1em]                        // direct child svg
-                                [&>svg]:block                             // sometimes helps alignment
-                                `}
+                className={`p-2 rounded-lg ${iconColor} text-xl md:text-2xl lg:text-3xl [&>svg]:size-[1em]`}
               >
                 {icon}
               </div>
@@ -55,9 +53,7 @@ const Card: React.FC<CardProps> = ({
             </p>
             {trend && (
               <span
-                className={`text-xs md:text-sm lg:text-base text-right font-medium ${
-                  trend === "up" ? "text-success" : "text-destructive"
-                }`}
+                className={`text-xs md:text-sm lg:text-base ${trend === "up" ? "text-success" : "text-destructive"}`}
               >
                 {trend === "up" ? "↑" : "↓"}
               </span>
@@ -72,7 +68,6 @@ const Card: React.FC<CardProps> = ({
       );
       break;
 
-    // Variant 2: Highlight / score card with big centered value
     case "highlight":
       content = (
         <div
@@ -86,7 +81,7 @@ const Card: React.FC<CardProps> = ({
             </h1>
           )}
           <p
-            className={`text-3xl md:text-4xl lg:text-5xl font-bold  ${textColor}`}
+            className={`text-3xl md:text-4xl lg:text-5xl font-bold ${textColor}`}
           >
             {value}
           </p>
@@ -99,14 +94,11 @@ const Card: React.FC<CardProps> = ({
       );
       break;
 
-    // Variant 3: Overall score with best/lowest (third screenshot style)
     case "overview":
       content = (
         <div className="p-4 md:p-6 lg:p-8 text-left w-full bg-linear-to-br from-primary/70 to-secondary/70 text-white">
           {title && (
-            <h3
-              className={`text-[10px] md:text-xs lg:text-sm font-medium mb-1`}
-            >
+            <h3 className="text-[10px] md:text-xs lg:text-sm font-medium mb-1">
               {title}
             </h3>
           )}
@@ -119,7 +111,6 @@ const Card: React.FC<CardProps> = ({
       );
       break;
 
-    // Variant 4: Compact / minimal
     case "compact":
       content = (
         <div className="p-4 md:p-5 lg:p-6 flex flex-col items-start w-full gap-4 md:gap-5 lg:gap-6">
@@ -130,31 +121,20 @@ const Card: React.FC<CardProps> = ({
               {icon}
             </div>
           )}
-
           <div className="flex flex-col flex-1 w-full gap-3 md:gap-3.5 lg:gap-4">
-            {/* Title - Single line only, with ellipsis if too long */}
             {title && (
-              <div className="flex items-center">
-                <p
-                  className={`font-bold ${textColor} text-base md:text-lg lg:text-xl 
-                       whitespace-nowrap overflow-hidden text-ellipsis`}
-                >
-                  {title}
-                </p>
-              </div>
+              <p
+                className={`font-bold ${textColor} text-base md:text-lg lg:text-xl whitespace-nowrap overflow-hidden text-ellipsis`}
+              >
+                {title}
+              </p>
             )}
-
-            {/* Description - Multi-line with proper clamping and consistent spacing */}
             {value && (
-              <div className="flex-1">
-                <p
-                  className={`${textColor} 
-                       text-xs md:text-sm lg:text-base 
-                      leading-relaxed`}
-                >
-                  {value}
-                </p>
-              </div>
+              <p
+                className={`${textColor} text-xs md:text-sm lg:text-base leading-relaxed`}
+              >
+                {value}
+              </p>
             )}
           </div>
         </div>
@@ -165,9 +145,7 @@ const Card: React.FC<CardProps> = ({
       content = (
         <div className="p-4 md:p-5 lg:p-6 flex flex-col items-left gap-2 md:gap-3 lg:gap-4 w-full bg-linear-to-br from-primary/70 to-secondary/70 h-full">
           {icon && (
-            <div
-              className={`text-white text-2xl md:text-3xl lg:text-4xl [&>svg]:block [&>svg]:size-[1em]`}
-            >
+            <div className="text-white text-2xl md:text-3xl lg:text-4xl [&>svg]:block [&>svg]:size-[1em]">
               {icon}
             </div>
           )}
@@ -179,13 +157,50 @@ const Card: React.FC<CardProps> = ({
             )}
             {value && (
               <p
-                className={`text-white font-semibold ${
-                  value.toString().length > 15
-                    ? "text-lg md:text-xl lg:text-2xl"
-                    : "text-xl md:text-2xl lg:text-3xl"
-                }`}
+                className={`text-white font-semibold ${value.toString().length > 15 ? "text-lg md:text-xl lg:text-2xl" : "text-xl md:text-2xl lg:text-3xl"}`}
               >
                 {value}
+              </p>
+            )}
+          </div>
+        </div>
+      );
+      break;
+
+    case "step":
+      content = (
+        <div className="flex flex-col h-full bg-white rounded-3xl overflow-hidden">
+          {/* Image Box */}
+          {image && (
+            <div className="relative h-48 md:h-52 lg:h-60 p-2 overflow-hidden">
+              <img
+                src={image}
+                alt={imageAlt || title || "Step illustration"}
+                className="w-full h-48 md:h-52 lg:h-60 object-contain"
+              />
+            </div>
+          )}
+
+          {/* Content Area */}
+          <div className="p-6 md:p-7 lg:p-8 flex flex-col flex-1 gap-2 md:gap-2.5 lg:gap-3">
+            {/* Step Number */}
+            {title && (
+              <div className="inline-flex items-center justify-center w-8 md:w-10 lg:w-12 h-8 md:h-10 lg:h-12 rounded-md md:rounded-lg lg:rounded-xl bg-primary text-white font-semibold text-md md:text-lg lg:text-xl shadow">
+                {title}
+              </div>
+            )}
+
+            {/* Main Title */}
+            {value && (
+              <h3 className="text-md md:text-lg lg:text-xl font-semibold text-foreground leading-tight line-clamp-1">
+                {value}
+              </h3>
+            )}
+
+            {/* Description */}
+            {subValue && (
+              <p className="text-muted-foreground text-sm md:text-md lg:text-base leading-relaxed flex-1">
+                {subValue}
               </p>
             )}
           </div>
