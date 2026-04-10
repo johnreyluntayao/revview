@@ -1,3 +1,4 @@
+'use client'
 import React, { useState, useEffect } from 'react';
 
 interface CountdownCardProps {
@@ -5,6 +6,7 @@ interface CountdownCardProps {
   targetDate?: string;        // ISO format or "April 10, 2026"
   message?: string;
   subMessage?: string;
+  className?: string;
 }
 
 const CountdownCard: React.FC<CountdownCardProps> = ({
@@ -12,6 +14,7 @@ const CountdownCard: React.FC<CountdownCardProps> = ({
   targetDate = "April 15, 2026",   // Default: April 10, 2026
   message = "Don't wait, start preparing today!",
   subMessage = "Every question you practice brings you closer to success.",
+  className = "",
 }) => {
   const [timeLeft, setTimeLeft] = useState({
     days: "00",
@@ -56,7 +59,7 @@ const CountdownCard: React.FC<CountdownCardProps> = ({
   }, [targetDate]);
 
   return (
-    <div className="w-full mx-auto flex flex-col gap-6 md:gap-8 rounded-2xl bg-linear-to-r from-hero2 via-hero1 to-hero3 p-6 md:p-8 text-white text-center shadow-2xl">
+    <div className={`w-full flex flex-col gap-6 md:gap-8 rounded-2xl bg-linear-to-r from-hero2 via-hero1 to-hero3 p-4 md:p-6 lg:p-8 text-white text-center shadow-2xl ${className}`}>
       
       {/* Header */}
       <div className="flex flex-col items-center">
@@ -76,7 +79,7 @@ const CountdownCard: React.FC<CountdownCardProps> = ({
       </div>
 
       {/* Countdown Boxes */}
-      <div className="grid grid-cols-4 gap-3 md:gap-4">
+      <div className="grid grid-cols-4 gap-1 md:gap-2 lg:gap-4">
         {[
           { value: timeLeft.days, label: "DAYS" },
           { value: timeLeft.hours, label: "HOURS" },
@@ -85,12 +88,12 @@ const CountdownCard: React.FC<CountdownCardProps> = ({
         ].map((item, index) => (
           <div
             key={index}
-            className="bg-primary/70 backdrop-blur-md rounded-xl p-4 border border-secondary/20 transition-all duration-300"
+            className="bg-primary/70 backdrop-blur-md rounded-xl p-4 border border-secondary/20 transition-all duration-300 justify-center items-center flex flex-col"
           >
-            <div className="text-4xl md:text-5xl font-bold tabular-nums">
+            <div className="text-xl md:text-2xl lg:text-3xl font-bold tabular-nums">
               {item.value}
             </div>
-            <div className="text-[10px] md:text-xs font-medium tracking-widest uppercase mt-1 text-blue-200">
+            <div className="text-xs font-medium tracking-widest uppercase text-center text-blue-200">
               {item.label}
             </div>
           </div>
