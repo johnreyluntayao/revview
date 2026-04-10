@@ -52,5 +52,5 @@ export {
     Home,
     CircleUserRound as User2,
     Calendar,
-
+    Sparkles,
 } from 'lucide-react';

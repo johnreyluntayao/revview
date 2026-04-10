@@ -3,7 +3,7 @@ import React from "react";
 
 const variantStyles = {
   default: {
-    background: "bg-amber-800/70",
+    background: "bg-black/70",
     text: "text-white",
   },
   numerical: {
