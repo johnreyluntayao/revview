@@ -1,3 +1,6 @@
+"use client";
+
+import { motion, easeOut } from "framer-motion";
 import { Card } from "@/lib/client-imports";
 import {
   CustomQuiz,
@@ -53,35 +56,83 @@ const featureCards = [
   },
 ];
 
+const container = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: easeOut,
+    },
+  },
+};
+
 const WhyChoose = () => {
   return (
     <section>
-      <div className="w-full flex flex-col items-center justify-center py-7.5 md:py-15 lg:py-22.5 px-4 md:px-6 lg:px-32 gap-8 md:gap-12 lg:gap-16">
+      <motion.div
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: "-100px" }}
+        variants={container}
+        className="w-full flex flex-col items-center justify-center py-7.5 md:py-15 lg:py-22.5 px-4 md:px-6 lg:px-32 gap-8 md:gap-12 lg:gap-16"
+      >
+
         <div className="flex flex-col items-center gap-2 md:gap-3 lg:gap-4">
-          <h1 className="text-2xl md:text-[32px] lg:text-5xl font-bold text-foreground">
+          <motion.h1
+            variants={fadeUp}
+            className="text-2xl md:text-[32px] lg:text-5xl font-bold text-foreground"
+          >
             Why Choose RevView?
-          </h1>
-          <p className="text-xs md:text-base lg:text-xl text-muted-foreground text-center">
+          </motion.h1>
+
+          <motion.p
+            variants={fadeUp}
+            className="text-xs md:text-base lg:text-xl text-muted-foreground text-center"
+          >
             Everything you need for successful exam preparation in one platform
-          </p>
+          </motion.p>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8 ">
+
+        <motion.div
+          variants={container}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8"
+        >
           {featureCards.map((feature, idx) => (
-            <Card
+            <motion.div
               key={idx}
-              variant="compact"
-              icon={feature.icon}
-              title={feature.title}
-              value={feature.description}
-              className="h-auto flex flex-col justify-between items-start"
-              bg="bg-linear-to-br from-primary/70 to-secondary/70"
-              textColor="text-white"
-              iconColor="text-white"
-            />
+              variants={fadeUp}
+              whileHover={{
+                y: -6,
+                scale: 1.02,
+                transition: { duration: 0.2 },
+              }}
+            >
+              <Card
+                variant="compact"
+                icon={feature.icon}
+                title={feature.title}
+                value={feature.description}
+                className="h-full flex flex-col justify-between items-start"
+                bg="bg-linear-to-br from-primary/70 to-secondary/70"
+                textColor="text-white"
+                iconColor="text-white"
+              />
+            </motion.div>
           ))}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </section>
   );
 };
