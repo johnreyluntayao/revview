@@ -161,7 +161,8 @@ export interface ChipProps {
     | "easy"
     | "medium"
     | "hard"
-    | "product";
+    | "product"
+    | "soon";
 }
 
 export interface CardProps {
@@ -173,7 +174,8 @@ export interface CardProps {
     | "data"
     | "report"
     | "step"
-    | "affiliate";
+    | "affiliate"
+    | "soon";
   title?: string;
   value: string | number;
   subValue?: string;
