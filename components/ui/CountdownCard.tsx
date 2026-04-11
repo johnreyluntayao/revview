@@ -3,15 +3,15 @@ import React, { useState, useEffect } from 'react';
 
 interface CountdownCardProps {
   title?: string;
-  targetDate?: string;        // ISO format or "April 10, 2026"
+  targetDate?: string;   
   message?: string;
   subMessage?: string;
   className?: string;
 }
 
 const CountdownCard: React.FC<CountdownCardProps> = ({
-  title = "Sample Exam Countdown",  // Default title
-  targetDate = "April 15, 2026",   // Default: April 10, 2026
+  title = "Exam Countdown",
+  targetDate = "August 15, 2026",
   message = "Don't wait, start preparing today!",
   subMessage = "Every question you practice brings you closer to success.",
   className = "",
@@ -28,7 +28,6 @@ const CountdownCard: React.FC<CountdownCardProps> = ({
       const target = new Date(targetDate);
       const now = new Date();
 
-      // If the target date has passed
       if (now >= target) {
         setTimeLeft({ days: "00", hours: "00", minutes: "00", seconds: "00" });
         return;
@@ -49,27 +48,25 @@ const CountdownCard: React.FC<CountdownCardProps> = ({
       });
     };
 
-    // Calculate immediately
     calculateTimeLeft();
 
-    // Update every second
     const timer = setInterval(calculateTimeLeft, 1000);
 
     return () => clearInterval(timer);
   }, [targetDate]);
 
   return (
-    <div className={`w-full flex flex-col gap-6 md:gap-8 rounded-2xl bg-linear-to-r from-hero2 via-hero1 to-hero3 p-4 md:p-6 lg:p-8 text-white text-center shadow-2xl ${className}`}>
+    <div className={`w-fit h-fit flex flex-col gap-6 md:gap-8 rounded-2xl bg-linear-to-r from-countdown1/50 via-countdown2/50 to-countdown3/60 border-2 border-primary/30 p-4 md:p-6 lg:p-8 text-center ${className}`}>
       
       {/* Header */}
-      <div className="flex flex-col items-center">
-        <p className="text-xs md:text-sm font-semibold tracking-widest uppercase text-white/80">
+      <div className="flex flex-col items-center justify-center">
+        <p className="text-[8px] md:text-[10px] lg:text-xs tracking-wider uppercase text-[#BFDBFE] mb-1 md:mb-1.5 lg:mb-2">
           COUNTDOWN TO
         </p>
-        <h1 className="text-3xl md:text-4xl font-bold mt-1 mb-1">
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-black mb-2 md:mb-3 lg:mb-4 text-white">
           {title}
         </h1>
-        <p className="text-sm md:text-base text-blue-100">
+        <p className="text-[10px] md:text-xs lg:text-sm text-primary100">
           {new Date(targetDate).toLocaleDateString('en-US', { 
             year: 'numeric', 
             month: 'long', 
@@ -79,7 +76,7 @@ const CountdownCard: React.FC<CountdownCardProps> = ({
       </div>
 
       {/* Countdown Boxes */}
-      <div className="grid grid-cols-4 gap-1 md:gap-2 lg:gap-4">
+      <div className="grid grid-cols-4 gap-2 md:gap-3 lg:gap-4">
         {[
           { value: timeLeft.days, label: "DAYS" },
           { value: timeLeft.hours, label: "HOURS" },
@@ -88,12 +85,12 @@ const CountdownCard: React.FC<CountdownCardProps> = ({
         ].map((item, index) => (
           <div
             key={index}
-            className="bg-primary/70 backdrop-blur-md rounded-xl p-4 border border-secondary/20 transition-all duration-300 justify-center items-center flex flex-col"
+            className="bg-linear-to-r from-primary600/80 to-primary700/80 rounded-lg gap-1 md:gap-1.5 lg:gap-2 p-4 md:p-5 lg:p-6 transition-all duration-300 justify-center items-center flex flex-col w-full h-auto"
           >
-            <div className="text-xl md:text-2xl lg:text-3xl font-bold tabular-nums">
+            <div className="text-2xl md:text-3xl lg:text-4xl tabular-nums text-white">
               {item.value}
             </div>
-            <div className="text-xs font-medium tracking-widest uppercase text-center text-blue-200">
+            <div className="text-[8px] md:text-[10px] lg:text-xs font-medium tracking-wider uppercase text-center text-primary100">
               {item.label}
             </div>
           </div>
@@ -101,11 +98,11 @@ const CountdownCard: React.FC<CountdownCardProps> = ({
       </div>
 
       {/* Motivational Message */}
-      <div className="bg-secondary/10 backdrop-blur-md rounded-2xl p-6 border border-primary/70">
-        <p className="text-lg md:text-xl font-semibold mb-2">
+      <div className="bg-linear-to-r from-primary/20 to-secondary/20 rounded-lg border border-primary/50 p-4 md:p-5 lg:p-6">
+        <p className="text-[10px] md:text-xs lg:text-sm font-bold text-white mb-1 md:mb-1.5 lg:mb-2">
           {message}
         </p>
-        <p className="text-sm md:text-base text-blue-100 leading-relaxed">
+        <p className="text-[10px] md:text-xs lg:text-sm text-primary100 leading-relaxed">
           {subMessage}
         </p>
       </div>
