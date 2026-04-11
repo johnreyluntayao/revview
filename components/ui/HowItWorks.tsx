@@ -1,44 +1,63 @@
-import { List } from '@/lib/client-imports';
+import { Card, List } from "@/lib/client-imports";
 
-const howItWorks = [
-    {
-        label: "Sign In",
-        description:
-            "Log in with your Google account or email to access your personalized dashboard and track your progress.",
-    },
-    {
-        label: "Customize Your Quiz",
-        description:
-            "Select categories (Verbal Ability, General Information), difficulty level, and number of questions that match your study goals.",
-    },
-    {
-        label: "Take the Quiz",
-        description:
-            "Answer questions under realistic time pressure with a countdown timer. No going back once you submit an answer!",
-    },
-
-    {
-        label: "Learn & Improve",
-        description:
-            "Receive instant feedback with detailed explanations to strengthen your understanding.",
-    }
-    
-
+const steps = [
+  {
+    stepNumber: "1",
+    title: "Sign In",
+    description: "Create your account with Google or email and set up your profile.",
+    image: "/steps/image 1.svg",
+  },
+  {
+    stepNumber: "2",
+    title: "Customize Your Quiz",
+    description: "Choose categories, difficulty level, and number of questions.",
+    image: "/steps/image 2.svg",
+  },
+  {
+    stepNumber: "3",
+    title: "Take the Quiz",
+    description: "Answer questions with real-time timer and immediate feedback.",
+    image: "/steps/image 3.svg",
+  },
+  {
+    stepNumber: "4",
+    title: "Learn & Improve",
+    description: "Review answers, track progress, and improve systematically.",
+    image: "/steps/image 4.svg",
+  },
 ];
 
 const HowItWorks = () => {
-    return (
-        <section>
-            <div className='w-full flex flex-col items-center justify-center text-pretty gap-4 md:gap-6 lg:gap-8  p-4 md:p-6 lg:p-8 min-h-screen'>
-                <h2 className='text-2xl md:text-3xl lg:text-4xl font-bold text-foreground'>
-                    How It Works
-                </h2>
-                <List items={howItWorks} isNumberedList={true} />
-            </div>
+  return (
+    <section>
+      <div className="w-full flex flex-col items-center justify-center text-pretty gap-4 md:gap-6 lg:gap-8 py-7.5 md:py-15 lg:py-22.5 px-4 md:px-6 lg:px-32">
+        <div className="flex flex-col items-center gap-2 md:gap-3 lg:gap-4">
+          <h1 className="text-2xl md:text-[32px] lg:text-5xl font-bold text-foreground">
+            How It Works
+          </h1>
+          <p className="text-xs md:text-base lg:text-xl text-muted-foreground text-center">
+            Simple 4-step process to ace your exam
+          </p>
+        </div>
 
-        </section>
+         <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {steps.map((step, index) => (
+        <Card
+          key={index}
+          variant="step"
+          title={step.stepNumber}     // shows in the blue circle
+          value={step.title}          // main bold heading
+          subValue={step.description}
+          image={step.image}
+          imageAlt={`${step.title} illustration`}
+          className="h-full"          // makes all cards same height
+        />
+        
+      ))}
+      </div>
+      </div>
+    </section>
+  );
+};
 
-    )
-}
-
-export default HowItWorks
+export default HowItWorks;
