@@ -62,6 +62,12 @@ const variantStyles = {
     background: "bg-destructive",
     text: "text-white font-medium",
   },
+
+  product: {
+    background: "bg-primary/10",
+    text: "text-primary",
+  },
+
 };
 
 const Chip: React.FC<ChipProps> = ({

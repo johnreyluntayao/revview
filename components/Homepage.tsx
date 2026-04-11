@@ -1,4 +1,5 @@
-import { HeroSection, HowItWorks, ComprehensiveCoverage, WhyChoose } from "@/lib/client-imports";
+import { HeroSection, HowItWorks, ComprehensiveCoverage, WhyChoose, Contact } from "@/lib/client-imports";
+import BoostPreparation from "./ui/BoostPreparation";
 
 const Homepage = () => {
   return (
@@ -7,6 +8,8 @@ const Homepage = () => {
       <WhyChoose />
       <ComprehensiveCoverage />
       <HowItWorks />
+      <BoostPreparation />
+      <Contact />
     </div>
   )
 }
