@@ -169,8 +169,45 @@
   --color-text2: hsl(var(--cyan-300));
   --color-text3: hsl(var(--purple-400));
 
-  --color-countdown1: hsl(var(--color-primary/20));
-  --color-countdown2: hsl(var(--color-secondary/20));
+  --color-countdown1: #1F2937;
+  --color-countdown2: #1E3A8A;
+  --color-countdown3: #581C87;
+
+  --color-primary50: hsl(var(--blue-50));
+  --color-primary100: hsl(var(--blue-100));
+  --color-primary200: hsl(var(--blue-200));
+  --color-primary300: hsl(var(--blue-300));
+  --color-primary400: hsl(var(--blue-400));
+  --color-primary500: hsl(var(--blue-500));
+  --color-primary600: hsl(var(--blue-600));
+  --color-primary700: hsl(var(--blue-700));
+  --color-primary800: hsl(var(--blue-800));
+  --color-primary900: hsl(var(--blue-900));
+  --color-primary950: hsl(var(--blue-950));
+
+  --color-cyan50: hsl(var(--cyan-50));
+  --color-cyan100: hsl(var(--cyan-100));
+  --color-cyan200: hsl(var(--cyan-200));
+  --color-cyan300: hsl(var(--cyan-300));
+  --color-cyan400: hsl(var(--cyan-400));
+  --color-cyan500: hsl(var(--cyan-500));
+  --color-cyan600: hsl(var(--cyan-600));
+  --color-cyan700: hsl(var(--cyan-700));
+  --color-cyan800: hsl(var(--cyan-800));
+  --color-cyan900: hsl(var(--cyan-900));
+  --color-cyan950: hsl(var(--cyan-950));
+
+  --color-purple50: hsl(var(--purple-50));
+  --color-purple100: hsl(var(--purple-100));
+  --color-purple200: hsl(var(--purple-200));
+  --color-purple300: hsl(var(--purple-300));
+  --color-purple400: hsl(var(--purple-400));
+  --color-purple500: hsl(var(--purple-500));
+  --color-purple600: hsl(var(--purple-600));
+  --color-purple700: hsl(var(--purple-700));
+  --color-purple800: hsl(var(--purple-800));
+  --color-purple900: hsl(var(--purple-900));
+  --color-purple950: hsl(var(--purple-950));
 }
 
 /* =============================================
