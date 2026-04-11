@@ -160,7 +160,8 @@ export interface ChipProps {
     | "default"
     | "easy"
     | "medium"
-    | "hard";
+    | "hard"
+    | "product";
 }
 
 export interface CardProps {
@@ -171,7 +172,8 @@ export interface CardProps {
     | "compact"
     | "data"
     | "report"
-    | "step";
+    | "step"
+    | "affiliate";
   title?: string;
   value: string | number;
   subValue?: string;
@@ -186,6 +188,10 @@ export interface CardProps {
   subColor2?: string;
   image?: string; // URL of the image
   imageAlt?: string;
+  badge?: string;           
+  price?: string;          
+  buttonText?: string;      
+  buttonLink?: string;      
 }
 
 export interface ComboBoxProps {

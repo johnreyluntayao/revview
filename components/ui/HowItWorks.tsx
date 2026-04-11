@@ -50,6 +50,7 @@ const HowItWorks = () => {
           subValue={step.description}
           image={step.image}
           imageAlt={`${step.title} illustration`}
+          subColor="bg-linear-to-br from-primary to-secondary"
           className="h-full"          // makes all cards same height
         />
         

@@ -1,4 +1,4 @@
-import { Homepage, Footer, NavBar, Contact } from "@/lib/client-imports"
+import { Homepage, Footer, NavBar} from "@/lib/client-imports"
 
 export default function Home() {
 
@@ -7,7 +7,7 @@ export default function Home() {
     <div className="w-full">
       <NavBar State="Home"/>
       <Homepage />
-      <Contact />
+      
       <Footer />
     </div>
   );
