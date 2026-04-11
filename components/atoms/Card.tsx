@@ -261,9 +261,9 @@ const Card: React.FC<CardProps> = ({
 
             {/* Price */}
             {price && (
-                <p className="text-md md:text-lg lg:text-xl font-bold text-foreground tracking-tight">
-                  {price}
-                </p>
+              <p className="text-md md:text-lg lg:text-xl font-bold text-foreground tracking-tight">
+                {price}
+              </p>
             )}
 
             {/* Learn More Button */}
@@ -274,6 +274,42 @@ const Card: React.FC<CardProps> = ({
                 textColor="text-white"
                 className="transition-all"
               />
+            )}
+          </div>
+        </div>
+      );
+      break;
+
+    case "soon":
+      content = (
+        <div className="flex flex-col h-full bg-white rounded-3xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-200 p-4 md:p-5 lg:p-6 gap-4 md:gap-5 lg:gap-6">
+          {/* Top Section: Icon + Coming Soon Badge */}
+          <div className="flex items-center justify-between">
+            {/* Icon Container */}
+            {icon && (
+              <div className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-2xl text-4xl md:text-5xl lg:text-6xl">
+                {icon}
+              </div>
+            )}
+
+            {/* Coming Soon Badge */}
+            {badge && (
+              <Chip text={badge} variant="soon"/>
+            )}
+          </div>
+          <div className="flex flex-col gap-2 md:gap-3 lg:gap-4">
+            {/* Title */}
+            {value && (
+              <h3 className="text-md md:text-lg lg:text-xl font-semibold text-foreground leading-tight line-clamp-2 md:min-h-[2.5em]">
+                {value}
+              </h3>
+            )}
+
+            {/* Description */}
+            {subValue && (
+              <p className="text-muted-foreground text-sm md:text-md lg:text-base leading-relaxed">
+                {subValue}
+              </p>
             )}
           </div>
         </div>

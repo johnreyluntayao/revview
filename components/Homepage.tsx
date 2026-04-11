@@ -1,5 +1,6 @@
 import { HeroSection, HowItWorks, ComprehensiveCoverage, WhyChoose, Contact } from "@/lib/client-imports";
 import BoostPreparation from "./ui/BoostPreparation";
+import ComingSoon from "./ui/ComingSoon";
 
 const Homepage = () => {
   return (
@@ -9,6 +10,7 @@ const Homepage = () => {
       <ComprehensiveCoverage />
       <HowItWorks />
       <BoostPreparation />
+      <ComingSoon />
       <Contact />
     </div>
   )

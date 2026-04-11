@@ -68,6 +68,12 @@ const variantStyles = {
     text: "text-primary",
   },
 
+  soon: {
+    background: "bg-secondary",
+    text: "text-white",
+  },
+
+
 };
 
 const Chip: React.FC<ChipProps> = ({
