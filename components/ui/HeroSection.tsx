@@ -7,17 +7,16 @@ const HeroSection = () => {
   return (
     <section>
       <div
-        className="w-full
+        className="w-full min-h-screen
         grid grid-cols-1 lg:grid-cols-2 
-        items-center justify-center
-        text-center text-pretty p-4 md:p-6 lg:p-8
-        bg-linear-to-r from-hero1 to-hero2 
-        space-y-8 lg:space-y-0 space-x-2
-        mt-8
-        py-12 md:py-20 lg:py-24"
+        bg-linear-to-r from-hero1 to-hero2
+        mt-16
+        py-12 md:py-20 lg:py-24
+        px-4 md:px-6 lg:px-8
+        gap-8"
       >
-        <div className="justify-start text-white text-center lg:text-left space-y-8">
-          <div className="space-y-2">
+        <div className="justify-start text-white text-center lg:text-left">
+          <div className="space-y-3.5 md:space-y-4 lg:space-y-4.5">
             <Chip
               text="Welcome to Revview"
               leftIcon={
@@ -28,21 +27,26 @@ const HeroSection = () => {
                   fill="currentColor"
                 />
               }
-              className="py-2 font-thin uppercase border-primary/20 bg-secondary/20 "
+              className=" uppercase border border-primary/30 bg-primary/20 tracking-widest text-[#BFDBFE]"
             />
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-none ">
-              Master Your
-              <span className="block bg-linear-to-r from-text1 via-text2 to-text3 bg-clip-text text-transparent">
-                Exam Prep
-              </span>
+            <div className="tracking-wide">
+              <h1 className="text-[36px] md:text-5xl lg:text-6xl font-black">
+              Master your
             </h1>
+            <h1 className="inline-block text-[36px] md:text-5xl lg:text-6xl font-black bg-linear-to-r from-text1 via-text2 to-text3 bg-clip-text text-transparent">
+                Board Exam
+            </h1>
+            </div>
+            
           </div>
-          <p className="text-sm md:text-base lg:text-lg font-light text-white/80">
+
+          <p className="text-base md:text-lg lg:text-xl text-white/80 mt-6 md:mt-7 lg:mt-8">
             The most intelligent online reviewer platform featuring adaptive
             learning algorithms, comprehensive analytics, and real-time feedback
             to accelerate your exam preparation.
           </p>
-          <div className="flex flex-col md:flex-row gap-4 justify-center lg:justify-start">
+
+          <div className="flex flex-col md:flex-row gap-2 md:gap-3 lg:gap-4 justify-center lg:justify-start mt-6 md:mt-8 lg:mt-12">
             <Button
               text="Get Started Free"
               backgroundColor="bg-primary"
@@ -56,76 +60,44 @@ const HeroSection = () => {
             />
           </div>
 
-          <div className="flex flex-row whitespace-nowrap gap-2">
-            {/* Expert */}
-            <div className="flex-1">
-              <div className="flex items-start gap-3">
-                {/* Gradient vertical line - auto height */}
-                <div className="hidden lg:flex w-1.5 bg-gradient-to-b from-blue-400 to-cyan-400 rounded-full flex-shrink-0 self-stretch"></div>
-
-                {/* Text Content */}
-                <div className="flex-1">
-                  <h1 className="text-xl md:text-2xl lg:text-3xl font-bold leading-none">
-                    <span className="text-lg md:text-xl lg:text-2xl bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                      Expert
-                    </span>
-                  </h1>
-
-                  <span className="block text-sm md:text-base text-slate-400 mt-2">
-                    Crafted Content
-                  </span>
-                </div>
-              </div>
+          <div className="flex mt-8 md:mt-10 lg:mt-12 text-center lg:text-start justify-center lg:justify-start">
+            <div className="flex-1 px-0 lg:px-3 py-0 border-l-none lg:border-l-4 border-primary300 space-y-2 md:space-y-2.5 lg:space-y-3">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary300">
+                Expert
+              </h1>
+              <p className="block text-[10px] md:text-xs lg:text-sm text-white/80">
+                Crafted Content
+              </p>
             </div>
 
-            {/* 100 */}
-            <div className="flex-1">
-              <div className="flex items-start gap-3">
-                {/* Gradient vertical line - auto height */}
-                <div className="hidden lg:flex w-1.5 bg-gradient-to-b from-blue-400 to-cyan-400 rounded-full flex-shrink-0 self-stretch"></div>
-
-                {/* Text Content */}
-                <div className="flex-1">
-                  <h1 className="text-xl md:text-2xl lg:text-3xl font-bold leading-none">
-                    <span className="text-lg md:text-xl lg:text-2xl bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                      100+
-                    </span>
-                  </h1>
-
-                  <span className="block text-sm md:text-base text-slate-400 mt-2">
-                    Practice Questions
-                  </span>
-                </div>
-              </div>
+            <div className="flex-1 px-0 lg:px-3 py-0 border-l-none lg:border-l-4 border-purple300 space-y-2 md:space-y-2.5 lg:space-y-3">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-purple300">
+                100+
+              </h1>
+              <p className="block text-[10px] md:text-xs lg:text-sm text-white/80">
+                Practice Questions
+              </p>
             </div>
 
-            {/* Realistic */}
-            <div className="flex-1">
-              <div className="flex items-start gap-3">
-                {/* Gradient vertical line - auto height */}
-                <div className="hidden lg:flex w-1.5 bg-gradient-to-b from-blue-400 to-cyan-400 rounded-full flex-shrink-0 self-stretch"></div>
-
-                {/* Text Content */}
-                <div className="flex-1">
-                  <h1 className="text-xl md:text-2xl lg:text-3xl font-bold leading-none">
-                    <span className="text-lg md:text-xl lg:text-2xl bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                      Realistic
-                    </span>
-                  </h1>
-
-                  <span className="block text-sm md:text-base text-slate-400 mt-2">
-                    Exam Simulation
-                  </span>
-                </div>
-              </div>
+            <div className="flex-1 px-0 lg:px-3 py-0 border-l-none lg:border-l-4 border-cyan400 space-y-2 md:space-y-2.5 lg:space-y-3">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-cyan400">
+                Realistic
+              </h1>
+              <p className="block text-[10px] md:text-xs lg:text-sm text-white/80">
+                Exam Simulation
+              </p>
             </div>
+
           </div>
         </div>
+        <div className="flex items-center justify-center">
 
-        <CountdownCard
-          targetDate="April 15, 2026"
+          <CountdownCard
+          targetDate="August 15, 2026"
           message="Exam Day is Approaching!"
         />
+        </div>
+        
       </div>
     </section>
   );

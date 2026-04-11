@@ -3,8 +3,8 @@ import React from "react";
 
 const variantStyles = {
   default: {
-    background: "bg-black/70",
-    text: "text-white",
+    background: "",
+    text: "",
   },
   numerical: {
     background: "bg-primary/70",
