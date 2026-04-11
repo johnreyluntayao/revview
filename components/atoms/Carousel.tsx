@@ -21,22 +21,26 @@ const Carousel: React.FC<CarouselProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const totalSlides = children.length;
 
-  // Responsive items per view: 3 on lg, 2 on md, 1 on mobile
-  const getItemsPerView = () => {
-    if (typeof window === "undefined") return 1;
-    if (window.innerWidth >= 1024) return 3;
-    if (window.innerWidth >= 768) return 2;
-    return 1;
-  };
+  // Start with 1 item on server + initial client render (safe default)
+  const [itemsPerView, setItemsPerView] = useState(1);
 
-  const [itemsPerView, setItemsPerView] = useState(getItemsPerView());
-
+  // Update items per view only after component is mounted on client
   useEffect(() => {
+    const getItemsPerView = () => {
+      if (window.innerWidth >= 1024) return 3;   // lg
+      if (window.innerWidth >= 768) return 2;    // md
+      return 1;                                  // mobile
+    };
+
     const handleResize = () => {
       const newItems = getItemsPerView();
       setItemsPerView(newItems);
+      // Safely adjust current index if needed
       setCurrentIndex((prev) => Math.min(prev, Math.max(0, totalSlides - newItems)));
     };
+
+    // Set initial value on mount
+    handleResize();
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -65,11 +69,11 @@ const Carousel: React.FC<CarouselProps> = ({
 
   const slideWidthPercentage = (100 / itemsPerView);
 
-  // Fade intensity
+  // Fade intensity (subtle)
   const fadeClass = {
     light: "from-white/10 to-transparent",
     medium: "from-white/30 to-transparent",
-    strong: "from-white/60 to-transparent",
+    strong: "from-white/40 to-transparent",
   }[fadeIntensity];
 
   return (
