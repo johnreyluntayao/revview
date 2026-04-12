@@ -88,7 +88,7 @@ const BoostPreparation = () => {
 
   return (
     <section>
-      <div className="bg-primary/10 w-full flex flex-col items-center justify-center text-pretty gap-4 md:gap-6 lg:gap-8 py-7.5 md:py-15 lg:py-22.5 px-4 md:px-6 lg:px-32">
+      <div className="bg-primary/10 w-full flex flex-col items-center justify-center text-pretty gap-4 md:gap-6 lg:gap-8 py-7.5 md:py-15 lg:py-22.5 px-4 md:px-6 lg:px-12">
         <div className="flex flex-col items-center gap-2 md:gap-3 lg:gap-4">
           <Chip
             text="Recommended Resources"

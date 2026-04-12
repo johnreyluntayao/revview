@@ -7,7 +7,7 @@ export default function Home() {
     <div className="w-full">
       <NavBar State="Home"/>
       <Homepage />
-      
+
       <Footer />
     </div>
   );
