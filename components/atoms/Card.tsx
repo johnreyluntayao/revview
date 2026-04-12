@@ -219,7 +219,7 @@ const Card: React.FC<CardProps> = ({
 
     case "affiliate":
       content = (
-        <div className="flex flex-col h-full bg-white dark:bg-card rounded-3xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-shadow">
+        <div className="flex flex-col h-full bg-white overflow-hidden ">
           {/* Top Gradient Area with Icon/Image */}
           <div className="relative h-52 md:h-60 flex items-center justify-center overflow-hidden">
             {image && (
@@ -281,7 +281,7 @@ const Card: React.FC<CardProps> = ({
 
     case "soon":
       content = (
-        <div className="flex flex-col h-full bg-white rounded-3xl overflow-hidden border border-border shadow-sm hover:shadow-md transition-all duration-200 p-4 md:p-5 lg:p-6 gap-4 md:gap-5 lg:gap-6">
+        <div className="flex flex-col h-full bg-white overflow-hidden transition-all duration-200 p-4 md:p-5 lg:p-6 gap-4 md:gap-5 lg:gap-6">
           {/* Top Section: Icon + Coming Soon Badge */}
           <div className="flex items-center justify-between">
             {/* Icon Container */}
