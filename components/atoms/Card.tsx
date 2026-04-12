@@ -26,7 +26,7 @@ const Card: React.FC<CardProps> = ({
   buttonLink, // new
 }) => {
   const baseClasses = `
-    rounded-3xl shadow-sm border border-border overflow-hidden
+    rounded-xl shadow-sm border border-border overflow-hidden
     ${bg} ${className}
   `;
 
@@ -175,41 +175,40 @@ const Card: React.FC<CardProps> = ({
 
     case "step":
       content = (
-        <div className="flex flex-col h-full bg-white rounded-3xl overflow-hidden">
+        <div className="flex flex-col h-full w-full bg-white rounded-lg overflow-hidden">
           {/* Image Box */}
           {image && (
-            <div className="relative h-48 md:h-52 lg:h-60 p-2 overflow-hidden">
               <Image
                 height={1000}
                 width={1000}
                 src={image}
                 alt={imageAlt || title || "Step illustration"}
-                className="w-full h-48 md:h-52 lg:h-60 object-contain"
+                className="w-full h-full object-cover rounded-lg overflow-hidden border-b border-border"
               />
-            </div>
           )}
 
           {/* Content Area */}
-          <div className="p-6 md:p-7 lg:p-8 flex flex-col flex-1 gap-2 md:gap-2.5 lg:gap-3">
-            {/* Step Number */}
+          <div className="p-4 md:p-5 lg:p-6 flex flex-col flex-1 gap-2 md:gap-2.5 lg:gap-3">
+            <div className="flex flex-col space-y-2 md:space-y-3 lg:space-y-4">
+              {/* Step Number */}
             {title && (
-              <div
-                className={`inline-flex items-center justify-center w-8 md:w-10 lg:w-12 h-8 md:h-10 lg:h-12 rounded-md md:rounded-lg lg:rounded-xl ${subColor} text-white font-semibold text-md md:text-lg lg:text-xl shadow`}
-              >
-                {title}
-              </div>
+              <Chip 
+              text={`Step ${title}`}
+              className="bg-linear-to-r from-primary to-secondary text-primary-foreground w-fit"
+              />
             )}
 
             {/* Main Title */}
             {value && (
-              <h3 className="text-md md:text-lg lg:text-xl font-semibold text-foreground leading-tight line-clamp-1">
+              <h3 className="text-sm md:text-base lg:text-lg font-bold text-foreground leading-tight line-clamp-1">
                 {value}
               </h3>
             )}
-
+            </div>
+            
             {/* Description */}
             {subValue && (
-              <p className="text-muted-foreground text-sm md:text-md lg:text-base leading-relaxed flex-1">
+              <p className="text-muted-foreground text-xs md:text-sm lg:text-base leading-relaxed flex-1">
                 {subValue}
               </p>
             )}
