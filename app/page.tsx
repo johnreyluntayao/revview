@@ -1,3 +1,4 @@
+import AdsSection from "@/components/ui/AdsSection";
 import { Homepage, Footer, NavBar} from "@/lib/client-imports"
 
 export default function Home() {
@@ -7,8 +8,8 @@ export default function Home() {
     <div className="w-full">
       <NavBar State="Home"/>
       <Homepage />
-
       <Footer />
+      <AdsSection variant="inline"/>
     </div>
   );
 }
