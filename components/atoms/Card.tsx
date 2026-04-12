@@ -247,7 +247,7 @@ const Card: React.FC<CardProps> = ({
 
             {/* Title */}
             {value && (
-              <h3 className="text-md md:text-lg lg:text-xl font-semibold text-foreground leading-tight">
+              <h3 className="text-md md:text-lg lg:text-xl font-semibold text-foreground leading-tight line-clamp-2 md:min-h-[2.5em]">
                 {value}
               </h3>
             )}

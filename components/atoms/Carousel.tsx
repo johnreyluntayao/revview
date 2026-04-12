@@ -18,6 +18,11 @@ const Carousel: React.FC<CarouselProps> = ({
   showDots = true,
   fadeIntensity = "medium",
 }) => {
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const totalSlides = children.length;
 
@@ -27,16 +32,18 @@ const Carousel: React.FC<CarouselProps> = ({
   // Update items per view only after component is mounted on client
   useEffect(() => {
     const getItemsPerView = () => {
-      if (window.innerWidth >= 1024) return 3;   // lg
-      if (window.innerWidth >= 768) return 2;    // md
-      return 1;                                  // mobile
+      if (window.innerWidth >= 1024) return 3; // lg
+      if (window.innerWidth >= 768) return 2; // md
+      return 1; // mobile
     };
 
     const handleResize = () => {
       const newItems = getItemsPerView();
       setItemsPerView(newItems);
       // Safely adjust current index if needed
-      setCurrentIndex((prev) => Math.min(prev, Math.max(0, totalSlides - newItems)));
+      setCurrentIndex((prev) =>
+        Math.min(prev, Math.max(0, totalSlides - newItems)),
+      );
     };
 
     // Set initial value on mount
@@ -67,7 +74,7 @@ const Carousel: React.FC<CarouselProps> = ({
     return () => clearInterval(interval);
   }, [goToNext, totalSlides, itemsPerView]);
 
-  const slideWidthPercentage = (100 / itemsPerView);
+  const slideWidthPercentage = 100 / itemsPerView;
 
   // Fade intensity (subtle)
   const fadeClass = {
@@ -76,64 +83,97 @@ const Carousel: React.FC<CarouselProps> = ({
     strong: "from-white/40 to-transparent",
   }[fadeIntensity];
 
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distance = touchStart - touchEnd;
+
+    if (distance > minSwipeDistance) {
+      // swipe left → next
+      goToNext();
+    } else if (distance < -minSwipeDistance) {
+      // swipe right → previous
+      goToPrevious();
+    }
+  };
+
   return (
-    <div className={`relative w-full overflow-hidden ${className}`}>
-      <div className="relative">
-        {/* Left Fade - only when not at start */}
-        {currentIndex > 0 && (
-          <div 
-            className={`absolute left-0 top-0 bottom-0 w-12 z-10 pointer-events-none bg-linear-to-r ${fadeClass}`} 
-          />
-        )}
-
-        {/* Right Fade - only when not at end */}
-        {currentIndex < maxIndex && (
-          <div 
-            className={`absolute right-0 top-0 bottom-0 w-12 z-10 pointer-events-none bg-linear-to-l ${fadeClass}`} 
-          />
-        )}
-
-        {/* Slides Container */}
-        <div
-          className="flex transition-transform duration-500 ease-out"
-          style={{ transform: `translateX(-${currentIndex * slideWidthPercentage}%)` }}
-        >
-          {children.map((child, index) => (
-            <div
-              key={index}
-              className="shrink-0 px-3 md:px-4"
-              style={{ width: `${slideWidthPercentage}%` }}
-            >
-              {child}
-            </div>
-          ))}
-        </div>
-
-        {/* Navigation Arrows - show only when needed */}
+    <div className={`w-full ${className}`}>
+      <div className="flex items-center gap-2 md:gap-4">
+        {/* Left Button */}
         {showArrows && totalSlides > itemsPerView && (
-          <>
-            {/* Left Arrow - hide when at first position */}
+          <div className="hidden md:flex">
             {currentIndex > 0 && (
               <button
                 onClick={goToPrevious}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-primary p-3.5 rounded-full shadow-lg z-20 hidden md:block transition-all hover:scale-105 active:scale-95"
+                className="bg-primary p-3.5 rounded-full shadow-lg transition-all hover:scale-105 active:scale-95"
                 aria-label="Previous slide"
               >
                 <ChevronLeft className="w-5 h-5 text-white" />
               </button>
             )}
+          </div>
+        )}
 
-            {/* Right Arrow - hide when at last position */}
+        {/* Carousel Content */}
+        <div className="relative w-full overflow-hidden">
+          {/* Fades */}
+          {currentIndex > 0 && (
+            <div
+              className={`absolute left-0 top-0 bottom-0 w-12 z-10 pointer-events-none bg-linear-to-r ${fadeClass}`}
+            />
+          )}
+
+          {currentIndex < maxIndex && (
+            <div
+              className={`absolute right-0 top-0 bottom-0 w-12 z-10 pointer-events-none bg-linear-to-l ${fadeClass}`}
+            />
+          )}
+
+          {/* Slides */}
+          <div
+            className="flex transition-transform duration-500 ease-out"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
+            style={{
+              transform: `translateX(-${currentIndex * slideWidthPercentage}%)`,
+            }}
+          >
+            {children.map((child, index) => (
+              <div
+                key={index}
+                className="shrink-0 px-3 md:px-4"
+                style={{ width: `${slideWidthPercentage}%` }}
+              >
+                {child}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Button */}
+        {showArrows && totalSlides > itemsPerView && (
+          <div className="hidden md:flex">
             {currentIndex < maxIndex && (
               <button
                 onClick={goToNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-primary p-3.5 rounded-full shadow-lg z-20 hidden md:block transition-all hover:scale-105 active:scale-95"
+                className="bg-primary p-3.5 rounded-full shadow-lg transition-all hover:scale-105 active:scale-95"
                 aria-label="Next slide"
               >
                 <ChevronRight className="w-5 h-5 text-white" />
               </button>
             )}
-          </>
+          </div>
         )}
       </div>
 

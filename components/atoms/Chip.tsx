@@ -69,7 +69,7 @@ const variantStyles = {
   },
 
   soon: {
-    background: "bg-secondary",
+    background: "bg-secondary/80",
     text: "text-white",
   },
 
