@@ -281,12 +281,12 @@ const Card: React.FC<CardProps> = ({
 
     case "soon":
       content = (
-        <div className="flex flex-col h-full bg-white overflow-hidden transition-all duration-200 p-4 md:p-5 lg:p-6 gap-4 md:gap-5 lg:gap-6">
+        <div className="flex flex-col h-full bg-white overflow-hidden transition-all duration-200 p-4 md:p-5 lg:p-6">
           {/* Top Section: Icon + Coming Soon Badge */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-start justify-between mb-3 mg:mb-3.5 lg:mb-4">
             {/* Icon Container */}
             {icon && (
-              <div className="w-14 h-14 md:w-16 md:h-16 flex items-center justify-center rounded-2xl text-4xl md:text-5xl lg:text-6xl">
+              <div className="flex items-center justify-center rounded-2xl text-[40px] md:text-[44px] lg:text-[48px]">
                 {icon}
               </div>
             )}
@@ -296,17 +296,17 @@ const Card: React.FC<CardProps> = ({
               <Chip text={badge} variant="soon"/>
             )}
           </div>
-          <div className="flex flex-col gap-2 md:gap-3 lg:gap-4">
+          <div className="flex flex-col gap-2 md:gap-2.5 lg:gap-3">
             {/* Title */}
             {value && (
-              <h3 className="text-md md:text-lg lg:text-xl font-semibold text-foreground leading-tight line-clamp-2 md:min-h-[2.5em]">
+              <h3 className="text-base md:text-xl lg:text-2xl font-semibold text-foreground leading-tight line-clamp-2">
                 {value}
               </h3>
             )}
 
             {/* Description */}
             {subValue && (
-              <p className="text-muted-foreground text-sm md:text-md lg:text-base leading-relaxed">
+              <p className="text-muted-foreground text-xs md:text-sm lg:text-base leading-relaxed">
                 {subValue}
               </p>
             )}
