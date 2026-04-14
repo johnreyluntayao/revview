@@ -1,200 +1,252 @@
-"use client";
+'use client';
 
-import React, { useCallback, useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import  { useState, useRef, useEffect, useCallback } from 'react';
+import { Button } from "@/lib/client-imports";
+import { ArrowRight, ArrowLeft } from "@/lib/icons"
 
-interface CarouselProps {
-  children: React.ReactNode[];
-  className?: string;
-  showArrows?: boolean;
-  showDots?: boolean;
-  fadeIntensity?: "light" | "medium" | "strong";
+interface Card {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
 }
 
-const Carousel: React.FC<CarouselProps> = ({
-  children,
-  className = "",
-  showArrows = true,
-  showDots = true,
-  fadeIntensity = "medium",
-}) => {
-  const [touchStart, setTouchStart] = useState<number | null>(null);
-  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+const cards: Card[] = [
+  { id: 1, title: "Complete CSE Review Guide", description: "Comprehensive 500-page study material covering all exam topics", image: "https://media.karousell.com/media/photos/products/2019/06/27/civil_service_exam_reviewer_1561614436_d26abb39_progressive.jpg" },
+  { id: 2, title: "Live Online Coaching", description: "Interactive live classes with expert instructors", image: "https://officersiasacademy.com/wp-content/uploads/2025/02/Blue-And-White-Modern-Minimalist-School-Admission-Facebook-Ad-10-1024x536.png" },
+  { id: 3, title: "Practice Question Bank", description: "2,000+ additional questions with solutions", image: "https://cdn-academy.pressidium.com/academy/wp-content/uploads/2024/10/civil-service-mobile-ad-67194b3e88d1a.webp" },
+  { id: 4, title: "Complete CSE Review Guide", description: "Comprehensive 500-page study material covering all exam topics", image: "https://media.karousell.com/media/photos/products/2019/06/27/civil_service_exam_reviewer_1561614436_d26abb39_progressive.jpg" },
+  { id: 5, title: "Live Online Coaching", description: "Interactive live classes with expert instructors", image: "https://officersiasacademy.com/wp-content/uploads/2025/02/Blue-And-White-Modern-Minimalist-School-Admission-Facebook-Ad-10-1024x536.png" },
+  { id: 6, title: "Practice Question Bank", description: "2,000+ additional questions with solutions", image: "https://cdn-academy.pressidium.com/academy/wp-content/uploads/2024/10/civil-service-mobile-ad-67194b3e88d1a.webp" },
+  { id: 7, title: "Complete CSE Review Guide", description: "Comprehensive 500-page study material covering all exam topics", image: "https://media.karousell.com/media/photos/products/2019/06/27/civil_service_exam_reviewer_1561614436_d26abb39_progressive.jpg" },
+  { id: 8, title: "Live Online Coaching", description: "Interactive live classes with expert instructors", image: "https://officersiasacademy.com/wp-content/uploads/2025/02/Blue-And-White-Modern-Minimalist-School-Admission-Facebook-Ad-10-1024x536.png" },
+];
 
-  const minSwipeDistance = 50;
+const gradientOptions = [
+  "from-emerald-500 to-teal-600",
+  "from-blue-500 to-cyan-600",
+  "from-purple-500 to-violet-600",
+  "from-amber-500 to-orange-600",
+  "from-green-500 to-lime-600",
+  "from-sky-500 to-indigo-600",
+  "from-pink-500 to-rose-600",
+  "from-yellow-500 to-amber-600",
+  "from-rose-500 to-pink-600",
+  "from-indigo-500 to-purple-600",
+  "from-teal-500 to-cyan-600",
+  "from-orange-500 to-red-600",
+];
 
+export default function Carousel() {
+  const carouselRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const totalSlides = children.length;
+  const [isPaused, setIsPaused] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Start with 1 item on server + initial client render (safe default)
-  const [itemsPerView, setItemsPerView] = useState(1);
+  const [cardsWithColor, setCardsWithColor] = useState<any[]>([]);
 
-  // Update items per view only after component is mounted on client
+  const totalCards = cards.length;
+  const extendedCards = [...cards, ...cards, ...cards];
+
   useEffect(() => {
-    const getItemsPerView = () => {
-      if (window.innerWidth >= 1024) return 3; // lg
-      if (window.innerWidth >= 768) return 2; // md
-      return 1; // mobile
-    };
+    const coloredCards = cards.map((card) => ({
+      ...card,
+      color: gradientOptions[Math.floor(Math.random() * gradientOptions.length)],
+    }));
+    setCardsWithColor(coloredCards);
+  }, []);
 
-    const handleResize = () => {
-      const newItems = getItemsPerView();
-      setItemsPerView(newItems);
-      // Safely adjust current index if needed
-      setCurrentIndex((prev) =>
-        Math.min(prev, Math.max(0, totalSlides - newItems)),
-      );
-    };
+  const slideToCenter = useCallback((targetIndex: number) => {
+    if (!carouselRef.current) return;
 
-    // Set initial value on mount
-    handleResize();
+    const normalizedIndex = ((targetIndex % totalCards) + totalCards) % totalCards;
+    const cardElements = carouselRef.current.children;
+    const targetElement = cardElements[normalizedIndex + totalCards] as HTMLElement;
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [totalSlides]);
+    if (targetElement) {
+      const carouselWidth = carouselRef.current.clientWidth;
+      const cardWidth = targetElement.offsetWidth;
+      const cardLeft = targetElement.offsetLeft;
 
-  const maxIndex = Math.max(0, totalSlides - itemsPerView);
+      const scrollPosition = cardLeft - (carouselWidth / 2) + (cardWidth / 2);
 
-  const goToPrevious = useCallback(() => {
-    setCurrentIndex((prev) => (prev === 0 ? maxIndex : prev - 1));
-  }, [maxIndex]);
+      carouselRef.current.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth',
+      });
 
-  const goToNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev === maxIndex ? 0 : prev + 1));
-  }, [maxIndex]);
-
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-  };
-
-  // Auto-play
-  useEffect(() => {
-    if (totalSlides <= itemsPerView) return;
-    const interval = setInterval(goToNext, 5000);
-    return () => clearInterval(interval);
-  }, [goToNext, totalSlides, itemsPerView]);
-
-  const slideWidthPercentage = 100 / itemsPerView;
-
-  // Fade intensity (subtle)
-  const fadeClass = {
-    light: "from-white/10 to-transparent",
-    medium: "from-white/30 to-transparent",
-    strong: "from-white/40 to-transparent",
-  }[fadeIntensity];
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-
-    const distance = touchStart - touchEnd;
-
-    if (distance > minSwipeDistance) {
-      // swipe left → next
-      goToNext();
-    } else if (distance < -minSwipeDistance) {
-      // swipe right → previous
-      goToPrevious();
+      setCurrentIndex(normalizedIndex);
     }
-  };
+  }, [totalCards]);
+
+  const goToPrevious = () => slideToCenter((currentIndex - 1 + totalCards) % totalCards);
+  const goToNext = () => slideToCenter((currentIndex + 1) % totalCards);
+
+  const autoCenterClosestCard = useCallback(() => {
+    if (!carouselRef.current) return;
+
+    const carousel = carouselRef.current;
+    const scrollLeft = carousel.scrollLeft;
+    const centerOffset = carousel.clientWidth / 2;
+
+    let closestIndex = 0;
+    let minDistance = Infinity;
+
+    Array.from(carousel.children).forEach((child, idx) => {
+      const card = child as HTMLElement;
+      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+      const distance = Math.abs(cardCenter - (scrollLeft + centerOffset));
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = idx % totalCards;
+      }
+    });
+
+    if (Math.abs(minDistance) > 5) {
+      slideToCenter(closestIndex);
+    } else {
+      setCurrentIndex(closestIndex);
+    }
+  }, [slideToCenter, totalCards]);
+
+  useEffect(() => {
+    if (isPaused) return;
+
+    const interval = setInterval(() => {
+      goToNext();
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [currentIndex, isPaused, goToNext]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      slideToCenter(0);
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [slideToCenter]);
+
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    if (!carousel) return;
+
+    const handleScroll = () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
+      scrollTimeoutRef.current = setTimeout(() => {
+        autoCenterClosestCard();
+      }, 150);
+    };
+
+    carousel.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      carousel.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [autoCenterClosestCard]);
+
+  if (cardsWithColor.length === 0) {
+    return <div className="relative w-full overflow-hidden h-150" />;
+  }
 
   return (
-    <div className={`w-full ${className}`}>
-      <div className="flex items-center gap-2 md:gap-4">
-        {/* Left Button */}
-        {showArrows && totalSlides > itemsPerView && (
-          <div className="hidden md:flex">
-            {currentIndex > 0 && (
-              <button
-                onClick={goToPrevious}
-                className="bg-primary p-3.5 rounded-full shadow-lg transition-all hover:scale-105 active:scale-95"
-                aria-label="Previous slide"
-              >
-                <ChevronLeft className="w-5 h-5 text-white" />
-              </button>
-            )}
-          </div>
-        )}
+    <div className="relative w-full overflow-hidden">
+      <div 
+        className="relative group"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
+        <div className="hidden md:block absolute left-0 top-0 bottom-0 w-30 lg:w-40 z-20 pointer-events-none bg-linear-to-r from-primary50/95 via-primary50/80 to-transparent" />
+        <button
+          onClick={goToPrevious}
+          className="hidden md:block absolute left-4 md:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-30 p-3 lg:p-4 bg-primary hover:bg-background hover:text-primary border border-primary rounded-full transition-all duration-300 text-white hover:scale-110 active:scale-95"
+          aria-label="Previous"
+        >
+          <ArrowLeft className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={2.5} />
+        </button>
 
-        {/* Carousel Content */}
-        <div className="relative w-full overflow-hidden">
-          {/* Fades */}
-          {currentIndex > 0 && (
-            <div
-              className={`absolute left-0 top-0 bottom-0 w-12 z-10 pointer-events-none bg-linear-to-r ${fadeClass}`}
-            />
-          )}
+        <div className="hidden md:block absolute right-0 top-0 bottom-0 w-30 lg:w-40 z-20 pointer-events-none bg-linear-to-l from-primary50/95 via-primary50/80 to-transparent" />
+        <button
+          onClick={goToNext}
+          className="hidden md:block absolute right-4 md:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-30 p-3 lg:p-4 bg-primary hover:bg-background hover:text-primary border border-primary rounded-full transition-all duration-300 text-white hover:scale-110 active:scale-95"
+          aria-label="Next"
+        >
+          <ArrowRight className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={2.5} />
+        </button>
 
-          {currentIndex < maxIndex && (
-            <div
-              className={`absolute right-0 top-0 bottom-0 w-12 z-10 pointer-events-none bg-linear-to-l ${fadeClass}`}
-            />
-          )}
+        <div
+          ref={carouselRef}
+          className="flex gap-2 md:gap-3 lg:gap-4 overflow-x-auto scrollbar-hide scroll-smooth py-12"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {extendedCards.map((card, idx) => {
+            const realIndex = idx % totalCards;
+            const currentCard = cardsWithColor[realIndex];
+            const isCenter = realIndex === currentIndex;
 
-          {/* Slides */}
-          <div
-            className="flex transition-transform duration-500 ease-out"
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
-            style={{
-              transform: `translateX(-${currentIndex * slideWidthPercentage}%)`,
-            }}
-          >
-            {children.map((child, index) => (
+            return (
               <div
-                key={index}
-                className="shrink-0 px-3 md:px-4"
-                style={{ width: `${slideWidthPercentage}%` }}
+                key={`${card.id}-${idx}`}
+                className={`shrink-0 transition-all duration-700 ease-out
+                  ${isCenter 
+                    ? 'scale-110 -translate-y-4 z-20' 
+                    : 'scale-90 opacity-75 hover:opacity-90 hover:scale-[0.95]'
+                  }`}
               >
-                {child}
+                <div className="relative w-70 md:w-90 lg:w-120 h-90 md:h-110 lg:h-140 rounded-xl overflow-hidden shadow-xl group/card">
+                  <img
+                    src={card.image}
+                    alt={card.title}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover/card:scale-110"
+                  />
+
+                  <div className={`absolute inset-0 bg-linear-to-b ${currentCard.color} opacity-65`} />
+
+                  <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 lg:p-6 bg-linear-to-t from-foreground/90 via-foreground/70 to-transparent">
+                    <div className="uppercase text-primary-foreground tracking-[2px] text-[10px] md:text-xs font-semibold mb-0.5 md:mb-0.75 lg:mb-1 opacity-75">
+                      PREMIUM LEARNING
+                    </div>
+                    
+                    <h3 className={`text-2xl md:text-3xl lg:text-4xl font-bold text-primary-foreground leading-none mb-1 md:mb-1.5 lg:mb-2 transition-all ${isCenter ? '' : 'text-white/90'}`}>
+                      {card.title}
+                    </h3>
+                    
+                    <p className="text-xs md:text-sm lg:text-base text-primary-foreground/90 leading-tight mb-4 md:mb-5 lg:mb-6">
+                      {card.description}
+                    </p>
+
+                    <div className="flex items-end justify-between gap-2 md:gap-3 lg:gap-4">
+                      <div>
+                        <span className="text-[10px] md:text-xs lg:text-sm text-primary-foreground/70">Starting at</span>
+                        <div className="flex items-baseline gap-0.5 md:gap-0.75 lg:gap-1">
+                          <span className="text-xl md:text-2xl lg:text-3xl font-bold text-primary-foreground tracking-tight">₱290</span>
+                          <span className="text-sm md:text-base text-primary-foreground/70">PHP</span>
+                        </div>
+                      </div>
+
+                      <Button 
+                        text="Get Instant Access"
+                        backgroundColor='bg-primary'
+                        textColor='text-white'
+                        className="shadow-lg transition-all active:scale-95"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="absolute inset-0 bg-linear-to-r from-transparent via-background/20 to-transparent -translate-x-full group-hover/card:translate-x-full transition-transform duration-1000" />
+                </div>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
-
-        {/* Right Button */}
-        {showArrows && totalSlides > itemsPerView && (
-          <div className="hidden md:flex">
-            {currentIndex < maxIndex && (
-              <button
-                onClick={goToNext}
-                className="bg-primary p-3.5 rounded-full shadow-lg transition-all hover:scale-105 active:scale-95"
-                aria-label="Next slide"
-              >
-                <ChevronRight className="w-5 h-5 text-white" />
-              </button>
-            )}
-          </div>
-        )}
       </div>
-
-      {/* Dots */}
-      {showDots && totalSlides > itemsPerView && (
-        <div className="flex justify-center gap-2 py-8">
-          {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`w-2.5 h-2.5 rounded-full transition-all ${
-                index === currentIndex
-                  ? "bg-primary scale-125"
-                  : "bg-gray-300 hover:bg-gray-400"
-              }`}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
-};
-
-export default Carousel;
+}

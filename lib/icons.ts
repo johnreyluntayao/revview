@@ -53,4 +53,7 @@ export {
     CircleUserRound as User2,
     Calendar,
     Sparkles,
+    ChevronRight as ArrowRight,
+    ChevronLeft as ArrowLeft,
+    CornerRightUp as ExternalLink,
 } from 'lucide-react';
