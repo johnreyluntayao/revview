@@ -267,3 +267,17 @@ export interface CountdownCardProps {
   seconds: number;
   className?: string;
 }
+
+
+
+export interface Affiliate {
+  id: string;       
+  title: string;
+  description?: string | null; 
+  category?: string | null;
+  price?: number | null;     
+  img_url?: string | null;
+  affiliate_link: string;
+  created_at: string;     
+  updated_at: string;
+}
