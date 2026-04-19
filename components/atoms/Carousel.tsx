@@ -4,23 +4,6 @@ import  { useState, useRef, useEffect, useCallback } from 'react';
 import { Button } from "@/lib/client-imports";
 import { ArrowRight, ArrowLeft } from "@/lib/icons"
 
-interface Card {
-  id: number;
-  title: string;
-  description: string;
-  image: string;
-}
-
-const cards: Card[] = [
-  { id: 1, title: "Complete CSE Review Guide", description: "Comprehensive 500-page study material covering all exam topics", image: "https://media.karousell.com/media/photos/products/2019/06/27/civil_service_exam_reviewer_1561614436_d26abb39_progressive.jpg" },
-  { id: 2, title: "Live Online Coaching", description: "Interactive live classes with expert instructors", image: "https://officersiasacademy.com/wp-content/uploads/2025/02/Blue-And-White-Modern-Minimalist-School-Admission-Facebook-Ad-10-1024x536.png" },
-  { id: 3, title: "Practice Question Bank", description: "2,000+ additional questions with solutions", image: "https://cdn-academy.pressidium.com/academy/wp-content/uploads/2024/10/civil-service-mobile-ad-67194b3e88d1a.webp" },
-  { id: 4, title: "Complete CSE Review Guide", description: "Comprehensive 500-page study material covering all exam topics", image: "https://media.karousell.com/media/photos/products/2019/06/27/civil_service_exam_reviewer_1561614436_d26abb39_progressive.jpg" },
-  { id: 5, title: "Live Online Coaching", description: "Interactive live classes with expert instructors", image: "https://officersiasacademy.com/wp-content/uploads/2025/02/Blue-And-White-Modern-Minimalist-School-Admission-Facebook-Ad-10-1024x536.png" },
-  { id: 6, title: "Practice Question Bank", description: "2,000+ additional questions with solutions", image: "https://cdn-academy.pressidium.com/academy/wp-content/uploads/2024/10/civil-service-mobile-ad-67194b3e88d1a.webp" },
-  { id: 7, title: "Complete CSE Review Guide", description: "Comprehensive 500-page study material covering all exam topics", image: "https://media.karousell.com/media/photos/products/2019/06/27/civil_service_exam_reviewer_1561614436_d26abb39_progressive.jpg" },
-  { id: 8, title: "Live Online Coaching", description: "Interactive live classes with expert instructors", image: "https://officersiasacademy.com/wp-content/uploads/2025/02/Blue-And-White-Modern-Minimalist-School-Admission-Facebook-Ad-10-1024x536.png" },
-];
 
 const gradientOptions = [
   "from-emerald-500 to-teal-600",
@@ -37,7 +20,20 @@ const gradientOptions = [
   "from-orange-500 to-red-600",
 ];
 
-export default function Carousel() {
+
+export interface Affiliate {
+  id: string;  
+  title: string;
+  description?: string | null;
+  category?: string | null;
+  price?: number | null;  
+  img_url?: string | null;
+  affiliate_link: string;
+  created_at: string;       
+  updated_at: string;
+}
+
+export default function Carousel({ cards }: { cards: Affiliate[]}) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -202,7 +198,7 @@ export default function Carousel() {
               >
                 <div className="relative w-70 md:w-90 lg:w-120 h-90 md:h-110 lg:h-140 rounded-xl overflow-hidden shadow-xl group/card">
                   <img
-                    src={card.image}
+                    src={card.img_url || '/icon.svg'}
                     alt={card.title}
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover/card:scale-110"
                   />
@@ -211,7 +207,7 @@ export default function Carousel() {
 
                   <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 lg:p-6 bg-linear-to-t from-foreground/90 via-foreground/70 to-transparent">
                     <div className="uppercase text-primary-foreground tracking-[2px] text-[10px] md:text-xs font-semibold mb-0.5 md:mb-0.75 lg:mb-1 opacity-75">
-                      PREMIUM LEARNING
+                      {card.category || "Uncategorized"}
                     </div>
                     
                     <h3 className={`text-2xl md:text-3xl lg:text-4xl font-bold text-primary-foreground leading-none mb-1 md:mb-1.5 lg:mb-2 transition-all ${isCenter ? '' : 'text-white/90'}`}>
@@ -226,7 +222,7 @@ export default function Carousel() {
                       <div>
                         <span className="text-[10px] md:text-xs lg:text-sm text-primary-foreground/70">Starting at</span>
                         <div className="flex items-baseline gap-0.5 md:gap-0.75 lg:gap-1">
-                          <span className="text-xl md:text-2xl lg:text-3xl font-bold text-primary-foreground tracking-tight">₱290</span>
+                          <span className="text-xl md:text-2xl lg:text-3xl font-bold text-primary-foreground tracking-tight">₱{card.price}</span>
                           <span className="text-sm md:text-base text-primary-foreground/70">PHP</span>
                         </div>
                       </div>
@@ -236,6 +232,7 @@ export default function Carousel() {
                         backgroundColor='bg-primary'
                         textColor='text-white'
                         className="shadow-lg transition-all active:scale-95"
+                        onClick={() => window.open(card.affiliate_link, '_blank')}
                       />
                     </div>
                   </div>

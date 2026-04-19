@@ -2,6 +2,9 @@
 
 import { motion, easeOut } from "framer-motion";
 import { Chip, Carousel } from "@/lib/client-imports";
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import type { Affiliate } from "@/lib/types";
 
 const container = {
   hidden: {},
@@ -26,6 +29,72 @@ const fadeUp = {
 };
 
 const BoostPreparation = () => {
+  const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchAffiliates() {
+      const supabase = createClient();
+
+      const { data, error } = await supabase
+        .from("affiliate")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching affiliates:", error);
+      } else {
+        setAffiliates(data || []);
+      }
+      setLoading(false);
+    }
+
+    fetchAffiliates();
+  }, []);
+
+  if (loading) {
+    return (
+      <section>
+        <motion.div
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={container}
+          className="bg-primary/10 w-full flex flex-col items-center justify-center text-pretty gap-8 md:gap-12 lg:gap-16 py-7.5 md:py-15 lg:py-22.5"
+        >
+          <div className="flex flex-col items-center">
+            <motion.div variants={fadeUp}>
+              <Chip
+                text="Recommended Resources"
+                className="mb-1 md:mb-1.5 lg:mb-2"
+                variant="product"
+                leftIcon={<span>📚</span>}
+              />
+            </motion.div>
+
+            <motion.h1
+              variants={fadeUp}
+              className="text-2xl md:text-[32px] lg:text-5xl font-bold text-foreground mb-2 md:mb-3 lg:mb-4 text-center"
+            >
+              Boost Your Preparation
+            </motion.h1>
+
+            <motion.p
+              variants={fadeUp}
+              className="text-xs md:text-base lg:text-xl text-muted-foreground text-center"
+            >
+              Curated study materials and courses from trusted providers
+            </motion.p>
+          </div>
+
+          <div className="w-full h-96 flex items-center justify-center">
+            <p className="text-muted-foreground">Loading resources...</p>
+          </div>
+        </motion.div>
+      </section>
+    );
+  }
+
   return (
     <section>
       <motion.div
@@ -60,11 +129,8 @@ const BoostPreparation = () => {
           </motion.p>
         </div>
 
-        <motion.div
-          variants={fadeUp}
-          className="w-full"
-        >
-          <Carousel />
+        <motion.div variants={fadeUp} className="w-full">
+          <Carousel cards={affiliates} />
         </motion.div>
       </motion.div>
     </section>
