@@ -3,10 +3,10 @@ import { ReactNode } from "react";
 export interface InputFieldProps {
   label?: ReactNode;
   placeholder?: string;
-  type?: "text" | "password" | "email" | "username" | "number";
+  type?: "text" | "password" | "email" | "username" | "number" | "textarea";
   name?: string;
   error?: string;
-  value?: string;
+  value?: string | number;
   defaultValue?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
@@ -281,3 +281,4 @@ export interface Affiliate {
   created_at: string;     
   updated_at: string;
 }
+

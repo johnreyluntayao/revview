@@ -7,7 +7,7 @@ import { Delete } from '@/lib/icons';
 interface DeletePopupProps {
   isOpen: boolean;
   questionText?: string;     
-  onConfirm: () => void;       
+  onConfirm: () => void;     
   onCancel: () => void;          
 }
 
@@ -18,6 +18,8 @@ const DeletePopup: React.FC<DeletePopupProps> = ({
   onCancel,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
+
+  
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -62,14 +64,14 @@ const DeletePopup: React.FC<DeletePopupProps> = ({
         <div className="flex items-center gap-3 mb-4">
           <Delete className="h-7 w-7 md:h-8 md:w-8 text-destructive shrink-0" />
           <h2 className="text-xl font-semibold text-foreground">
-            Delete Question?
+            Delete Item?
           </h2>
         </div>
 
         {/* Body */}
         <div className="space-y-4">
           <p className="text-muted-foreground leading-relaxed">
-            Are you sure you want to delete this question? This action cannot be undone.
+            Are you sure you want to delete this item? This action cannot be undone.
           </p>
 
           {questionText && (
