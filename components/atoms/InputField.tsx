@@ -11,6 +11,9 @@ interface ExtendedInputFieldProps extends InputFieldProps {
   min?: number | string;
   max?: number | string;
   step?: number | string;
+  onChange?: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
 }
 
 const InputField: React.FC<ExtendedInputFieldProps> = ({
@@ -34,6 +37,7 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
+  const isTextarea = type === "textarea";
   const isUsername = type === "username";
   const isDisabled = disabled || state === "disabled";
   const isReadOnly = state === "readonly" || isDisabled;
@@ -59,32 +63,33 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
     lg: "text-lg py-3 px-5",
   }[size];
 
-  const paddingLeft = isUsername && state !== "readonly" ? "pl-10" : icon ? "pl-10" : "pl-4";
-  const paddingRight = showPasswordToggle ? "pr-12" : "pr-4";
+  const paddingLeft =
+    isUsername && state !== "readonly"
+      ? "pl-10"
+      : icon && !isTextarea
+      ? "pl-10"
+      : "pl-4";
 
-  // ── Number clamping logic ───────────────────────────────────────
+  const paddingRight =
+    showPasswordToggle && !isTextarea ? "pr-12" : "pr-4";
+
+  // ── Number clamping logic (INPUT ONLY) ───────────────────────────
   const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (type !== "number" || !onChange) {
-      onChange?.(e);
-      return;
-    }
+    if (!onChange) return;
 
     const inputValue = e.target.value;
 
-    // Allow empty string (user deleting everything)
     if (inputValue === "") {
       onChange(e);
       return;
     }
 
-    // Allow only valid number input (including -, ., temporary invalid states)
     if (!/^-?\d*\.?\d*$/.test(inputValue)) {
-      return; // ignore invalid characters
+      return;
     }
 
     const numValue = Number(inputValue);
 
-    // If it's not a valid number yet (like "-" or "12."), allow it
     if (isNaN(numValue)) {
       onChange(e);
       return;
@@ -92,7 +97,6 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
 
     let clamped = numValue;
 
-    // Apply min clamp
     if (min !== undefined) {
       const minVal = Number(min);
       if (!isNaN(minVal) && clamped < minVal) {
@@ -100,7 +104,6 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
       }
     }
 
-    // Apply max clamp
     if (max !== undefined) {
       const maxVal = Number(max);
       if (!isNaN(maxVal) && clamped > maxVal) {
@@ -108,7 +111,6 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
       }
     }
 
-    // Create synthetic event with clamped value
     const newEvent = {
       ...e,
       target: {
@@ -120,7 +122,7 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
 
     onChange(newEvent as React.ChangeEvent<HTMLInputElement>);
   };
-  // ─────────────────────────────────────────────────────────────────
+  // ────────────────────────────────────────────────────────────────
 
   return (
     <div className={`space-y-2 ${className}`}>
@@ -131,56 +133,113 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
       )}
 
       <div className="relative flex items-center w-full">
-        {isUsername && state !== "readonly" && (
-          <span className="absolute left-3 text-gray-500 text-xs md:text-sm lg:text-base">@</span>
+        {isUsername && state !== "readonly" && !isTextarea && (
+          <span className="absolute left-3 text-gray-500 text-xs md:text-sm lg:text-base">
+            @
+          </span>
         )}
 
-        {icon && !isUsername && (
+        {icon && !isUsername && !isTextarea && (
           <div className="absolute left-3 top-1/2 -translate-y-1/2 text-border pointer-events-none">
             {icon}
           </div>
         )}
 
-        <input
-          {...rest}
-          type={effectiveType}
-          name={name}
-          value={displayValue}
-          onChange={!isReadOnly ? (type === "number" ? handleNumberChange : onChange) : undefined}
-          disabled={isDisabled}
-          readOnly={isReadOnly && !isDisabled}
-          placeholder={placeholder}
-          min={type === "number" ? min : undefined}
-          max={type === "number" ? max : undefined}
-          step={type === "number" ? step : undefined}
-          className={`
-            w-full rounded-lg transition-all duration-150 text-xs md:text-sm lg:text-base
-            focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500
-            ${sizeClasses} ${paddingLeft} ${paddingRight}
-            ${hasError ? "border-destructive ring-2 ring-red-200 text-destructive" : ""}
-            ${
-              isDisabled
-                ? "bg-background text-foreground/50 cursor-not-allowed border-border"
-                : state === "readonly"
-                ? "bg-transparent text-foreground/80 cursor-default pointer-events-none border-none"
-                : " text-foreground border border-border hover:border-border"
+        {isTextarea ? (
+          <textarea
+            {...rest}
+            name={name}
+            value={displayValue}
+            onChange={
+              !isReadOnly
+                ? (onChange as React.ChangeEventHandler<HTMLTextAreaElement>)
+                : undefined
             }
-          `}
-        />
-
-        {showPasswordToggle && type === "password" && !isDisabled && (
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground/70"
             disabled={isDisabled}
-          >
-            {showPassword ? <EyeOff className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" /> : <Eye className="w-5 h-5" />}
-          </button>
+            readOnly={isReadOnly && !isDisabled}
+            placeholder={placeholder}
+            rows={4}
+            className={`
+              w-full rounded-lg transition-all duration-150 resize-none
+              focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500
+              ${sizeClasses} pl-4 pr-4
+              ${
+                hasError
+                  ? "border-destructive ring-2 ring-red-200 text-destructive"
+                  : ""
+              }
+              ${
+                isDisabled
+                  ? "bg-background text-foreground/50 cursor-not-allowed border-border"
+                  : state === "readonly"
+                  ? "bg-transparent text-foreground/80 cursor-default pointer-events-none border-none"
+                  : "text-foreground border border-border hover:border-border"
+              }
+            `}
+          />
+        ) : (
+          <input
+            {...rest}
+            type={effectiveType}
+            name={name}
+            value={displayValue}
+            onChange={
+              !isReadOnly
+                ? type === "number"
+                  ? handleNumberChange
+                  : (onChange as React.ChangeEventHandler<HTMLInputElement>)
+                : undefined
+            }
+            disabled={isDisabled}
+            readOnly={isReadOnly && !isDisabled}
+            placeholder={placeholder}
+            min={type === "number" ? min : undefined}
+            max={type === "number" ? max : undefined}
+            step={type === "number" ? step : undefined}
+            className={`
+              w-full rounded-lg transition-all duration-150 text-xs md:text-sm lg:text-base
+              focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500
+              ${sizeClasses} ${paddingLeft} ${paddingRight}
+              ${
+                hasError
+                  ? "border-destructive ring-2 ring-red-200 text-destructive"
+                  : ""
+              }
+              ${
+                isDisabled
+                  ? "bg-background text-foreground/50 cursor-not-allowed border-border"
+                  : state === "readonly"
+                  ? "bg-transparent text-foreground/80 cursor-default pointer-events-none border-none"
+                  : "text-foreground border border-border hover:border-border"
+              }
+            `}
+          />
         )}
+
+        {!isTextarea &&
+          showPasswordToggle &&
+          type === "password" &&
+          !isDisabled && (
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground/70"
+              disabled={isDisabled}
+            >
+              {showPassword ? (
+                <EyeOff className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
+              ) : (
+                <Eye className="w-5 h-5" />
+              )}
+            </button>
+          )}
       </div>
 
-      {error && <p className="text-destructive text-[10px] md:text-xs lg:text-sm mt-1 font-medium">{error}</p>}
+      {error && (
+        <p className="text-destructive text-[10px] md:text-xs lg:text-sm mt-1 font-medium">
+          {error}
+        </p>
+      )}
     </div>
   );
 };
