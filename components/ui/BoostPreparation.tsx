@@ -39,6 +39,7 @@ const BoostPreparation = () => {
       const { data, error } = await supabase
         .from("affiliate")
         .select("*")
+        .eq("is_active", true)
         .order("created_at", { ascending: false });
 
       if (error) {
