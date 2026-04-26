@@ -116,7 +116,7 @@ const AddEditAffiliateItem: React.FC<AddEditAffiliateItemProps> = ({
                 <option value="">Choose option...</option>
                 <option value="Book">Book</option>
                 <option value="Course">Course</option>
-                <option value="Software">Software</option>
+                <option value="Material">Material</option>
               </select>
             </div>
 

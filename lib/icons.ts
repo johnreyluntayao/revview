@@ -56,4 +56,6 @@ export {
     ChevronRight as ArrowRight,
     ChevronLeft as ArrowLeft,
     CornerRightUp as ExternalLink,
+    Waypoints as Affiliate,
+    ExternalLink as Redirect,
 } from 'lucide-react';

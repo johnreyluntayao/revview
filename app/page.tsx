@@ -1,5 +1,4 @@
 import AdsSection from "@/components/ui/AdsSection";
-import AffiliateManagement from "@/components/ui/AffiliateManagement";
 import { Homepage, Footer, NavBar} from "@/lib/client-imports"
 
 export default function Home() {
@@ -11,7 +10,6 @@ export default function Home() {
       <Homepage />
       <Footer />
       <AdsSection variant="inline"/>
-      <AffiliateManagement/>
     </div>
   );
 }

@@ -17,6 +17,7 @@ import {
   Close,
   Username as User,
   User2,
+  Affiliate,
 } from "@/lib/icons";
 import { toast } from "sonner";
 import { useHybridQuizTimer } from "@/lib/hooks/useHybridQuizTimer";
@@ -135,6 +136,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
     { href: "/feedbacks", label: "Feedback", icon: ShowFeedback },
     { href: "/manage-questions", label: "Questions", icon: Questions },
     { href: "/admin-account", label: "Account Settings", icon: AccountSettings },
+    { href: "/affiliate", label: "Manage Affiliate", icon: Affiliate },
   ];
 
   const handlePauseClick = async () => {

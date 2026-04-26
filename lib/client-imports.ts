@@ -7,6 +7,7 @@ export { default as ManageQuestions } from "@/components/ManageQuestion";
 export { default as AccountSettings } from "@/components/AccountSettings";
 export { default as ResultsHistory } from "@/components/ResultsHistory";
 export { default as Quiz } from "@/components/Quiz";
+export { default as AdminAffiliate } from '@/components/AffiliateManagement'
 
 
 //UI Components
@@ -37,6 +38,7 @@ export { default as DeletePopup } from "@/components/ui/DeletePopup";
 export { default as ScoreRecord } from "@/components/ui/ScoreRecord";
 export { default as PauseModal } from "@/components/ui/PauseQuiz";
 export { default as RecentTestsInfinite } from "@/components/ui/RecentTests";
+export { default as AddEditAffiliate } from '@/components/ui/AddEditAffiliateItem';
 
 
 //Atom Components
