@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { ScoreCard, Card, QuizAccordion } from "@/lib/client-imports";
 import { toast } from "sonner";
+import AdsSection from "./ui/AdsSection";
 
 type Question = {
   id: string;
@@ -186,11 +187,14 @@ const QuizResult = ({ sessionId }: QuizResultProps) => {
       </div>
 
       <div className="rounded-xl border border-border p-4 md:p-6 lg:p-8 bg-white">
+        
         <h2 className="text-base md:text-lg lg:text-xl font-bold mb-4 md:mb-5 lg:mb-6 text-foreground">
           Answer Review
         </h2>
         <QuizAccordion questions={questions} answers={answers} />
       </div>
+
+      <AdsSection variant="inline" link="https://google.com" />
     </div>
   );
 };

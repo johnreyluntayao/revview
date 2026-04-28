@@ -2,6 +2,7 @@ import Link from "next/link";
 import { BeginQuiz } from "@/lib/icons";
 import { QuizCategory } from "@/lib/types";
 import { Button } from "@/lib/client-imports"
+import AdsSection from "./AdsSection";
 
 interface SummaryPanelProps {
   categories: QuizCategory[];
@@ -141,6 +142,9 @@ export default function SummaryPanel({
         </Link>
 
         </div>
+      </div>
+      <div className="py-2 md:py-3 lg:py-4">
+        <AdsSection variant="card" link="https://google.com" />
       </div>
     </div>
   );

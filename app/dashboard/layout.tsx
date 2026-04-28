@@ -67,13 +67,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
         />
+        
 
         {/* Main content – pushed down by header height on mobile */}
         <main className="flex-1 pt-0 lg:pt-0">
           <div className="min-h-[calc(100vh-4rem)] lg:min-h-screen">
             {children}
+            
           </div>
         </main>
+
       </div>
 
       {/* Backdrop for mobile sidebar */}
