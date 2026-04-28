@@ -1,3 +1,4 @@
+import AdsSection from "@/components/ui/AdsSection";
 import { AccountSettings } from "@/lib/client-imports"
 import { createClient } from "@/lib/supabase/server"
 
@@ -22,6 +23,7 @@ const userInfo = {
   return (
     <main>
       <AccountSettings userInfo={userInfo} role="user" />
+      
     </main>
   )
 }

@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/client";
 import { QuizCategory, DifficultyLevel } from "@/lib/types";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import AdsSection from "./ui/AdsSection";
 
 const CustomizeQuiz = () => {
   const supabase = createClient();
@@ -148,6 +149,7 @@ const CustomizeQuiz = () => {
             isStarting={isStarting}
             handleStartQuiz={handleStartQuiz}
           />
+          
         </div>
       </div>
     </div>
