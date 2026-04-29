@@ -145,6 +145,7 @@ export interface ChipProps {
   rightIcon?: ReactNode;
   text: ReactNode;
   className?: string;
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
   variant?:
     | "numerical"
     | "verbal"

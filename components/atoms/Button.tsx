@@ -35,7 +35,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         ? {
             lg: "text-[16px] gap-2 py-3 px-6",
             md: "text-[14px] gap-1.5 py-2.5 px-5",
-            sm: "text-[12px] gap-1 py-2 px-4",
+            sm: "text-[12px] gap-1 py-2 px-2",
           }[size]
         : "text-[12px] gap-1 py-2 px-4 " +
           "md:text-[14px] md:gap-1.5 md:py-2.5 md:px-5 " +

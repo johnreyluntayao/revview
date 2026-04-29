@@ -81,6 +81,7 @@ const Chip: React.FC<ChipProps> = ({
   rightIcon,
   text,
   className,
+  onClick,
   variant = "default",
 }) => {
   const style = variantStyles[variant] || variantStyles.default;
@@ -95,7 +96,7 @@ const Chip: React.FC<ChipProps> = ({
   whitespace-normal break-words text-center
 `;
   return (
-    <div className={baseClasses}>
+    <div className={baseClasses} onClick={onClick}>
       {leftIcon && <span>{leftIcon}</span>}
       {text && <span>{text}</span>}
       {rightIcon && <span>{rightIcon}</span>}
