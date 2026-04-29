@@ -1,0 +1,58 @@
+//Main Components
+export { default as ManageFeedback } from "@/components/ManageFeedbacks";
+export { default as QuizResult } from "@/components/QuizResult";
+export { default as Homepage } from "@/components/Homepage";
+export { default as CustomizeQuiz } from "@/components/CustomizeQuiz";
+export { default as ManageQuestions } from "@/components/ManageQuestion";
+export { default as AccountSettings } from "@/components/AccountSettings";
+export { default as ResultsHistory } from "@/components/ResultsHistory";
+export { default as Quiz } from "@/components/Quiz";
+export { default as AdminAffiliate } from '@/components/AffiliateManagement'
+
+
+//UI Components
+export { default as Sidebar } from "@/components/ui/SideBar";
+export { default as NavBar } from "@/components/ui/NavBar";
+export { default as SummaryPanel } from "@/components/ui/SummaryPannel";
+export { default as Login } from "@/components/ui/Login";
+export { default as SignUp } from "@/components/ui/SignUp";
+export { default as Feedback } from "@/components/atoms/Feedback";
+export { default as QuizAccordion } from "@/components/ui/QuizAccordion";
+export { default as ScoreCard } from "@/components/ui/ScoreCard";
+export { default as HeroSection } from "@/components/ui/HeroSection";
+export { default as Footer } from "@/components/atoms/Footer";
+export { default as HowItWorks } from "@/components/ui/HowItWorks";
+export { default as Contact } from "@/components/ui/Contact";
+export { default as ComprehensiveCoverage } from "@/components/ui/ComprehensiveCoverage";
+export { default as WhyChoose } from "@/components/ui/WhyChoose";
+export { default as SubmitFeedback } from "@/components/ui/SubmitFeedback";
+export { default as SelectCategory } from "@/components/ui/SelectCategory";
+export { default as SelectDifficultyLevel } from "@/components/ui/SelectDifficultyLevel";
+export { default as SelectNumQuestions } from "@/components/ui/SelectNumQuestions";
+export { default as CategoryProgress } from "@/components/ui/CategoryProgress";
+export { default as PerformanceOverview } from "@/components/ui/PerformanceOverview";
+export { default as RecentScores } from "@/components/ui/RecentScores";
+export { default as SummaryCards } from "@/components/ui/SummaryCards";
+export { default as AddEditQuestion } from "@/components/ui/AddEditQuestion";
+export { default as DeletePopup } from "@/components/ui/DeletePopup";
+export { default as ScoreRecord } from "@/components/ui/ScoreRecord";
+export { default as PauseModal } from "@/components/ui/PauseQuiz";
+export { default as RecentTestsInfinite } from "@/components/ui/RecentTests";
+export { default as AddEditAffiliate } from '@/components/ui/AddEditAffiliateItem';
+
+
+//Atom Components
+export { default as Button } from "@/components/atoms/Button";
+export { default as InputField } from "@/components/atoms/InputField";
+export { default as Card } from "@/components/atoms/Card";
+export { default as Chip } from "@/components/atoms/Chip";
+export { default as ComboBox } from "@/components/atoms/ComboBox";
+export { default as CountDownTimer } from "@/components/atoms/CountDownTimer";
+export { default as Progress } from "@/components/atoms/Progress";
+export { default as RadioButton } from "@/components/atoms/RadioButton";
+export { default as List } from "@/components/atoms/List";
+export { default as InsertImage } from "@/components/atoms/InsertImage";
+export { default as Carousel } from "@/components/atoms/Carousel";
+
+//Auth
+export { AuthProvider, useAuth } from "@/components/auth/AuthProvider";

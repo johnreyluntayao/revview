@@ -1,0 +1,325 @@
+// components/Card.tsx
+import { CardProps } from "@/lib/types";
+import React, { JSX } from "react";
+import Image from "next/image";
+import Chip from "./Chip";
+import Button from "./Button";
+
+const Card: React.FC<CardProps> = ({
+  variant = "stat",
+  title = "",
+  value,
+  subValue = "",
+  icon,
+  bg = "bg-background",
+  textColor = "text-foreground",
+  iconColor = "text-primary",
+  trend = null,
+  className = "",
+  subColor,
+  subColor2,
+  image, // new
+  imageAlt = "", // new
+  badge, // new
+  price, // new
+  buttonText, // new
+  buttonLink, // new
+}) => {
+  const baseClasses = `
+    rounded-xl shadow-sm border border-border overflow-hidden
+    ${bg} ${className}
+  `;
+
+  let content: JSX.Element;
+
+  switch (variant) {
+    case "stat":
+      content = (
+        <div className="p-4 md:p-5 lg:p-6 w-full bg-linear-to-br from-primary/70 to-secondary/70 text-white">
+          {/* ... your existing stat content ... */}
+          <div className="flex items-center justify-between">
+            {title && (
+              <h3
+                className={`text-xs md:text-sm lg:text-base font-medium ${textColor}`}
+              >
+                {title}
+              </h3>
+            )}
+            {icon && (
+              <div
+                className={`p-2 rounded-lg ${iconColor} text-xl md:text-2xl lg:text-3xl [&>svg]:size-[1em]`}
+              >
+                {icon}
+              </div>
+            )}
+          </div>
+          <div className="flex items-baseline">
+            <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-right text-white">
+              {value}
+            </p>
+            {trend && (
+              <span
+                className={`text-xs md:text-sm lg:text-base ${trend === "up" ? "text-success" : "text-destructive"}`}
+              >
+                {trend === "up" ? "↑" : "↓"}
+              </span>
+            )}
+          </div>
+          {subValue && (
+            <p className="mt-1 text-xs md:text-sm lg:text-base text-white">
+              {subValue}
+            </p>
+          )}
+        </div>
+      );
+      break;
+
+    case "highlight":
+      content = (
+        <div
+          className={`p-4 md:p-5 lg:p-6 space-y-2 text-left w-full bg-linear-to-br ${bg}`}
+        >
+          {title && (
+            <h1
+              className={`text-sm md:text-base lg:text-lg font-semibold ${subColor}`}
+            >
+              {title}
+            </h1>
+          )}
+          <p
+            className={`text-3xl md:text-4xl lg:text-5xl font-bold ${textColor}`}
+          >
+            {value}
+          </p>
+          {subValue && (
+            <p className={`mt-2 text-sm md:text-base lg:text-lg ${subColor2}`}>
+              {subValue}
+            </p>
+          )}
+        </div>
+      );
+      break;
+
+    case "overview":
+      content = (
+        <div className="p-4 md:p-6 lg:p-8 text-left w-full bg-linear-to-br from-primary/70 to-secondary/70 text-white">
+          {title && (
+            <h3 className="text-[10px] md:text-xs lg:text-sm font-medium mb-1">
+              {title}
+            </h3>
+          )}
+          <p
+            className={`text-base md:text-lg lg:text-xl font-semibold text-white capitalize ${textColor}`}
+          >
+            {value}
+          </p>
+        </div>
+      );
+      break;
+
+    case "compact":
+      content = (
+        <div className="p-4 md:p-5 lg:p-6 flex flex-col items-start w-full gap-4 md:gap-5 lg:gap-6">
+          {icon && (
+            <div
+              className={`${iconColor} text-[40px] md:text-[50px] lg:text-6xl`}
+            >
+              {icon}
+            </div>
+          )}
+          <div className="flex flex-col flex-1 w-full gap-3 md:gap-3.5 lg:gap-4">
+            {title && (
+              <p
+                className={`font-bold ${textColor} text-base md:text-lg lg:text-xl whitespace-nowrap overflow-hidden text-ellipsis`}
+              >
+                {title}
+              </p>
+            )}
+            {value && (
+              <p
+                className={`${textColor} text-xs md:text-sm lg:text-base leading-relaxed`}
+              >
+                {value}
+              </p>
+            )}
+          </div>
+        </div>
+      );
+      break;
+
+    case "data":
+      content = (
+        <div className="p-4 md:p-5 lg:p-6 flex flex-col items-left gap-2 md:gap-3 lg:gap-4 w-full bg-linear-to-br from-primary/70 to-secondary/70 h-full">
+          {icon && (
+            <div className="text-white text-2xl md:text-3xl lg:text-4xl [&>svg]:block [&>svg]:size-[1em]">
+              {icon}
+            </div>
+          )}
+          <div className="flex flex-col gap-1 md:gap-2 lg:gap-3">
+            {title && (
+              <p className="text-xs md:text-sm lg:text-base text-white">
+                {title}
+              </p>
+            )}
+            {value && (
+              <p
+                className={`text-white font-semibold ${value.toString().length > 15 ? "text-lg md:text-xl lg:text-2xl" : "text-xl md:text-2xl lg:text-3xl"}`}
+              >
+                {value}
+              </p>
+            )}
+          </div>
+        </div>
+      );
+      break;
+
+    case "step":
+      content = (
+        <div className="flex flex-col h-full w-full bg-white rounded-lg overflow-hidden">
+          {/* Image Box */}
+          {image && (
+              <Image
+                height={1000}
+                width={1000}
+                src={image}
+                alt={imageAlt || title || "Step illustration"}
+                className="w-full h-full object-cover rounded-lg overflow-hidden border-b border-border"
+              />
+          )}
+
+          {/* Content Area */}
+          <div className="p-4 md:p-5 lg:p-6 flex flex-col flex-1 gap-2 md:gap-2.5 lg:gap-3">
+            <div className="flex flex-col space-y-2 md:space-y-3 lg:space-y-4">
+              {/* Step Number */}
+            {title && (
+              <Chip 
+              text={`Step ${title}`}
+              className="bg-linear-to-r from-primary to-secondary text-primary-foreground w-fit"
+              />
+            )}
+
+            {/* Main Title */}
+            {value && (
+              <h3 className="text-sm md:text-base lg:text-lg font-bold text-foreground leading-tight line-clamp-1">
+                {value}
+              </h3>
+            )}
+            </div>
+            
+            {/* Description */}
+            {subValue && (
+              <p className="text-muted-foreground text-xs md:text-sm lg:text-base leading-relaxed flex-1">
+                {subValue}
+              </p>
+            )}
+          </div>
+        </div>
+      );
+      break;
+
+    case "affiliate":
+      content = (
+        <div className="flex flex-col h-full bg-white overflow-hidden ">
+          {/* Top Gradient Area with Icon/Image */}
+          <div className="relative h-52 md:h-60 flex items-center justify-center overflow-hidden">
+            {image && (
+              <div className="relative h-48 md:h-52 lg:h-60 p-2 overflow-hidden">
+                <Image
+                  height={1000}
+                  width={1000}
+                  src={image}
+                  alt={imageAlt || title || "Product image"}
+                  className="w-full h-48 md:h-52 lg:h-60 object-contain"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-1 p-6 md:p-7 lg:p-8  gap-2 md:gap-3 lg:gap-4 flex flex-col">
+            {/* Badge */}
+            {badge && (
+              <div className="inline-block">
+                <Chip text={badge} variant="product" />
+              </div>
+            )}
+
+            {/* Title */}
+            {value && (
+              <h3 className="text-md md:text-lg lg:text-xl font-semibold text-foreground leading-tight line-clamp-2 md:min-h-[2.5em]">
+                {value}
+              </h3>
+            )}
+
+            {/* Description */}
+            {subValue && (
+              <p className="text-muted-foreground text-sm md:text-md lg:text-base leading-relaxed flex-1">
+                {subValue}
+              </p>
+            )}
+
+            {/* Price */}
+            {price && (
+              <p className="text-md md:text-lg lg:text-xl font-bold text-foreground tracking-tight">
+                {price}
+              </p>
+            )}
+
+            {/* Learn More Button */}
+            {buttonText && (
+              <Button
+                text={buttonText}
+                backgroundColor="bg-primary"
+                textColor="text-white"
+                className="transition-all"
+              />
+            )}
+          </div>
+        </div>
+      );
+      break;
+
+    case "soon":
+      content = (
+        <div className="flex flex-col h-full bg-white overflow-hidden transition-all duration-200 p-4 md:p-5 lg:p-6">
+          {/* Top Section: Icon + Coming Soon Badge */}
+          <div className="flex items-start justify-between mb-3 mg:mb-3.5 lg:mb-4">
+            {/* Icon Container */}
+            {icon && (
+              <div className="flex items-center justify-center rounded-2xl text-[40px] md:text-[44px] lg:text-[48px]">
+                {icon}
+              </div>
+            )}
+
+            {/* Coming Soon Badge */}
+            {badge && (
+              <Chip text={badge} variant="soon"/>
+            )}
+          </div>
+          <div className="flex flex-col gap-2 md:gap-2.5 lg:gap-3">
+            {/* Title */}
+            {value && (
+              <h3 className="text-base md:text-xl lg:text-2xl font-semibold text-foreground leading-tight line-clamp-2">
+                {value}
+              </h3>
+            )}
+
+            {/* Description */}
+            {subValue && (
+              <p className="text-muted-foreground text-xs md:text-sm lg:text-base leading-relaxed">
+                {subValue}
+              </p>
+            )}
+          </div>
+        </div>
+      );
+      break;
+
+    default:
+      content = <div className="p-6 text-center">Invalid variant</div>;
+  }
+
+  return <div className={baseClasses}>{content}</div>;
+};
+
+export default Card;

@@ -1,9 +1,15 @@
-
+import AdsSection from "@/components/ui/AdsSection";
+import { Homepage, Footer, NavBar} from "@/lib/client-imports"
 
 export default function Home() {
+
+
   return (
-    <div className="flex min-h-screen items-center justify-center font-sans">
-      Hello
+    <div className="w-full">
+      <NavBar State="Home"/>
+      <Homepage />
+      <Footer />
+      <AdsSection variant="inline"/>
     </div>
   );
 }

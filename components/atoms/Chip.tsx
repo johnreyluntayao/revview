@@ -1,0 +1,107 @@
+import { ChipProps } from "@/lib/types";
+import React from "react";
+
+const variantStyles = {
+  default: {
+    background: "",
+    text: "",
+  },
+  numerical: {
+    background: "bg-primary/70",
+    text: "text-white",
+  },
+  verbal: {
+    background: "bg-success/70",
+    text: "text-white",
+  },
+  general: {
+    background: "bg-warning/70",
+    text: "text-white",
+  },
+  analytical: {
+    background: "bg-secondary/70",
+    text: "text-white",
+  },
+  all: {
+    background: "bg-linear-to-r from-primary/70 to-secondary/70",
+    text: "text-white",
+  },
+  correct: {
+    background: "bg-success/10",
+    text: "text-success",
+  },
+  incorrect: {
+    background: "bg-destructive/10",
+    text: "text-destructive",
+  },
+  correct2: {
+    background: "bg-success",
+    text: "text-white",
+  },
+  incorrect2: {
+    background: "bg-destructive",
+    text: "text-white",
+  },
+  resolved: {
+    background: "bg-success/10",
+    text: "text-success",
+  },
+  score: {
+    background: "bg-primary",
+    text: "text-white font-medium",
+  },
+  easy: {
+    background: "bg-success",
+    text: "text-white font-medium",
+  },
+  medium: {
+    background: "bg-warning",
+    text: "text-white font-medium",
+  },
+  hard: {
+    background: "bg-destructive",
+    text: "text-white font-medium",
+  },
+
+  product: {
+    background: "bg-secondary/10",
+    text: "text-secondary",
+  },
+
+  soon: {
+    background: "bg-secondary/80",
+    text: "text-white",
+  },
+
+
+};
+
+const Chip: React.FC<ChipProps> = ({
+  leftIcon,
+  rightIcon,
+  text,
+  className,
+  onClick,
+  variant = "default",
+}) => {
+  const style = variantStyles[variant] || variantStyles.default;
+
+  const baseClasses = `
+  inline-flex items-center font-medium gap-2 
+  px-3 py-1 
+  text-[10px] md:text-xs lg:text-sm 
+  ${className} 
+  ${style.background} ${style.text} 
+  rounded-full 
+  whitespace-normal break-words text-center
+`;
+  return (
+    <div className={baseClasses} onClick={onClick}>
+      {leftIcon && <span>{leftIcon}</span>}
+      {text && <span>{text}</span>}
+      {rightIcon && <span>{rightIcon}</span>}
+    </div>
+  );
+};
+
+export default Chip;
