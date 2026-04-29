@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Chip, DeletePopup, AddEditAffiliate, Card } from "@/lib/client-imports";
+import {
+  Button,
+  Chip,
+  DeletePopup,
+  AddEditAffiliate,
+  Card,
+} from "@/lib/client-imports";
 import { Add, Delete, Edit, Redirect, Eye, EyeOff } from "@/lib/icons";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -39,7 +45,6 @@ const AffiliateManagement = () => {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error(error);
       toast.error("Failed to load items");
       return;
     }
@@ -52,7 +57,7 @@ const AffiliateManagement = () => {
       price: Number(item.price),
       imageUrl: item.img_url,
       affiliateLink: item.affiliate_link,
-      status: (item.is_active ? "Active" : "Inactive") as "Active" | "Inactive",
+      status: item.is_active ? "Active" : "Inactive",
     }));
 
     setItems(formatted);
@@ -70,7 +75,6 @@ const AffiliateManagement = () => {
     });
 
     if (error) {
-      console.error(error);
       toast.error("Failed to add item");
       return;
     }
@@ -131,8 +135,7 @@ const AffiliateManagement = () => {
   const totalValue = items.reduce((sum, i) => sum + i.price, 0);
 
   return (
-    <div className="px-4 md:px-6 lg:px-8 py-20 space-y-6 bg-primary/3 min-h-screen">
-
+    <div className="px-4 md:px-6 lg:px-8 py-20 md:py-24 lg:py-28 space-y-6 bg-primary/3 min-h-screen">
       {/* HEADER */}
       <div className="flex justify-between items-center mb-8">
         <div>
@@ -158,12 +161,16 @@ const AffiliateManagement = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
+      {/* MAIN GRID */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start ">
         {/* STATS */}
-        <div className="grid gap-4">
+        <div className="grid gap-2 lg:h-[500px]">
           <Card title="Total Items" textColor="text-white" value={totalItems} />
-          <Card title="Active Items" textColor="text-white" value={activeItems} />
+          <Card
+            title="Active Items"
+            textColor="text-white"
+            value={activeItems}
+          />
           <Card
             title="Total Value"
             textColor="text-white"
@@ -176,112 +183,115 @@ const AffiliateManagement = () => {
 
         {/* TABLE */}
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-
-              <thead>
-                <tr className="bg-blue-50 border-b">
+          <div className="h-[500px] flex flex-col">
+            {/* HEADER */}
+            <table className="w-full border-collapse">
+              <thead className="bg-blue-50 border-b">
+                <tr>
                   <th className="text-left px-4 py-3">Title</th>
-                  <th className="hidden md:table-cell px-4 py-3">Category</th>
-                  <th className="hidden lg:table-cell px-4 py-3">Price</th>
-                  <th className="px-4 py-3">Status</th>
+                  <th className="text-left hidden md:table-cell px-4 py-3">
+                    Category
+                  </th>
+                  <th className="text-left hidden lg:table-cell px-4 py-3">
+                    Price
+                  </th>
+                  <th className="hidden md:table-cell px-4 py-3">Status</th>
                   <th className="text-center px-4 py-3">Actions</th>
                 </tr>
               </thead>
-
-              <tbody className="divide-y">
-                {items.map((item) => (
-                  <tr key={item.id}>
-
-                    <td className="px-4 py-4">
-                      <div className="font-medium">{item.title}</div>
-                      <div className="text-xs text-gray-500 md:hidden">
-                        {item.category} • ₱ {item.price.toLocaleString()}
-                      </div>
-                    </td>
-
-                    <td className="hidden md:table-cell px-4 py-4">
-                      {item.category}
-                    </td>
-
-                    <td className="hidden lg:table-cell px-4 py-4 font-semibold">
-                      ₱ {item.price.toLocaleString()}
-                    </td>
-
-                    {/* STATUS + EYE */}
-                    <td className="px-4 py-4">
-                      <div className="flex items-center justify-center gap-2">
-
-                        <Chip
-                          text={item.status}
-                          className={
-                            item.status === "Active"
-                              ? "bg-success text-white whitespace-nowrap"
-                              : "bg-gray-300 text-gray-800 whitespace-nowrap"
-                          }
-                          onClick={() => toggleStatus(item)}
-                        />
-
-                        <Button
-                          onClick={() => toggleStatus(item)}
-                          leftIcon={
-                            item.status === "Active" ? <Eye /> : <EyeOff />
-                          }
-                          size="sm"
-                          backgroundColor="bg-transparent"
-                          textColor="text-gray-600"
-                          className="hidden md:flex"
-                        />
-                      </div>
-                    </td>
-
-                    {/* ACTIONS */}
-                    <td className="p-2">
-                      <div className="flex justify-center gap-1">
-
-                        <Button
-                          onClick={() => {
-                            setEditingItem(item);
-                            setIsModalOpen(true);
-                          }}
-                          leftIcon={<Edit className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6"/>}
-                          backgroundColor="bg-primary/20"
-                          textColor="text-primary"
-                          size="sm"
-                        />
-
-                        <Button
-                          onClick={() =>
-                            window.open(item.affiliateLink, "_blank")
-                          }
-                          leftIcon={<Redirect className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6"/>}
-                          backgroundColor="bg-primary/20"
-                          textColor="text-primary"
-                          size="sm"
-                        />
-
-                        <Button
-                          onClick={() => openDeletePopup(item.id)}
-                          leftIcon={<Delete className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6"/>}
-                          backgroundColor="bg-destructive/20"
-                          textColor="text-destructive"
-                          size="sm"
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-
-                {items.length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="text-center py-10">
-                      No affiliate items yet.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-
             </table>
+
+            {/* SCROLLABLE BODY */}
+            <div className="overflow-y-auto flex-1">
+              <table className="w-full border-collapse">
+                <tbody className="divide-y">
+                  {items.map((item) => (
+                    <tr key={item.id}>
+                      <td className="px-4 py-4">
+                        <div className="font-medium">{item.title}</div>
+                        <div className="text-xs text-gray-500 md:hidden">
+                          {item.category} • ₱ {item.price.toLocaleString()}
+                        </div>
+                      </td>
+
+                      <td className="hidden md:table-cell px-4 py-4">
+                        {item.category}
+                      </td>
+
+                      <td className="hidden lg:table-cell px-4 py-4 font-semibold">
+                        ₱ {item.price.toLocaleString()}
+                      </td>
+
+                      <td className="hidden md:table-cell px-4 py-4">
+                        <div className="flex justify-center gap-2">
+                          <Chip
+                            text={item.status}
+                            className={
+                              item.status === "Active"
+                                ? "bg-success text-white"
+                                : "bg-gray-300 text-gray-800"
+                            }
+                            onClick={() => toggleStatus(item)}
+                          />
+
+                          <Button
+                            onClick={() => toggleStatus(item)}
+                            leftIcon={
+                              item.status === "Active" ? <Eye /> : <EyeOff />
+                            }
+                            size="sm"
+                            backgroundColor="bg-transparent"
+                            textColor="text-gray-600"
+                            className="hidden md:flex"
+                          />
+                        </div>
+                      </td>
+
+                      <td className="p-2">
+                        <div className="flex justify-center gap-1">
+                          <Button
+                            onClick={() => {
+                              setEditingItem(item);
+                              setIsModalOpen(true);
+                            }}
+                            leftIcon={<Edit />}
+                            backgroundColor="bg-primary/20"
+                            textColor="text-primary"
+                            size="sm"
+                          />
+
+                          <Button
+                            onClick={() =>
+                              window.open(item.affiliateLink, "_blank")
+                            }
+                            leftIcon={<Redirect />}
+                            backgroundColor="bg-primary/20"
+                            textColor="text-primary"
+                            size="sm"
+                          />
+
+                          <Button
+                            onClick={() => openDeletePopup(item.id)}
+                            leftIcon={<Delete />}
+                            backgroundColor="bg-destructive/20"
+                            textColor="text-destructive"
+                            size="sm"
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+
+                  {items.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="text-center py-10">
+                        No affiliate items yet.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -296,7 +306,7 @@ const AffiliateManagement = () => {
         initialData={editingItem}
         onSubmit={async (formData) => {
           if (editingItem) {
-            const { error } = await supabase
+            await supabase
               .from("affiliate")
               .update({
                 title: formData.title,
@@ -305,14 +315,8 @@ const AffiliateManagement = () => {
                 price: formData.price,
                 img_url: formData.imageUrl,
                 affiliate_link: formData.affiliateLink,
-                is_active: editingItem.status === "Active",
               })
               .eq("id", editingItem.id);
-
-            if (error) {
-              toast.error("Failed to update");
-              return;
-            }
 
             toast.success("Item updated!");
           } else {
