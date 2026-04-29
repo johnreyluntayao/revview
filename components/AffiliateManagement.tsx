@@ -210,15 +210,16 @@ const AffiliateManagement = () => {
 
                     {/* STATUS + EYE */}
                     <td className="px-4 py-4">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-center gap-2">
 
                         <Chip
                           text={item.status}
                           className={
                             item.status === "Active"
-                              ? "bg-success text-white"
-                              : "bg-gray-300 text-gray-800"
+                              ? "bg-success text-white whitespace-nowrap"
+                              : "bg-gray-300 text-gray-800 whitespace-nowrap"
                           }
+                          onClick={() => toggleStatus(item)}
                         />
 
                         <Button
@@ -229,12 +230,13 @@ const AffiliateManagement = () => {
                           size="sm"
                           backgroundColor="bg-transparent"
                           textColor="text-gray-600"
+                          className="hidden md:flex"
                         />
                       </div>
                     </td>
 
                     {/* ACTIONS */}
-                    <td className="p-3">
+                    <td className="p-2">
                       <div className="flex justify-center gap-1">
 
                         <Button
@@ -242,7 +244,7 @@ const AffiliateManagement = () => {
                             setEditingItem(item);
                             setIsModalOpen(true);
                           }}
-                          leftIcon={<Edit />}
+                          leftIcon={<Edit className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6"/>}
                           backgroundColor="bg-primary/20"
                           textColor="text-primary"
                           size="sm"
@@ -252,7 +254,7 @@ const AffiliateManagement = () => {
                           onClick={() =>
                             window.open(item.affiliateLink, "_blank")
                           }
-                          leftIcon={<Redirect />}
+                          leftIcon={<Redirect className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6"/>}
                           backgroundColor="bg-primary/20"
                           textColor="text-primary"
                           size="sm"
@@ -260,7 +262,7 @@ const AffiliateManagement = () => {
 
                         <Button
                           onClick={() => openDeletePopup(item.id)}
-                          leftIcon={<Delete />}
+                          leftIcon={<Delete className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6"/>}
                           backgroundColor="bg-destructive/20"
                           textColor="text-destructive"
                           size="sm"
