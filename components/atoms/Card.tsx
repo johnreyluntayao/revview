@@ -35,16 +35,16 @@ const Card: React.FC<CardProps> = ({
   switch (variant) {
     case "stat":
       content = (
-        <div className="p-4 md:p-5 lg:p-6 w-full bg-linear-to-br from-primary/70 to-secondary/70 text-white">
-          {/* ... your existing stat content ... */}
+        <div className="p-4 md:p-5 lg:p-6 w-full h-full bg-linear-to-br from-primary/70 to-secondary/70 text-white flex flex-col justify-center">
           <div className="flex items-center justify-between">
             {title && (
-              <h3
+              <h1
                 className={`text-xs md:text-sm lg:text-base font-medium ${textColor}`}
               >
                 {title}
-              </h3>
+              </h1>
             )}
+
             {icon && (
               <div
                 className={`p-2 rounded-lg ${iconColor} text-xl md:text-2xl lg:text-3xl [&>svg]:size-[1em]`}
@@ -53,18 +53,23 @@ const Card: React.FC<CardProps> = ({
               </div>
             )}
           </div>
-          <div className="flex items-baseline">
+
+          <div className="flex items-baseline mt-2">
             <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-right text-white">
               {value}
             </p>
+
             {trend && (
               <span
-                className={`text-xs md:text-sm lg:text-base ${trend === "up" ? "text-success" : "text-destructive"}`}
+                className={`text-xs md:text-sm lg:text-base ml-1 ${
+                  trend === "up" ? "text-success" : "text-destructive"
+                }`}
               >
                 {trend === "up" ? "↑" : "↓"}
               </span>
             )}
           </div>
+
           {subValue && (
             <p className="mt-1 text-xs md:text-sm lg:text-base text-white">
               {subValue}
@@ -178,34 +183,34 @@ const Card: React.FC<CardProps> = ({
         <div className="flex flex-col h-full w-full bg-white rounded-lg overflow-hidden">
           {/* Image Box */}
           {image && (
-              <Image
-                height={1000}
-                width={1000}
-                src={image}
-                alt={imageAlt || title || "Step illustration"}
-                className="w-full h-full object-cover rounded-lg overflow-hidden border-b border-border"
-              />
+            <Image
+              height={1000}
+              width={1000}
+              src={image}
+              alt={imageAlt || title || "Step illustration"}
+              className="w-full h-full object-cover rounded-lg overflow-hidden border-b border-border"
+            />
           )}
 
           {/* Content Area */}
           <div className="p-4 md:p-5 lg:p-6 flex flex-col flex-1 gap-2 md:gap-2.5 lg:gap-3">
             <div className="flex flex-col space-y-2 md:space-y-3 lg:space-y-4">
               {/* Step Number */}
-            {title && (
-              <Chip 
-              text={`Step ${title}`}
-              className="bg-linear-to-r from-primary to-secondary text-primary-foreground w-fit"
-              />
-            )}
+              {title && (
+                <Chip
+                  text={`Step ${title}`}
+                  className="bg-linear-to-r from-primary to-secondary text-primary-foreground w-fit"
+                />
+              )}
 
-            {/* Main Title */}
-            {value && (
-              <h3 className="text-sm md:text-base lg:text-lg font-bold text-foreground leading-tight line-clamp-1">
-                {value}
-              </h3>
-            )}
+              {/* Main Title */}
+              {value && (
+                <h3 className="text-sm md:text-base lg:text-lg font-bold text-foreground leading-tight line-clamp-1">
+                  {value}
+                </h3>
+              )}
             </div>
-            
+
             {/* Description */}
             {subValue && (
               <p className="text-muted-foreground text-xs md:text-sm lg:text-base leading-relaxed flex-1">
@@ -292,9 +297,7 @@ const Card: React.FC<CardProps> = ({
             )}
 
             {/* Coming Soon Badge */}
-            {badge && (
-              <Chip text={badge} variant="soon"/>
-            )}
+            {badge && <Chip text={badge} variant="soon" />}
           </div>
           <div className="flex flex-col gap-2 md:gap-2.5 lg:gap-3">
             {/* Title */}
