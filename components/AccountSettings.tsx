@@ -42,10 +42,12 @@ const AccountSettings = ({ userInfo, role = "user" }: AccountSettingsProps) => {
     fetchUser();
   }, []);
 
-  const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+ const handleProfileChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+) => {
+  const { name, value } = e.target;
+  setFormData((prev) => ({ ...prev, [name]: value }));
+};
 
   const handlePasswordChange = (field: "current" | "new" | "confirm", value: string) => {
     if (field === "current") setCurrentPassword(value);
