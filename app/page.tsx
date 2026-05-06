@@ -6,6 +6,7 @@ export default function Home() {
 
   return (
     <div className="w-full">
+      <AdsSection variant="inline" slot="2169763728"/>
       <NavBar State="Home"/>
       <Homepage />
       <Footer />
