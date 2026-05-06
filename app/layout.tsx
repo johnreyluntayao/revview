@@ -14,7 +14,10 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "RevView",
-  description: "A reviewing web application for CSE",
+  description: "A reviewing web application for CSE, LPT, and many more.",
+  other: {
+    "google-adsense-account": "ca-pub-4571981118354444",
+  },
 };
 
 export default function RootLayout({
