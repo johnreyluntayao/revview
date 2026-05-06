@@ -9,7 +9,7 @@ export default function Home() {
       <NavBar State="Home"/>
       <Homepage />
       <Footer />
-      <AdsSection variant="inline"/>
+      <AdsSection variant="inline" slot="2728166929"/>
     </div>
   );
 }
