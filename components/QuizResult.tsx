@@ -194,7 +194,7 @@ const QuizResult = ({ sessionId }: QuizResultProps) => {
         <QuizAccordion questions={questions} answers={answers} />
       </div>
 
-      <AdsSection variant="inline"  />
+      <AdsSection variant="inline"  slot="2728166929"/>
     </div>
   );
 };
