@@ -1,45 +1,55 @@
 'use client'
-import React from "react";
+import React, { useEffect } from "react";
 
 type AdVariant = "banner" | "card" | "sidebar" | "inline";
 
 interface AdsSectionProps {
   variant?: AdVariant;
-  title?: string;
-  description?: string;
-  image?: string;
-  cta?: string;
-  link?: string;
+  slot: string;           // Required
+  format?: string;
+  className?: string;
+}
+
+// Declare adsbygoogle on Window (TypeScript fix)
+declare global {
+  interface Window {
+    adsbygoogle: any[];
+  }
 }
 
 const AdsSection: React.FC<AdsSectionProps> = ({
   variant = "banner",
-  title = "Your Ad Here",
-  description = "Promote your product or service with high visibility.",
-  image = "https://via.placeholder.com/600x300",
-  cta = "Learn More",
-  link = "#",
+  slot,
+  format = "auto",
+  className = "",
 }) => {
-  const handleClick = () => {
-    if (link) {
-      window.location.href = link;
+  useEffect(() => {
+    try {
+      // This is the standard way to push AdSense ads
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (err) {
+      console.error("AdSense error:", err);
     }
+  }, [slot]);
+
+  const adProps = {
+    className: `adsbygoogle ${className}`.trim(),
+    style: { display: "block" } as React.CSSProperties,
+    "data-ad-client": "ca-pub-4571981118354444",
+    "data-ad-slot": slot,
+    "data-ad-format": format,
+    "data-full-width-responsive": "true",
   };
 
   // BANNER
   if (variant === "banner") {
     return (
-      <div className="w-full bg-linear-to-r from-primary to-secondary text-white rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl md:text-2xl font-bold">{title}</h2>
-          <p className="text-sm opacity-90">{description}</p>
-        </div>
-        <button
-          onClick={handleClick}
-          className="bg-white text-black px-4 py-2 rounded-xl font-semibold hover:bg-gray-200 transition"
-        >
-          {cta}
-        </button>
+      <div className="w-full my-6">
+        <ins
+          {...adProps}
+          data-ad-format="auto"
+          style={{ display: "block", width: "100%", minHeight: "100px" }}
+        />
       </div>
     );
   }
@@ -47,18 +57,12 @@ const AdsSection: React.FC<AdsSectionProps> = ({
   // CARD
   if (variant === "card") {
     return (
-      <div className="w-full bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-        <img src={image} alt="ad" className="w-full h-30 object-cover" />
-        <div className="p-4 flex flex-col gap-2">
-          <h3 className="font-semibold text-lg">{title}</h3>
-          <p className="text-sm text-gray-500">{description}</p>
-          <button
-            onClick={handleClick}
-            className="mt-2 bg-indigo-500 text-white px-3 py-2 rounded-lg hover:bg-indigo-600 transition"
-          >
-            {cta}
-          </button>
-        </div>
+      <div className="w-full rounded-xl overflow-hidden shadow-md my-4">
+        <ins
+          {...adProps}
+          data-ad-format="rectangle"
+          style={{ display: "block", width: "100%", minHeight: "280px" }}
+        />
       </div>
     );
   }
@@ -66,16 +70,12 @@ const AdsSection: React.FC<AdsSectionProps> = ({
   // SIDEBAR
   if (variant === "sidebar") {
     return (
-      <div className="w-64 bg-gray-100 rounded-2xl p-4 flex flex-col gap-3">
-        <img src={image} alt="ad" className="w-full h-32 object-cover rounded-lg" />
-        <h3 className="font-semibold">{title}</h3>
-        <p className="text-sm text-gray-600">{description}</p>
-        <button
-          onClick={handleClick}
-          className="bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition"
-        >
-          {cta}
-        </button>
+      <div className="w-64 mx-auto my-4">
+        <ins
+          {...adProps}
+          data-ad-format="vertical"
+          style={{ display: "block", width: "100%", minHeight: "300px" }}
+        />
       </div>
     );
   }
@@ -83,17 +83,12 @@ const AdsSection: React.FC<AdsSectionProps> = ({
   // INLINE
   if (variant === "inline") {
     return (
-      <div className="w-full bg-yellow-100 border border-yellow-300 rounded-xl p-4 flex items-center justify-between gap-4">
-        <div>
-          <h4 className="font-semibold text-sm">{title}</h4>
-          <p className="text-xs text-gray-600">{description}</p>
-        </div>
-        <button
-          onClick={handleClick}
-          className="text-xs bg-yellow-400 px-3 py-1 rounded-lg hover:bg-yellow-500 transition"
-        >
-          {cta}
-        </button>
+      <div className="my-4">
+        <ins
+          {...adProps}
+          data-ad-format="fluid"
+          style={{ display: "block", width: "100%", minHeight: "80px" }}
+        />
       </div>
     );
   }
