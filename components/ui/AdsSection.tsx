@@ -5,12 +5,12 @@ type AdVariant = "banner" | "card" | "sidebar" | "inline";
 
 interface AdsSectionProps {
   variant?: AdVariant;
-  slot?: string;           // Required
+  slot: string;                    // ← Required
   format?: string;
   className?: string;
 }
 
-// Declare adsbygoogle on Window (TypeScript fix)
+// TypeScript declaration for AdSense
 declare global {
   interface Window {
     adsbygoogle: any[];
@@ -24,20 +24,23 @@ const AdsSection: React.FC<AdsSectionProps> = ({
   className = "",
 }) => {
   useEffect(() => {
+    if (!slot) return;
+
     try {
-      // This is the standard way to push AdSense ads
       (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch (err) {
-      console.error("AdSense error:", err);
+      console.error("AdSense push error:", err);
     }
   }, [slot]);
 
-  const adProps = {
+  if (!slot) {
+    return <div className="text-red-500 text-sm p-4">Ad slot ID is missing</div>;
+  }
+
+  const baseProps = {
     className: `adsbygoogle ${className}`.trim(),
-    style: { display: "block" } as React.CSSProperties,
     "data-ad-client": "ca-pub-4571981118354444",
     "data-ad-slot": slot,
-    "data-ad-format": format,
     "data-full-width-responsive": "true",
   };
 
@@ -46,7 +49,7 @@ const AdsSection: React.FC<AdsSectionProps> = ({
     return (
       <div className="w-full my-6">
         <ins
-          {...adProps}
+          {...baseProps}
           data-ad-format="auto"
           style={{ display: "block", width: "100%", minHeight: "100px" }}
         />
@@ -59,7 +62,7 @@ const AdsSection: React.FC<AdsSectionProps> = ({
     return (
       <div className="w-full rounded-xl overflow-hidden shadow-md my-4">
         <ins
-          {...adProps}
+          {...baseProps}
           data-ad-format="rectangle"
           style={{ display: "block", width: "100%", minHeight: "280px" }}
         />
@@ -72,7 +75,7 @@ const AdsSection: React.FC<AdsSectionProps> = ({
     return (
       <div className="w-64 mx-auto my-4">
         <ins
-          {...adProps}
+          {...baseProps}
           data-ad-format="vertical"
           style={{ display: "block", width: "100%", minHeight: "300px" }}
         />
@@ -85,7 +88,7 @@ const AdsSection: React.FC<AdsSectionProps> = ({
     return (
       <div className="my-4">
         <ins
-          {...adProps}
+          {...baseProps}
           data-ad-format="fluid"
           style={{ display: "block", width: "100%", minHeight: "80px" }}
         />
