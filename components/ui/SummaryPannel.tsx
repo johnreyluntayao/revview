@@ -144,7 +144,7 @@ export default function SummaryPanel({
         </div>
       </div>
       <div className="py-2 md:py-3 lg:py-4">
-        <AdsSection variant="card" link="https://google.com" />
+        <AdsSection variant="card"/>
       </div>
     </div>
   );

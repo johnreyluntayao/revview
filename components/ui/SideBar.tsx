@@ -167,7 +167,7 @@ export default function Sidebar({
                   <p className="px-2 md:px-4 mb-2 md:mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Advertisement
                   </p>
-                  <AdsSection variant="card" link="https://google.com" />
+                  <AdsSection variant="card"/>
                 </div>
               )}
 
