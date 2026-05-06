@@ -5,12 +5,11 @@ type AdVariant = "banner" | "card" | "sidebar" | "inline";
 
 interface AdsSectionProps {
   variant?: AdVariant;
-  slot: string;                    // ← Required
+  slot: string;             
   format?: string;
   className?: string;
 }
 
-// TypeScript declaration for AdSense
 declare global {
   interface Window {
     adsbygoogle: any[];
@@ -44,7 +43,6 @@ const AdsSection: React.FC<AdsSectionProps> = ({
     "data-full-width-responsive": "true",
   };
 
-  // BANNER
   if (variant === "banner") {
     return (
       <div className="w-full my-6">
@@ -57,7 +55,6 @@ const AdsSection: React.FC<AdsSectionProps> = ({
     );
   }
 
-  // CARD
   if (variant === "card") {
     return (
       <div className="w-full rounded-xl overflow-hidden shadow-md my-4">
@@ -70,7 +67,6 @@ const AdsSection: React.FC<AdsSectionProps> = ({
     );
   }
 
-  // SIDEBAR
   if (variant === "sidebar") {
     return (
       <div className="w-64 mx-auto my-4">
@@ -83,7 +79,6 @@ const AdsSection: React.FC<AdsSectionProps> = ({
     );
   }
 
-  // INLINE
   if (variant === "inline") {
     return (
       <div className="my-4">

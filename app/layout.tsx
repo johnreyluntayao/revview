@@ -47,7 +47,6 @@ export default function RootLayout({
           />
         </AuthProvider>
 
-        {/* ✅ Google AdSense Script */}
         <Script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4571981118354444"
