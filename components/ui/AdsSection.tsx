@@ -5,7 +5,7 @@ type AdVariant = "banner" | "card" | "sidebar" | "inline";
 
 interface AdsSectionProps {
   variant?: AdVariant;
-  slot: string;           // Required
+  slot?: string;           // Required
   format?: string;
   className?: string;
 }
