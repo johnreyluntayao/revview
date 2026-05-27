@@ -1,16 +1,17 @@
 import AdsSection from "@/components/ui/AdsSection";
-import { Homepage, Footer, NavBar} from "@/lib/client-imports"
+import ProductList from "@/components/ui/ProductList";
+import { Homepage, Footer, NavBar } from "@/lib/client-imports";
 
 export default function Home() {
-
-
   return (
     <div className="w-full">
-      <AdsSection variant="inline" slot="2169763728"/>
-      <NavBar State="Home"/>
+      <AdsSection variant="inline" slot="2169763728" />
+      <NavBar State="Home" />
       <Homepage />
       <Footer />
-      <AdsSection variant="inline" slot="2728166929"/>
+      <AdsSection variant="inline" slot="2728166929" />
+      <ProductList/>
+      
     </div>
   );
 }
