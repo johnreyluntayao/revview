@@ -1,5 +1,4 @@
 import AdsSection from "@/components/ui/AdsSection";
-import ProductList from "@/components/ui/ProductList";
 import { Homepage, Footer, NavBar } from "@/lib/client-imports";
 
 export default function Home() {
@@ -10,7 +9,6 @@ export default function Home() {
       <Homepage />
       <Footer />
       <AdsSection variant="inline" slot="2728166929" />
-      <ProductList/>
       
     </div>
   );
