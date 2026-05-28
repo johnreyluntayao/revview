@@ -1,5 +1,4 @@
 import AdsSection from "@/components/ui/AdsSection";
-import ProductList from "@/components/ui/ProductList";
 import { Homepage, Footer, NavBar } from "@/lib/client-imports";
 
 export default function Home() {
