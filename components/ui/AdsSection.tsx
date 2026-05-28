@@ -1,97 +1,120 @@
 'use client'
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 
-type AdVariant = "banner" | "card" | "sidebar" | "inline";
+type AdVariant = "banner" | "card" | "sidebar" | "inline" | "native";
 
 interface AdsSectionProps {
   variant?: AdVariant;
-  slot: string;             
-  format?: string;
+  keyId: string;           // This is the most important: your Adsterra 'key'
+  width?: number;
+  height?: number;
+  format?: "iframe" | "js";
   className?: string;
-}
-
-declare global {
-  interface Window {
-    adsbygoogle: any[];
-  }
 }
 
 const AdsSection: React.FC<AdsSectionProps> = ({
   variant = "banner",
-  slot,
-  format = "auto",
+  keyId,
+  width,
+  height,
+  format = "iframe",
   className = "",
 }) => {
+  const adRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    if (!slot) return;
+    if (!keyId || !adRef.current) return;
+
+    // Prevent duplicate ads
+    if (adRef.current.hasChildNodes()) return;
 
     try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (err) {
-      console.error("AdSense push error:", err);
-    }
-  }, [slot]);
+      const atOptions = {
+        key: keyId,
+        format: format,
+        height: height || getDefaultHeight(variant),
+        width: width || getDefaultWidth(variant),
+        params: {},
+      };
 
-  if (!slot) {
-    return <div className="text-red-500 text-sm p-4">Ad slot ID is missing</div>;
+      // Create configuration script
+      const conf = document.createElement("script");
+      conf.innerHTML = `atOptions = ${JSON.stringify(atOptions)};`;
+
+      // Create invoke script
+      const script = document.createElement("script");
+      script.type = "text/javascript";
+      script.src = `//www.highperformancedformats.com/${keyId}/invoke.js`;
+
+      // Append both
+      adRef.current.appendChild(conf);
+      adRef.current.appendChild(script);
+    } catch (err) {
+      console.error("Adsterra ad error:", err);
+    }
+  }, [keyId, variant, width, height, format]);
+
+  if (!keyId) {
+    return (
+      <div className="text-red-500 text-sm p-4 border border-red-300 bg-red-50 rounded-lg">
+        Adsterra keyId is missing
+      </div>
+    );
   }
 
-  const baseProps = {
-    className: `adsbygoogle ${className}`.trim(),
-    "data-ad-client": "ca-pub-4571981118354444",
-    "data-ad-slot": slot,
-    "data-full-width-responsive": "true",
+  const getContainerClasses = () => {
+    switch (variant) {
+      case "banner":
+        return "w-full my-6";
+      case "card":
+        return "w-full rounded-2xl overflow-hidden shadow-lg my-6 border border-gray-100";
+      case "sidebar":
+        return "w-[300px] mx-auto my-6";
+      case "inline":
+        return "my-4";
+      case "native":
+        return "w-full my-4";
+      default:
+        return "w-full my-6";
+    }
   };
 
-  if (variant === "banner") {
-    return (
-      <div className="w-full my-6">
-        <ins
-          {...baseProps}
-          data-ad-format="auto"
-          style={{ display: "block", width: "100%", minHeight: "100px" }}
-        />
-      </div>
-    );
-  }
+  return (
+    <div className={getContainerClasses()}>
+      <div 
+        ref={adRef}
+        className={`adsterra-ad ${className}`.trim()}
+        style={{
+          width: "100%",
+          minHeight: height || getDefaultHeight(variant),
+          display: "block"
+        }}
+      />
+    </div>
+  );
+};
 
-  if (variant === "card") {
-    return (
-      <div className="w-full rounded-xl overflow-hidden shadow-md my-4">
-        <ins
-          {...baseProps}
-          data-ad-format="rectangle"
-          style={{ display: "block", width: "100%", minHeight: "280px" }}
-        />
-      </div>
-    );
+// Helper functions
+const getDefaultWidth = (variant: AdVariant): number => {
+  switch (variant) {
+    case "banner": return 728;
+    case "card": return 300;
+    case "sidebar": return 300;
+    case "inline": return 320;
+    case "native": return 300;
+    default: return 728;
   }
+};
 
-  if (variant === "sidebar") {
-    return (
-      <div className="w-64 mx-auto my-4">
-        <ins
-          {...baseProps}
-          data-ad-format="vertical"
-          style={{ display: "block", width: "100%", minHeight: "300px" }}
-        />
-      </div>
-    );
+const getDefaultHeight = (variant: AdVariant): number => {
+  switch (variant) {
+    case "banner": return 90;
+    case "card": return 250;
+    case "sidebar": return 600;
+    case "inline": return 50;
+    case "native": return 250;
+    default: return 90;
   }
-
-  if (variant === "inline") {
-    return (
-      <div className="my-4">
-        <ins
-          {...baseProps}
-          data-ad-format="fluid"
-          style={{ display: "block", width: "100%", minHeight: "80px" }}
-        />
-      </div>
-    );
-  }
-
-  return null;
 };
 
 export default AdsSection;
