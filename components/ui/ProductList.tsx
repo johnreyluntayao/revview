@@ -1,7 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import ProductCard from "../atoms/ProductCard";
+import ComboBox from "../atoms/ComboBox";
+import Sidebar from "./SideBar";
+import { Menu } from "@/lib/icons";
+
+/* ---------------- TYPES ---------------- */
+
+type Category = "All" | "Materials" | "Books" | "Courses";
+
+type PriceFilter = "All" | "Under 50" | "50-100" | "Over 100";
 
 type Product = {
   id: number;
@@ -9,8 +18,11 @@ type Product = {
   title: string;
   subtitle: string;
   buttonLink: string;
-  category: "Materials" | "Books" | "Courses";
+  price: number;
+  category: Exclude<Category, "All">;
 };
+
+/* ---------------- DATA ---------------- */
 
 const products: Product[] = [
   {
@@ -18,7 +30,9 @@ const products: Product[] = [
     image: "/steps/image 1.svg",
     title: "Color Mastery in Web Design",
     subtitle: "A Guide to Creating Visually Stunning Websites",
-    buttonLink: "https://www.amazon.com/dp/B0CGLZ9Z5P?ref_=pe_3052080_397514860",
+    buttonLink:
+      "https://www.amazon.com/dp/B0CGLZ9Z5P?ref_=pe_3052080_397514860",
+    price: 29.99,
     category: "Books",
   },
   {
@@ -27,90 +41,219 @@ const products: Product[] = [
     title: "Minimalist UI Kit",
     subtitle: "High-quality Figma components",
     buttonLink: "#",
+    price: 49,
     category: "Materials",
   },
   {
     id: 3,
     image: "/images/product2.jpg",
-    title: "Minimalist UI Kit",
-    subtitle: "High-quality Figma components",
+    title: "Advanced React Course",
+    subtitle: "Master React and Next.js",
     buttonLink: "#",
-    category: "Materials",
+    price: 120,
+    category: "Courses",
   },
   {
     id: 4,
     image: "/images/product2.jpg",
-    title: "Minimalist UI Kit",
-    subtitle: "High-quality Figma components",
+    title: "Design System Pack",
+    subtitle: "Reusable design assets",
     buttonLink: "#",
+    price: 89,
     category: "Materials",
   },
   {
     id: 5,
     image: "/images/product2.jpg",
-    title: "Minimalist UI Kit",
-    subtitle: "High-quality Figma components",
+    title: "Frontend Masterclass",
+    subtitle: "Complete web development course",
     buttonLink: "#",
+    price: 199,
+    category: "Courses",
+  },
+  {
+    id: 6,
+    image: "/images/product2.jpg",
+    title: "UI Resources Bundle",
+    subtitle: "Icons, templates, and assets",
+    buttonLink: "#",
+    price: 39,
     category: "Materials",
   },
 ];
 
-const categories = ["All", "Materials", "Books", "Courses"] as const;
+/* ---------------- OPTIONS ---------------- */
+
+const categoryOptions = [
+  { value: "All", label: "All" },
+  { value: "Materials", label: "Materials" },
+  { value: "Books", label: "Books" },
+  { value: "Courses", label: "Courses" },
+];
+
+const priceOptions = [
+  { value: "All", label: "All Prices" },
+  { value: "Under 50", label: "Under $50" },
+  { value: "50-100", label: "$50 - $100" },
+  { value: "Over 100", label: "Over $100" },
+];
+
+const PRODUCTS_PER_PAGE = 8;
+
+/* ---------------- COMPONENT ---------------- */
 
 const ProductList = () => {
-  const [activeFilter, setActiveFilter] = useState<"All" | "Materials" | "Books" | "Courses">("All");
+  const [activeFilter, setActiveFilter] = useState<Category>("All");
+  const [priceFilter, setPriceFilter] = useState<PriceFilter>("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  const filteredProducts = activeFilter === "All"
-    ? products
-    : products.filter((product) => product.category === activeFilter);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeFilter, priceFilter]);
+
+  const filteredProducts = useMemo(() => {
+    return products.filter((product) => {
+      const categoryMatch =
+        activeFilter === "All" || product.category === activeFilter;
+
+      const priceMatch =
+        priceFilter === "All"
+          ? true
+          : priceFilter === "Under 50"
+          ? product.price < 50
+          : priceFilter === "50-100"
+          ? product.price >= 50 && product.price <= 100
+          : product.price > 100;
+
+      return categoryMatch && priceMatch;
+    });
+  }, [activeFilter, priceFilter]);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)
+  );
+
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * PRODUCTS_PER_PAGE,
+    currentPage * PRODUCTS_PER_PAGE
+  );
+
+  useEffect(() => {
+    const element = sentinelRef.current;
+    if (!element || currentPage >= totalPages) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setCurrentPage((prevPage) =>
+            Math.min(prevPage + 1, totalPages)
+          );
+        }
+      },
+      {
+        rootMargin: "200px",
+      }
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [currentPage, totalPages]);
 
   return (
-    <main className="px-4 md:px-6 lg:px-8 py-8 md:py-10 min-h-screen">
-      <div className="mx-auto">
-        {/* Fixed Sticky Filter */}
-        <div className="sticky top-6 md:top-8 lg:top-10 bg-white z-30 pb-6 border-b border-gray-100">
-          <div className="flex flex-wrap gap-3">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveFilter(category)}
-                className={`px-5 py-2.5 rounded-full font-medium transition-all duration-200 text-sm
-                  ${
-                    activeFilter === category
-                      ? "bg-black text-white shadow-md"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                  }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
+    <div className="flex min-h-screen">
+      {/* Sidebar */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+
+      {/* Main Content */}
+      <main className="flex-1">
+        {/* Mobile Menu Button */}
+        <div className="lg:hidden sticky top-0 z-40 bg-white border-b border-border px-4 py-3">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            aria-label="Open menu"
+          >
+            <Menu className="w-5 h-5" />
+            <span className="text-sm">Menu</span>
+          </button>
         </div>
 
-        {/* Scrollable Product Area */}
-        <div className="h-[calc(100vh-180px)] md:h-[calc(100vh-200px)] overflow-y-auto scrollbar-hide pt-6 pb-12 pr-2">
-          {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  image={product.image}
-                  title={product.title}
-                  subtitle={product.subtitle}
-                  buttonLink={product.buttonLink}
-                />
-              ))}
+        <div className="px-4 md:px-6 lg:px-8 py-4">
+          <div className="mx-auto">
+            {/* FILTERS + INFO */}
+            <div className="sticky top-10 lg:top-0 bg-white z-30 py-2 md:py-3 lg:py-4 ">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="w-full md:w-56">
+                  <ComboBox
+                    options={categoryOptions}
+                    value={activeFilter}
+                    onChange={(value) =>
+                      setActiveFilter(value as Category)
+                    }
+                    placeholder="Category"
+                    isSearchable={false}
+                  />
+                </div>
+
+                <div className="w-full md:w-56">
+                  <ComboBox
+                    options={priceOptions}
+                    value={priceFilter}
+                    onChange={(value) =>
+                      setPriceFilter(value as PriceFilter)
+                    }
+                    placeholder="Price Range"
+                    isSearchable={false}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between mt-4">
+                <p className="text-sm text-gray-500">
+                  Showing {paginatedProducts.length} of {filteredProducts.length} products
+                </p>
+
+                <p className="text-sm text-gray-500">
+                  Page {currentPage} of {totalPages}
+                </p>
+              </div>
             </div>
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-center text-gray-500 text-lg">
-                No products found in this category.
-              </p>
-            </div>
-          )}
+
+            {/* PRODUCTS */}
+            {filteredProducts.length > 0 ? (
+              <>
+                <div className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(320px,1fr))] px-2">
+                  {paginatedProducts.map((product) => (
+                    <ProductCard
+                      key={product.id}
+                      image={product.image}
+                      title={product.title}
+                      subtitle={product.subtitle}
+                      buttonLink={product.buttonLink}
+                      category={product.category}
+                    />
+                  ))}
+                </div>
+
+                <div ref={sentinelRef} className="h-2" />
+                {currentPage < totalPages && (
+                  <div className="flex justify-center py-8">
+                    <p className="text-sm text-gray-500">Loading more products...</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="flex justify-center py-20">
+                <p className="text-gray-500">No products found.</p>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 };
 
