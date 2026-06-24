@@ -4,98 +4,21 @@ import React, { useMemo, useState, useEffect, useRef } from "react";
 import ProductCard from "../atoms/ProductCard";
 import ComboBox from "../atoms/ComboBox";
 import Sidebar from "./SideBar";
-import { Menu } from "@/lib/icons";
+import { Menu, Search } from "@/lib/icons";
+import { createClient } from "@/lib/supabase/client";
+import type { Affiliate } from "@/lib/types";
 
 /* ---------------- TYPES ---------------- */
 
-type Category = "All" | "Materials" | "Books" | "Courses";
-
 type PriceFilter = "All" | "Under 50" | "50-100" | "Over 100";
-
-type Product = {
-  id: number;
-  image: string;
-  title: string;
-  subtitle: string;
-  buttonLink: string;
-  price: number;
-  category: Exclude<Category, "All">;
-};
-
-/* ---------------- DATA ---------------- */
-
-const products: Product[] = [
-  {
-    id: 1,
-    image: "/steps/image 1.svg",
-    title: "Color Mastery in Web Design",
-    subtitle: "A Guide to Creating Visually Stunning Websites",
-    buttonLink:
-      "https://www.amazon.com/dp/B0CGLZ9Z5P?ref_=pe_3052080_397514860",
-    price: 29.99,
-    category: "Books",
-  },
-  {
-    id: 2,
-    image: "/images/product2.jpg",
-    title: "Minimalist UI Kit",
-    subtitle: "High-quality Figma components",
-    buttonLink: "#",
-    price: 49,
-    category: "Materials",
-  },
-  {
-    id: 3,
-    image: "/images/product2.jpg",
-    title: "Advanced React Course",
-    subtitle: "Master React and Next.js",
-    buttonLink: "#",
-    price: 120,
-    category: "Courses",
-  },
-  {
-    id: 4,
-    image: "/images/product2.jpg",
-    title: "Design System Pack",
-    subtitle: "Reusable design assets",
-    buttonLink: "#",
-    price: 89,
-    category: "Materials",
-  },
-  {
-    id: 5,
-    image: "/images/product2.jpg",
-    title: "Frontend Masterclass",
-    subtitle: "Complete web development course",
-    buttonLink: "#",
-    price: 199,
-    category: "Courses",
-  },
-  {
-    id: 6,
-    image: "/images/product2.jpg",
-    title: "UI Resources Bundle",
-    subtitle: "Icons, templates, and assets",
-    buttonLink: "#",
-    price: 39,
-    category: "Materials",
-  },
-];
 
 /* ---------------- OPTIONS ---------------- */
 
-const categoryOptions = [
-  { value: "All", label: "All" },
-  { value: "Materials", label: "Materials" },
-  { value: "Books", label: "Books" },
-  { value: "Courses", label: "Courses" },
-];
-
 const priceOptions = [
   { value: "All", label: "All Prices" },
-  { value: "Under 50", label: "Under $50" },
-  { value: "50-100", label: "$50 - $100" },
-  { value: "Over 100", label: "Over $100" },
+  { value: "Under 50", label: "Under ₱50" },
+  { value: "50-100", label: "₱50 - ₱100" },
+  { value: "Over 100", label: "Over ₱100" },
 ];
 
 const PRODUCTS_PER_PAGE = 8;
@@ -103,18 +26,87 @@ const PRODUCTS_PER_PAGE = 8;
 /* ---------------- COMPONENT ---------------- */
 
 const ProductList = () => {
-  const [activeFilter, setActiveFilter] = useState<Category>("All");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeFilter, setActiveFilter] = useState("All");
   const [priceFilter, setPriceFilter] = useState<PriceFilter>("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [products, setProducts] = useState<Affiliate[]>([]);
+  const [loading, setLoading] = useState(true);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
+    async function fetchAffiliates() {
+      const supabase = createClient();
+
+      const { data, error } = await supabase
+        .from("affiliate")
+        .select("*")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching affiliates:", error);
+        setLoading(false);
+        return;
+      }
+
+      setProducts(data || []);
+      setLoading(false);
+    }
+
+    fetchAffiliates();
+  }, []);
+
+  const categoryOptions = useMemo(() => {
+    const categories = Array.from(
+      new Set(
+        products
+          .map((product) => product.category)
+          .filter((category): category is string => Boolean(category)),
+      ),
+    );
+
+    return [
+      { value: "All", label: "All" },
+      ...categories.map((category) => ({ value: category, label: category })),
+    ];
+  }, [products]);
+
+  const handleCategoryChange = (category: string) => {
+    setActiveFilter(category);
     setCurrentPage(1);
-  }, [activeFilter, priceFilter]);
+  };
+
+  const handlePriceFilterChange = (value: string) => {
+    setPriceFilter(value as PriceFilter);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1);
+  };
 
   const filteredProducts = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
     return products.filter((product) => {
+      const price = Number(product.price) || 0;
+
+      const searchMatch =
+        normalizedSearch === "" ||
+        [
+          product.title,
+          product.description,
+          product.category,
+          price.toString(),
+          `₱${price}`,
+          `${price} php`,
+        ].some((value) =>
+          (value || "").toString().toLowerCase().includes(normalizedSearch),
+        );
+
       const categoryMatch =
         activeFilter === "All" || product.category === activeFilter;
 
@@ -122,23 +114,23 @@ const ProductList = () => {
         priceFilter === "All"
           ? true
           : priceFilter === "Under 50"
-          ? product.price < 50
-          : priceFilter === "50-100"
-          ? product.price >= 50 && product.price <= 100
-          : product.price > 100;
+            ? price < 50
+            : priceFilter === "50-100"
+              ? price >= 50 && price <= 100
+              : price > 100;
 
-      return categoryMatch && priceMatch;
+      return searchMatch && categoryMatch && priceMatch;
     });
-  }, [activeFilter, priceFilter]);
+  }, [activeFilter, priceFilter, products, searchTerm]);
 
   const totalPages = Math.max(
     1,
-    Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)
+    Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE),
   );
 
   const paginatedProducts = filteredProducts.slice(
     (currentPage - 1) * PRODUCTS_PER_PAGE,
-    currentPage * PRODUCTS_PER_PAGE
+    currentPage * PRODUCTS_PER_PAGE,
   );
 
   useEffect(() => {
@@ -148,14 +140,12 @@ const ProductList = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting) {
-          setCurrentPage((prevPage) =>
-            Math.min(prevPage + 1, totalPages)
-          );
+          setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
         }
       },
       {
         rootMargin: "200px",
-      }
+      },
     );
 
     observer.observe(element);
@@ -186,13 +176,22 @@ const ProductList = () => {
             {/* FILTERS + INFO */}
             <div className="sticky top-10 lg:top-0 bg-white z-30 py-2 md:py-3 lg:py-4 ">
               <div className="flex flex-col md:flex-row gap-4">
+                <div className="relative w-full md:flex-1">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/40" />
+                  <input
+                    type="search"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    placeholder="Search products..."
+                    className="w-full rounded-md border border-border bg-background py-2.5 pl-10 pr-4 text-xs text-foreground placeholder-foreground focus:border-primary/75 focus:ring focus:ring-primary/30 md:text-sm lg:text-base"
+                  />
+                </div>
+
                 <div className="w-full md:w-56">
                   <ComboBox
                     options={categoryOptions}
                     value={activeFilter}
-                    onChange={(value) =>
-                      setActiveFilter(value as Category)
-                    }
+                    onChange={handleCategoryChange}
                     placeholder="Category"
                     isSearchable={false}
                   />
@@ -202,9 +201,7 @@ const ProductList = () => {
                   <ComboBox
                     options={priceOptions}
                     value={priceFilter}
-                    onChange={(value) =>
-                      setPriceFilter(value as PriceFilter)
-                    }
+                    onChange={handlePriceFilterChange}
                     placeholder="Price Range"
                     isSearchable={false}
                   />
@@ -213,7 +210,8 @@ const ProductList = () => {
 
               <div className="flex items-center justify-between mt-4">
                 <p className="text-sm text-gray-500">
-                  Showing {paginatedProducts.length} of {filteredProducts.length} products
+                  Showing {paginatedProducts.length} of{" "}
+                  {filteredProducts.length} products
                 </p>
 
                 <p className="text-sm text-gray-500">
@@ -223,17 +221,25 @@ const ProductList = () => {
             </div>
 
             {/* PRODUCTS */}
-            {filteredProducts.length > 0 ? (
+            {loading ? (
+              <div className="flex justify-center py-20">
+                <p className="text-gray-500">Loading products...</p>
+              </div>
+            ) : filteredProducts.length > 0 ? (
               <>
-                <div className="grid gap-6 grid-cols-[repeat(auto-fit,minmax(320px,1fr))] px-2">
+                <div className="grid gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3 px-2">
                   {paginatedProducts.map((product) => (
                     <ProductCard
                       key={product.id}
-                      image={product.image}
+                      id={product.id}
+                      image={product.img_url || "/icon.svg"}
+                      imageAlt={product.title}
                       title={product.title}
-                      subtitle={product.subtitle}
-                      buttonLink={product.buttonLink}
+                      subtitle={product.description || ""}
+                      price={product.price}
+                      buttonLink={product.affiliate_link}
                       category={product.category}
+                      onCategoryClick={handleCategoryChange}
                     />
                   ))}
                 </div>
@@ -241,7 +247,9 @@ const ProductList = () => {
                 <div ref={sentinelRef} className="h-2" />
                 {currentPage < totalPages && (
                   <div className="flex justify-center py-8">
-                    <p className="text-sm text-gray-500">Loading more products...</p>
+                    <p className="text-sm text-gray-500">
+                      Loading more products...
+                    </p>
                   </div>
                 )}
               </>
