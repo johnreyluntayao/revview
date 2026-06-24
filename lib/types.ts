@@ -33,6 +33,7 @@ export interface ButtonProps {
   className?: string;
   isRounded?: boolean;
   ref?: React.ForwardedRef<HTMLButtonElement>;
+  restrict?: boolean; // New property to restrict button width
 }
 
 //Done
