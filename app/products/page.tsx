@@ -1,11 +1,15 @@
 import ProductList from "@/components/ui/ProductList";
-import { ManageQuestions, NavBar } from "@/lib/client-imports";
+import { Footer, NavBar } from "@/lib/client-imports";
 
 const page = () => {
   return (
-    <main className="min-h-screen">
+    <>
+      <NavBar State="Default" />
+      <main className="min-h-screen pt-16 lg:pt-20">
         <ProductList />
-    </main>
+      </main>
+      <Footer />
+    </>
   )
 }
 
