@@ -13,9 +13,7 @@ import {
   StartQuiz,
   ProgressTracking,
   AverageScore,
-  Sparkles,
 } from "@/lib/icons";
-import AdsSection from "./AdsSection";
 
 type NavItem = {
   href: string;
@@ -37,7 +35,6 @@ const defaultItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: ProgressTracking, section: "main", exact: true },
   { href: "/quiz-selection", label: "Start Review", section: "main", icon: StartQuiz, exact: false },
   { href: "/results-history", label: "Results History", section: "main", icon: AverageScore, exact: true },
-  { href: "/products", label: "Products", icon: Sparkles, section: "main", exact: true },
   { href: "/user-account", label: "Account Settings", icon: AccountSettings, section: "account", exact: true },
 ];
 

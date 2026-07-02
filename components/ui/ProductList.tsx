@@ -3,22 +3,31 @@
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import ProductCard from "../atoms/ProductCard";
 import ComboBox from "../atoms/ComboBox";
-import Sidebar from "./SideBar";
-import { Menu, Search } from "@/lib/icons";
+import { Close, Search } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
 import type { Affiliate } from "@/lib/types";
 
 /* ---------------- TYPES ---------------- */
 
-type PriceFilter = "All" | "Under 50" | "50-100" | "Over 100";
+type SortOption = "newest" | "price-low" | "price-high" | "name";
+type PriceRange = "all" | "under-50" | "50-100" | "101-200" | "201-500" | "over-500";
 
 /* ---------------- OPTIONS ---------------- */
 
-const priceOptions = [
-  { value: "All", label: "All Prices" },
-  { value: "Under 50", label: "Under ₱50" },
-  { value: "50-100", label: "₱50 - ₱100" },
-  { value: "Over 100", label: "Over ₱100" },
+const sortOptions = [
+  { value: "newest", label: "Newest" },
+  { value: "price-low", label: "Price: Low to High" },
+  { value: "price-high", label: "Price: High to Low" },
+  { value: "name", label: "Name A-Z" },
+];
+
+const priceRangeOptions = [
+  { value: "all", label: "All Prices" },
+  { value: "under-50", label: "Under PHP 50" },
+  { value: "50-100", label: "PHP 50 - PHP 100" },
+  { value: "101-200", label: "PHP 101 - PHP 200" },
+  { value: "201-500", label: "PHP 201 - PHP 500" },
+  { value: "over-500", label: "Over PHP 500" },
 ];
 
 const PRODUCTS_PER_PAGE = 8;
@@ -28,9 +37,9 @@ const PRODUCTS_PER_PAGE = 8;
 const ProductList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
-  const [priceFilter, setPriceFilter] = useState<PriceFilter>("All");
+  const [priceRange, setPriceRange] = useState<PriceRange>("all");
+  const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [currentPage, setCurrentPage] = useState(1);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [products, setProducts] = useState<Affiliate[]>([]);
   const [loading, setLoading] = useState(true);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -78,8 +87,13 @@ const ProductList = () => {
     setCurrentPage(1);
   };
 
-  const handlePriceFilterChange = (value: string) => {
-    setPriceFilter(value as PriceFilter);
+  const handlePriceRangeChange = (value: string) => {
+    setPriceRange(value as PriceRange);
+    setCurrentPage(1);
+  };
+
+  const handleSortChange = (value: string) => {
+    setSortBy(value as SortOption);
     setCurrentPage(1);
   };
 
@@ -88,40 +102,75 @@ const ProductList = () => {
     setCurrentPage(1);
   };
 
+  const resetFilters = () => {
+    setSearchTerm("");
+    setActiveFilter("All");
+    setPriceRange("all");
+    setSortBy("newest");
+    setCurrentPage(1);
+  };
+
   const filteredProducts = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const searchTerms = searchTerm
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean);
 
     return products.filter((product) => {
       const price = Number(product.price) || 0;
 
+      const searchableText = [
+        product.title,
+        product.description,
+        product.category,
+        price.toString(),
+        `php ${price}`,
+        `${price} php`,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
       const searchMatch =
-        normalizedSearch === "" ||
-        [
-          product.title,
-          product.description,
-          product.category,
-          price.toString(),
-          `₱${price}`,
-          `${price} php`,
-        ].some((value) =>
-          (value || "").toString().toLowerCase().includes(normalizedSearch),
-        );
+        searchTerms.length === 0 ||
+        searchTerms.every((term) => searchableText.includes(term));
 
       const categoryMatch =
         activeFilter === "All" || product.category === activeFilter;
 
       const priceMatch =
-        priceFilter === "All"
+        priceRange === "all"
           ? true
-          : priceFilter === "Under 50"
+          : priceRange === "under-50"
             ? price < 50
-            : priceFilter === "50-100"
+            : priceRange === "50-100"
               ? price >= 50 && price <= 100
-              : price > 100;
+              : priceRange === "101-200"
+                ? price >= 101 && price <= 200
+                : priceRange === "201-500"
+                  ? price >= 201 && price <= 500
+                  : price > 500;
 
       return searchMatch && categoryMatch && priceMatch;
+    }).sort((a, b) => {
+      if (sortBy === "price-low") {
+        return (Number(a.price) || 0) - (Number(b.price) || 0);
+      }
+
+      if (sortBy === "price-high") {
+        return (Number(b.price) || 0) - (Number(a.price) || 0);
+      }
+
+      if (sortBy === "name") {
+        return a.title.localeCompare(b.title);
+      }
+
+      return (
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
     });
-  }, [activeFilter, priceFilter, products, searchTerm]);
+  }, [activeFilter, priceRange, products, searchTerm, sortBy]);
 
   const totalPages = Math.max(
     1,
@@ -132,6 +181,12 @@ const ProductList = () => {
     (currentPage - 1) * PRODUCTS_PER_PAGE,
     currentPage * PRODUCTS_PER_PAGE,
   );
+
+  const hasActiveFilters =
+    searchTerm.trim() !== "" ||
+    activeFilter !== "All" ||
+    priceRange !== "all" ||
+    sortBy !== "newest";
 
   useEffect(() => {
     const element = sentinelRef.current;
@@ -153,29 +208,13 @@ const ProductList = () => {
   }, [currentPage, totalPages]);
 
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-
-      {/* Main Content */}
-      <main className="flex-1">
-        {/* Mobile Menu Button */}
-        <div className="lg:hidden sticky top-0 z-40 bg-white border-b border-border px-4 py-3">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
-            aria-label="Open menu"
-          >
-            <Menu className="w-5 h-5" />
-            <span className="text-sm">Menu</span>
-          </button>
-        </div>
-
-        <div className="px-4 md:px-6 lg:px-8 py-4">
-          <div className="mx-auto">
+    <div className="min-h-screen bg-background">
+      <main>
+        <div className="px-4 md:px-6 lg:px-8 py-6">
+          <div className="mx-auto max-w-screen-3xl">
             {/* FILTERS + INFO */}
-            <div className="sticky top-10 lg:top-0 bg-white z-30 py-2 md:py-3 lg:py-4 ">
-              <div className="flex flex-col md:flex-row gap-4">
+            <div className="sticky top-16 lg:top-20 bg-white z-30 py-2 md:py-3 lg:py-4 ">
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(220px,1fr)_220px_190px_190px_auto]">
                 <div className="relative w-full md:flex-1">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/40" />
                   <input
@@ -187,28 +226,48 @@ const ProductList = () => {
                   />
                 </div>
 
-                <div className="w-full md:w-56">
+                <div className="w-full">
                   <ComboBox
                     options={categoryOptions}
                     value={activeFilter}
                     onChange={handleCategoryChange}
                     placeholder="Category"
-                    isSearchable={false}
+                    isSearchable
                   />
                 </div>
 
-                <div className="w-full md:w-56">
+                <div className="w-full">
                   <ComboBox
-                    options={priceOptions}
-                    value={priceFilter}
-                    onChange={handlePriceFilterChange}
+                    options={priceRangeOptions}
+                    value={priceRange}
+                    onChange={handlePriceRangeChange}
                     placeholder="Price Range"
                     isSearchable={false}
                   />
                 </div>
+
+                <div className="w-full">
+                  <ComboBox
+                    options={sortOptions}
+                    value={sortBy}
+                    onChange={handleSortChange}
+                    placeholder="Sort"
+                    isSearchable={false}
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  disabled={!hasActiveFilters}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-border px-3 text-xs font-medium text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                >
+                  <Close className="h-4 w-4" />
+                  Reset
+                </button>
               </div>
 
-              <div className="flex items-center justify-between mt-4">
+              <div className="flex flex-col gap-1 mt-4 text-sm text-gray-500 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-gray-500">
                   Showing {paginatedProducts.length} of{" "}
                   {filteredProducts.length} products

@@ -139,6 +139,12 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
     { href: "/affiliate", label: "Manage Affiliate", icon: Affiliate },
   ];
 
+  const publicNavItems = [
+    { href: "/products", label: "Products" },
+    { href: "/privacy", label: "Privacy Policy" },
+    { href: "/terms", label: "Terms and Conditions" },
+  ];
+
   const handlePauseClick = async () => {
     if (!sessionId) return;
 
@@ -276,6 +282,28 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                   >
                     <item.icon className="w-5 h-5" />
                     <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+
+          {(State === "Home" || State === "Default") && (
+            <div className="hidden md:flex items-center justify-center gap-4 lg:gap-6 absolute left-1/2 -translate-x-1/2">
+              {publicNavItems.map((item) => {
+                const isActive = pathname === item.href;
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`text-sm lg:text-base font-medium transition-colors ${
+                      isActive
+                        ? "text-primary"
+                        : "text-muted-foreground hover:text-primary"
+                    }`}
+                  >
+                    {item.label}
                   </Link>
                 );
               })}
