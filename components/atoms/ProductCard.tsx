@@ -1,23 +1,9 @@
-// components/ProductCard.tsx
 "use client";
 
 import React from "react";
+import { ExternalLink } from "lucide-react";
 import Button from "./Button";
-
-const gradientOptions = [
-  "from-emerald-500 to-teal-600",
-  "from-blue-500 to-cyan-600",
-  "from-purple-500 to-violet-600",
-  "from-amber-500 to-orange-600",
-  "from-green-500 to-lime-600",
-  "from-sky-500 to-indigo-600",
-  "from-pink-500 to-rose-600",
-  "from-yellow-500 to-amber-600",
-  "from-rose-500 to-pink-600",
-  "from-indigo-500 to-purple-600",
-  "from-teal-500 to-cyan-600",
-  "from-orange-500 to-red-600",
-];
+import Chip from "./Chip";
 
 interface ProductCardProps {
   id?: string;
@@ -34,93 +20,102 @@ interface ProductCardProps {
   className?: string;
 }
 
-const getGradient = (seed: string) => {
-  const hash = seed.split("").reduce((total, char) => total + char.charCodeAt(0), 0);
-  return gradientOptions[hash % gradientOptions.length];
+const formatPrice = (price: number | string | null | undefined) => {
+  const amount = Number(price);
+
+  if (!Number.isFinite(amount)) return "Price unavailable";
+
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
+  }).format(amount);
 };
 
 const ProductCard: React.FC<ProductCardProps> = ({
-  id,
   image,
   imageAlt = "Product image",
   category,
   title,
   subtitle,
   price,
-  buttonText = "Get Instant Access",
+  buttonText = "View product",
   buttonLink,
   onButtonClick,
   onCategoryClick,
   className = "",
 }) => {
-  const displayCategory = category || "Uncategorized";
-  const gradient = getGradient(id || title);
+  const displayCategory = category || "Study resource";
 
   const handleClick = () => {
-    if (onButtonClick) return onButtonClick();
-    if (buttonLink) window.open(buttonLink, "_blank", "noopener,noreferrer");
+    if (onButtonClick) {
+      onButtonClick();
+      return;
+    }
+
+    if (buttonLink) {
+      window.open(buttonLink, "_blank", "noopener,noreferrer");
+    }
   };
 
   return (
-    <div
-      className={`relative w-full h-90 md:h-110 lg:h-115 xl:h-140 rounded-xl overflow-hidden shadow-xl group/card ${className}`}
+    <article
+      className={`group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border/80 bg-background shadow-sm transition duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/8 ${className}`}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={image}
-        alt={imageAlt}
-        className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover/card:scale-110"
-      />
-
-      <div className={`absolute inset-0 bg-linear-to-b ${gradient} opacity-65`} />
-
-      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 xl:p-6 bg-linear-to-t from-foreground/90 via-foreground/70 to-transparent">
+      <div className="relative aspect-[4/3] overflow-hidden bg-muted/50">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={image}
+          alt={imageAlt}
+          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-foreground/10 to-transparent" />
         <button
           type="button"
-          className="uppercase text-primary-foreground tracking-[2px] text-[10px] md:text-xs font-semibold mb-0.5 md:mb-0.75 xl:mb-1 opacity-75 text-left"
           onClick={() => category && onCategoryClick?.(category)}
+          disabled={!category}
+          className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)] text-left transition hover:brightness-95 disabled:cursor-default"
         >
-          {displayCategory}
+          <Chip
+            text={displayCategory}
+            variant="product"
+          />
         </button>
+      </div>
 
-        <h3 className="text-2xl md:text-3xl lg:text-2xl xl:text-4xl font-bold text-primary-foreground leading-none mb-1 md:mb-1.5 xl:mb-2 line-clamp-2">
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <h3 className="line-clamp-2 text-base font-bold leading-snug text-foreground sm:text-lg">
           {title}
         </h3>
 
-        {subtitle && (
-          <p className="text-xs md:text-sm xl:text-base text-primary-foreground/90 leading-tight mb-4 md:mb-5 xl:mb-6 line-clamp-3 lg:line-clamp-2 xl:line-clamp-3">
-            {subtitle}
-          </p>
-        )}
+        <p className="mt-2 line-clamp-2 min-h-10 text-xs leading-5 text-muted-foreground sm:text-sm">
+          {subtitle || "A recommended resource selected to support your exam preparation."}
+        </p>
 
-        <div className="flex items-end justify-between gap-2 md:gap-3 xl:gap-4">
-          <div>
-            <span className="text-[10px] md:text-xs xl:text-sm text-primary-foreground/70">
+        <div className="mt-auto flex items-end justify-between gap-3 pt-5">
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
               Starting at
-            </span>
-            <div className="flex items-baseline gap-0.5 md:gap-0.75 xl:gap-1">
-              <span className="text-base md:text-md lg:text-lg xl:text-2xl font-bold text-primary-foreground tracking-tight leading-none line-clamp-1">
-                ₱{price ?? 0}
-              </span>
-              <span className="text-xs md:text-sm xl:text-base text-primary-foreground/70 leading-none line-clamp-1">
-                PHP
-              </span>
-            </div>
+            </p>
+            <p className="mt-0.5 truncate text-lg font-extrabold tracking-tight text-foreground">
+              {formatPrice(price)}
+            </p>
           </div>
 
           <Button
             text={buttonText}
+            size="sm"
             backgroundColor="bg-primary"
-            textColor="text-white"
-            className="text-[10px] md:text-xs xl:text-lg"
+            textColor="text-primary-foreground"
+            rightIcon={<ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />}
             onClick={handleClick}
-            restrict={true}
+            isDisabled={!buttonLink && !onButtonClick}
+            className="min-h-10 shrink-0 px-3.5 py-2 text-xs font-bold shadow-sm sm:text-sm"
+            restrict
           />
         </div>
       </div>
-
-      <div className="absolute inset-0 bg-linear-to-r from-transparent via-background/20 to-transparent -translate-x-full group-hover/card:translate-x-full transition-transform duration-1000" />
-    </div>
+    </article>
   );
 };
 

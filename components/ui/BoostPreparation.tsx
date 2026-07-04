@@ -5,6 +5,8 @@ import { Chip, Carousel } from "@/lib/client-imports";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import type { Affiliate } from "@/lib/types";
+import Link from "next/link";
+import { ArrowRight } from "@/lib/icons";
 
 const container = {
   hidden: {},
@@ -55,7 +57,7 @@ const BoostPreparation = () => {
 
   if (loading) {
     return (
-      <section>
+      <section id="products" className="scroll-mt-16 lg:scroll-mt-20">
         <motion.div
           initial="hidden"
           whileInView="show"
@@ -97,7 +99,7 @@ const BoostPreparation = () => {
   }
 
   return (
-    <section>
+    <section id="products" className="scroll-mt-16 lg:scroll-mt-20">
       <motion.div
         initial="hidden"
         whileInView="show"
@@ -132,6 +134,16 @@ const BoostPreparation = () => {
 
         <motion.div variants={fadeUp} className="w-full">
           <Carousel cards={affiliates} />
+        </motion.div>
+
+        <motion.div variants={fadeUp}>
+          <Link
+            href="/products"
+            className="group inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition hover:-translate-y-0.5 hover:bg-primary/90 md:px-6 md:text-base"
+          >
+            Explore all products
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
         </motion.div>
       </motion.div>
     </section>

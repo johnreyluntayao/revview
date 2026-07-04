@@ -52,7 +52,7 @@ const fadeUp = {
 
 const ComingSoon = () => {
   return (
-    <section>
+    <section id="coming-soon" className="scroll-mt-16 lg:scroll-mt-20">
       <motion.div
         initial="hidden"
         whileInView="show"
@@ -82,7 +82,7 @@ const ComingSoon = () => {
             variants={fadeUp}
             className="text-xs md:text-base lg:text-xl text-muted-foreground text-center"
           >
-            We're expanding to help more professionals achieve their goals
+            We&apos;re expanding to help more professionals achieve their goals
           </motion.p>
         </div>
 

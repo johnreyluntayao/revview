@@ -1,7 +1,13 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import React, {
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from "react";
+import { Check, ChevronDown, Search } from "lucide-react";
 
 type Size = "sm" | "md" | "lg";
 
@@ -39,124 +45,225 @@ export default function ComboBox({
 }: ComboBoxProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [highlightedIndex, setHighlightedIndex] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const listboxId = useId();
+  const labelId = useId();
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const normalizedOptions = useMemo(
+    () =>
+      options.map((option) =>
+        typeof option === "string"
+          ? { value: option, label: option }
+          : option,
+      ),
+    [options],
+  );
 
-  useEffect(() => {
-    if (!isOpen) setSearch("");
-  }, [isOpen]);
+  const selectedOption = normalizedOptions.find(
+    (option) => option.value === value,
+  );
 
-  // Get display label for current value
-  const getDisplayLabel = () => {
-    const selected = options.find(opt =>
-      typeof opt === "string" ? opt === value : opt.value === value
+  const filteredOptions = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return normalizedOptions;
+
+    return normalizedOptions.filter((option) =>
+      option.label.toLowerCase().includes(query),
     );
-    return typeof selected === "string" ? selected : selected?.label || "";
-  };
+  }, [normalizedOptions, search]);
 
-  const displayText = isOpen && isSearchable ? search : getDisplayLabel();
-
-  const filteredOptions = isSearchable
-    ? options.filter(opt => {
-        const label = typeof opt === "string" ? opt : opt.label;
-        return label.toLowerCase().includes(search.toLowerCase());
-      })
-    : options;
-
-  // Size classes
   const sizeClasses = {
-    sm: "text-sm py-2 px-3 gap-1",
-    md: "text-base py-2.5 px-4 gap-1.5",
-    lg: "text-lg py-3 px-5 gap-2",
+    sm: "min-h-9 px-3 text-xs",
+    md: "min-h-11 px-3.5 text-sm",
+    lg: "min-h-12 px-4 text-base",
   }[size];
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!isSearchable) return;
-    setSearch(e.target.value);
-    if (!isOpen) setIsOpen(true);
-  };
-
-  const handleInputClick = () => {
+  const openMenu = () => {
     if (disabled) return;
+
+    const selectedIndex = normalizedOptions.findIndex(
+      (option) => option.value === value,
+    );
+    setSearch("");
+    setHighlightedIndex(Math.max(selectedIndex, 0));
     setIsOpen(true);
-    if (isSearchable) inputRef.current?.focus();
+
+    if (isSearchable) {
+      requestAnimationFrame(() => searchInputRef.current?.focus());
+    }
   };
 
-  const handleSelect = (option: ComboBoxOption) => {
-    const selectedValue = typeof option === "string" ? option : option.value;
-    onChange?.(selectedValue);
+  const closeMenu = (restoreFocus = false) => {
     setIsOpen(false);
     setSearch("");
+
+    if (restoreFocus) {
+      requestAnimationFrame(() => triggerRef.current?.focus());
+    }
+  };
+
+  const handleSelect = (option: Option) => {
+    onChange?.(option.value);
+    closeMenu(true);
+  };
+
+  const moveHighlight = (direction: 1 | -1) => {
+    if (filteredOptions.length === 0) return;
+
+    setHighlightedIndex((current) => {
+      const next = current + direction;
+      if (next < 0) return filteredOptions.length - 1;
+      if (next >= filteredOptions.length) return 0;
+      return next;
+    });
+  };
+
+  const handleKeyboard = (event: KeyboardEvent<HTMLElement>) => {
+    if (event.key === "Escape" && isOpen) {
+      event.preventDefault();
+      closeMenu(true);
+      return;
+    }
+
+    if (!isOpen && ["Enter", " ", "ArrowDown"].includes(event.key)) {
+      event.preventDefault();
+      openMenu();
+      return;
+    }
+
+    if (!isOpen) return;
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      moveHighlight(1);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      moveHighlight(-1);
+    } else if (event.key === "Enter" && filteredOptions[highlightedIndex]) {
+      event.preventDefault();
+      handleSelect(filteredOptions[highlightedIndex]);
+    }
   };
 
   return (
-   <div className={`w-full space-y-2 ${className}`}>
+    <div
+      ref={wrapperRef}
+      className={`w-full space-y-2 ${className}`}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          closeMenu();
+        }
+      }}
+    >
       {label && (
-        <label className="block text-[10px] md:text-xs lg:text-sm font-medium text-foreground">
+        <span
+          id={labelId}
+          className="block text-xs font-bold text-foreground"
+        >
           {label}
-        </label>
+          {required && <span className="ml-0.5 text-destructive">*</span>}
+        </span>
       )}
 
-      <div className="relative w-full">
-        <input
-          ref={inputRef}
-          type="text"
-          value={displayText}
-          onChange={handleInputChange}
-          onClick={handleInputClick}
-          placeholder={value ? getDisplayLabel() || placeholder : placeholder}
-          readOnly={!isSearchable || !isOpen}
+      <div className="relative">
+        <button
+          ref={triggerRef}
+          type="button"
           disabled={disabled}
-          className={`w-full text-xs md:text-sm lg:text-base rounded-md border bg-background 
-          ${!isSearchable || !isOpen ? "cursor-pointer" : "cursor-text"}
-          border-border text-foreground placeholder-foreground 
-          focus:border-primary/75 focus:ring focus:ring-primary/30
-          disabled:cursor-not-allowed disabled:opacity-50
-          ${sizeClasses}
-        `}/>
-
-        <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+          aria-expanded={isOpen}
+          aria-haspopup="listbox"
+          aria-controls={listboxId}
+          aria-labelledby={label ? labelId : undefined}
+          aria-label={label ? undefined : placeholder}
+          onClick={() => (isOpen ? closeMenu(false) : openMenu())}
+          onKeyDown={handleKeyboard}
+          className={`flex w-full items-center justify-between gap-3 rounded-lg border bg-background text-left transition ${
+            isOpen
+              ? "border-primary ring-2 ring-primary/20"
+              : "border-border hover:border-primary/40"
+          } ${sizeClasses} disabled:cursor-not-allowed disabled:opacity-50`}
+        >
+          <span
+            className={`min-w-0 flex-1 truncate ${
+              selectedOption ? "text-foreground" : "text-muted-foreground"
+            }`}
+          >
+            {selectedOption?.label || placeholder}
+          </span>
           <ChevronDown
-            size={size === "lg" ? 20 : size === "md" ? 16 : 18}
-            className={`text-foreground/40 transition-transform ${isOpen ? "rotate-180" : ""}`}
+            className={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
+              isOpen ? "rotate-180" : ""
+            }`}
+            aria-hidden="true"
           />
-        </div>
+        </button>
 
         {isOpen && !disabled && (
-          <div className="absolute text-xs md:text-sm lg:text-base z-50 mt-1 w-full overflow-auto rounded-md border border-border/30 bg-background shadow-lg max-h-60">
-            {filteredOptions.length === 0 ? (
-              <div className="p-3 text-foreground/40">No options found</div>
-            ) : (
-              filteredOptions.map((option, index) => {
-                const label = typeof option === "string" ? option : option.label;
-                const optValue = typeof option === "string" ? option : option.value;
-                const isSelected = optValue === value;
-
-                return (
-                  <div
-                    key={index}
-                    className={`flex text-xs md:text-sm lg:text-base items-center justify-between cursor-pointer px-3 py-2 transition hover:bg-primary hover:text-primary-foreground ${
-                      isSelected ? "bg-primary text-primary-foreground font-medium" : "text-foreground"
-                    }`}
-                    onClick={() => handleSelect(option)}
-                  >
-                    <span>{label}</span>
-                    {isSelected && <Check size={16} />}
-                  </div>
-                );
-              })
+          <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-border bg-background shadow-xl shadow-foreground/10">
+            {isSearchable && (
+              <div className="border-b border-border p-2">
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    ref={searchInputRef}
+                    type="search"
+                    value={search}
+                    onChange={(event) => {
+                      setSearch(event.target.value);
+                      setHighlightedIndex(0);
+                    }}
+                    onKeyDown={handleKeyboard}
+                    placeholder="Search options..."
+                    className="min-h-9 w-full rounded-lg border border-border bg-muted/30 py-2 pl-9 pr-3 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+                  />
+                </div>
+              </div>
             )}
+
+            <div
+              id={listboxId}
+              role="listbox"
+              aria-labelledby={label ? labelId : undefined}
+              className="max-h-60 overflow-y-auto p-1.5"
+            >
+              {filteredOptions.length === 0 ? (
+                <div className="px-3 py-6 text-center text-xs text-muted-foreground">
+                  No matching options
+                </div>
+              ) : (
+                filteredOptions.map((option, index) => {
+                  const isSelected = option.value === value;
+                  const isHighlighted = index === highlightedIndex;
+
+                  return (
+                    <div
+                      key={option.value}
+                      role="option"
+                      aria-selected={isSelected}
+                      onMouseDown={(event) => event.preventDefault()}
+                      onMouseEnter={() => setHighlightedIndex(index)}
+                      onClick={() => handleSelect(option)}
+                      className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-xs transition md:text-sm ${
+                        isHighlighted
+                          ? "bg-primary/8 text-primary"
+                          : "text-foreground hover:bg-muted"
+                      } ${isSelected ? "font-bold" : "font-medium"}`}
+                    >
+                      <span className="min-w-0 truncate">{option.label}</span>
+                      {isSelected && (
+                        <Check
+                          className="h-4 w-4 shrink-0 text-primary"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
         )}
       </div>

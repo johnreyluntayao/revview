@@ -58,7 +58,7 @@ const fadeUp = {
 
 const HowItWorks = () => {
   return (
-    <section>
+    <section id="how-it-works" className="scroll-mt-16 lg:scroll-mt-20">
       <motion.div
         initial="hidden"
         whileInView="show"

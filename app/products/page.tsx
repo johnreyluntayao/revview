@@ -4,8 +4,8 @@ import { Footer, NavBar } from "@/lib/client-imports";
 const page = () => {
   return (
     <>
-      <NavBar State="Default" />
-      <main className="min-h-screen pt-16 lg:pt-20">
+      <NavBar State="Default" title="Products to Power Your Progress" />
+      <main className="min-h-screen">
         <ProductList />
       </main>
       <Footer />
