@@ -214,6 +214,10 @@
    Base styles
    ============================================= */
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   * {
     @apply border-border;
   }
@@ -240,5 +244,11 @@
   :focus-visible {
     outline: none;
     @apply ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }

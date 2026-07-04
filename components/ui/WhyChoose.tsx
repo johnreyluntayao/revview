@@ -80,7 +80,7 @@ const fadeUp = {
 
 const WhyChoose = () => {
   return (
-    <section>
+    <section id="why-revview" className="scroll-mt-16 lg:scroll-mt-20">
       <motion.div
         initial="hidden"
         whileInView="show"

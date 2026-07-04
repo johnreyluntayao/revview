@@ -53,12 +53,12 @@ const slideRight = {
 
 const HeroSection = () => {
   return (
-    <section>
+    <section id="home" className="scroll-mt-16 lg:scroll-mt-20">
       <div
         className="w-full min-h-screen
         grid grid-cols-1 lg:grid-cols-2 
         bg-linear-to-r from-hero1 to-hero2
-        mt-16 items-center
+        items-center
         py-12 md:py-20 lg:py-24
         px-4 md:px-6 lg:px-8
         gap-8"

@@ -3,9 +3,8 @@ import Link from "next/link";
 
 const footerData = {
   menuItems: [
-    { name: "Products", href: "/products" },
-    { name: "Privacy", href: "/privacy" },
-    { name: "Terms", href: "/terms" },
+    { name: "Privacy Policy", href: "/privacy" },
+    { name: "Terms & Conditions", href: "/terms" },
   ],
 
   socialLinks: [
