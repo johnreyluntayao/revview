@@ -14,7 +14,6 @@ import {
   ProgressTracking,
   AverageScore,
 } from "@/lib/icons";
-import AdsSection from "./AdsSection";
 
 type NavItem = {
   href: string;
@@ -160,14 +159,6 @@ export default function Sidebar({
                       <span>{item.label}</span>
                     </Link>
                   ))}
-                </div>
-              )}
-              {!adHide && (
-                <div className="pt-6 md:pt-8 mt-2 md:mt-4 border-t border-border">
-                  <p className="px-2 md:px-4 mb-2 md:mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Advertisement
-                  </p>
-                  <AdsSection variant="card" keyId="29453454"/>
                 </div>
               )}
 

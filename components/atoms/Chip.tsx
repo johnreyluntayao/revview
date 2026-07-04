@@ -64,8 +64,8 @@ const variantStyles = {
   },
 
   product: {
-    background: "bg-secondary/10",
-    text: "text-secondary",
+    background: "bg-secondary",
+    text: "text-white",
   },
 
   soon: {

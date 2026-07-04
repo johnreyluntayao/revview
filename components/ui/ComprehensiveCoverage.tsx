@@ -81,7 +81,7 @@ const fadeUp = {
 
 const ComprehensiveCoverage = () => {
   return (
-    <section>
+    <section id="coverage" className="scroll-mt-16 lg:scroll-mt-20">
       <motion.div
         initial="hidden"
         whileInView="show"

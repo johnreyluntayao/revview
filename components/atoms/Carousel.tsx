@@ -1,6 +1,7 @@
 'use client';
 
 import  { useState, useRef, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from "@/lib/client-imports";
 import { ArrowRight, ArrowLeft } from "@/lib/icons"
 
@@ -34,6 +35,7 @@ export interface Affiliate {
 }
 
 export default function Carousel({ cards }: { cards: Affiliate[]}) {
+  const router = useRouter();
   const carouselRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -196,7 +198,18 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
                     : 'scale-90 opacity-75 hover:opacity-90 hover:scale-[0.95]'
                   }`}
               >
-                <div className="relative w-70 md:w-90 lg:w-120 h-90 md:h-110 lg:h-140 rounded-xl overflow-hidden shadow-xl group/card">
+                <div
+                  className="relative w-70 md:w-90 lg:w-120 h-90 md:h-110 lg:h-140 rounded-xl overflow-hidden shadow-xl group/card cursor-pointer"
+                  onClick={() => router.push('/products')}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      router.push('/products');
+                    }
+                  }}
+                  role="link"
+                  tabIndex={0}
+                >
                   <img
                     src={card.img_url || '/icon.svg'}
                     alt={card.title}
@@ -228,11 +241,11 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
                       </div>
 
                       <Button 
-                        text="Get Instant Access"
+                        text="View Products"
                         backgroundColor='bg-primary'
                         textColor='text-white'
                         className="shadow-lg transition-all active:scale-95"
-                        onClick={() => window.open(card.affiliate_link, '_blank')}
+                        onClick={() => router.push('/products')}
                       />
                     </div>
                   </div>

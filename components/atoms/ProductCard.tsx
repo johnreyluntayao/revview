@@ -1,91 +1,121 @@
-// components/ProductCard.tsx
+"use client";
+
 import React from "react";
-import Image from "next/image";
-import Chip from "./Chip";
+import { ExternalLink } from "lucide-react";
 import Button from "./Button";
+import Chip from "./Chip";
 
 interface ProductCardProps {
+  id?: string;
   image: string;
   imageAlt?: string;
-  badge?: string;
+  category?: string | null;
   title: string;
   subtitle?: string;
+  price?: number | string | null;
   buttonText?: string;
   buttonLink?: string;
   onButtonClick?: () => void;
+  onCategoryClick?: (category: string) => void;
   className?: string;
 }
 
+const formatPrice = (price: number | string | null | undefined) => {
+  const amount = Number(price);
+
+  if (!Number.isFinite(amount)) return "Price unavailable";
+
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
+  }).format(amount);
+};
+
 const ProductCard: React.FC<ProductCardProps> = ({
   image,
-  imageAlt = "Product cover",
-  badge = "Book",
+  imageAlt = "Product image",
+  category,
   title,
-  subtitle = "A Guide to Creating Visually Stunning Websites",
-  buttonText = "Shop Now",
+  subtitle,
+  price,
+  buttonText = "View product",
   buttonLink,
   onButtonClick,
+  onCategoryClick,
   className = "",
 }) => {
+  const displayCategory = category || "Study resource";
+
   const handleClick = () => {
     if (onButtonClick) {
       onButtonClick();
-    } else if (buttonLink) {
+      return;
+    }
+
+    if (buttonLink) {
       window.open(buttonLink, "_blank", "noopener,noreferrer");
     }
   };
 
   return (
-    <div
-      className={`flex flex-col h-full w-full bg-white rounded-lg overflow-hidden border border-border shadow-sm ${className}`}
+    <article
+      className={`group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border/80 bg-background shadow-sm transition duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/8 ${className}`}
     >
-      {/* Image Box */}
-      {image && (
-        <Image
-          height={1000}
-          width={1000}
+      <div className="relative aspect-[4/3] overflow-hidden bg-muted/50">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={image}
           alt={imageAlt}
-          className="w-full aspect-[4/3] object-cover rounded-t-lg"
+          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
-      )}
+        <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-foreground/10 to-transparent" />
+        <button
+          type="button"
+          onClick={() => category && onCategoryClick?.(category)}
+          disabled={!category}
+          className="absolute left-3 top-3 max-w-[calc(100%-1.5rem)] text-left transition hover:brightness-95 disabled:cursor-default"
+        >
+          <Chip
+            text={displayCategory}
+            variant="product"
+          />
+        </button>
+      </div>
 
-      {/* Content Area - Fixed structure for consistent card height */}
-      <div className="p-4 md:p-5 lg:p-6 flex flex-col flex-1">
-        <div className="flex flex-col gap-3 flex-1">
-          {/* Published Badge */}
-          {badge && (
-            <Chip
-              text={badge}
-              className="bg-primary text-white w-fit text-xs"
-            />
-          )}
+      <div className="flex flex-1 flex-col p-4 sm:p-5">
+        <h3 className="line-clamp-2 text-base font-bold leading-snug text-foreground sm:text-lg">
+          {title}
+        </h3>
 
-          {/* Main Title - Limited to 2 lines */}
-          <h3 className="text-sm md:text-base lg:text-lg font-bold text-foreground leading-tight line-clamp-2 min-h-[2.8em]">
-            {title}
-          </h3>
+        <p className="mt-2 line-clamp-2 min-h-10 text-xs leading-5 text-muted-foreground sm:text-sm">
+          {subtitle || "A recommended resource selected to support your exam preparation."}
+        </p>
 
-          {/* Subtitle / Description - Limited to 4 lines */}
-          {subtitle && (
-            <p className="text-muted-foreground text-xs md:text-sm lg:text-base leading-relaxed line-clamp-4 flex-1">
-              {subtitle}
+        <div className="mt-auto flex items-end justify-between gap-3 pt-5">
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              Starting at
             </p>
-          )}
-        </div>
+            <p className="mt-0.5 truncate text-lg font-extrabold tracking-tight text-foreground">
+              {formatPrice(price)}
+            </p>
+          </div>
 
-        {/* Button - Always at the bottom */}
-        <div className="mt-auto pt-4">
           <Button
             text={buttonText}
+            size="sm"
             backgroundColor="bg-primary"
-            textColor="text-white"
-            className="w-full transition-all h-8 md:h-9 lg:h-10"
+            textColor="text-primary-foreground"
+            rightIcon={<ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />}
             onClick={handleClick}
+            isDisabled={!buttonLink && !onButtonClick}
+            className="min-h-10 shrink-0 px-3.5 py-2 text-xs font-bold shadow-sm sm:text-sm"
+            restrict
           />
         </div>
       </div>
-    </div>
+    </article>
   );
 };
 

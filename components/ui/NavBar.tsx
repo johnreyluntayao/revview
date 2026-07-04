@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
@@ -16,8 +16,8 @@ import {
   Menu,
   Close,
   Username as User,
-  User2,
   Affiliate,
+  Home,
 } from "@/lib/icons";
 import { toast } from "sonner";
 import { useHybridQuizTimer } from "@/lib/hooks/useHybridQuizTimer";
@@ -57,6 +57,11 @@ interface NavbarProps {
   sessionId?: string;
 }
 
+type QuizWindow = Window &
+  typeof globalThis & {
+    setQuizPaused?: (paused: boolean) => void;
+  };
+
 export default function Navbar({ State, title, sessionId }: NavbarProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -68,6 +73,12 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
   const [quizCategoryName, setQuizCategoryName] = useState<string>(title || "Quiz");
 
   const [dashboardHref, setDashboardHref] = useState<string | null>(null);
+  const [isAtTop, setIsAtTop] = useState(true);
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const [activeSection, setActiveSection] = useState("home");
+  const lastScrollY = useRef(0);
+  const accumulatedScroll = useRef(0);
+  const lastDirection = useRef<"up" | "down" | null>(null);
 
   const supabase = createClient();
 
@@ -131,6 +142,86 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
     loadCategory();
   }, [State, sessionId, supabase]);
 
+  useEffect(() => {
+    const hasScrollBehavior = State === "Home" || State === "Default";
+    if (!hasScrollBehavior) return;
+
+    const handleScroll = () => {
+      const currentScrollY = Math.max(window.scrollY, 0);
+      const distance = currentScrollY - lastScrollY.current;
+      const direction = distance > 0 ? "down" : "up";
+
+      setIsAtTop(currentScrollY < 12);
+
+      if (direction !== lastDirection.current) {
+        accumulatedScroll.current = 0;
+        lastDirection.current = direction;
+      }
+
+      accumulatedScroll.current += distance;
+
+      if (currentScrollY < 12) {
+        setIsHeaderVisible(true);
+        accumulatedScroll.current = 0;
+      } else if (isMobileMenuOpen || isProfileOpen) {
+        setIsHeaderVisible(true);
+      } else if (accumulatedScroll.current > 32) {
+        setIsHeaderVisible(false);
+        accumulatedScroll.current = 0;
+      } else if (accumulatedScroll.current < -16) {
+        setIsHeaderVisible(true);
+        accumulatedScroll.current = 0;
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    lastScrollY.current = window.scrollY;
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [State, isMobileMenuOpen, isProfileOpen]);
+
+  useEffect(() => {
+    if (State !== "Home") return;
+
+    const sectionIds = [
+      "home",
+      "why-revview",
+      "coverage",
+      "how-it-works",
+      "products",
+    ];
+    let animationFrame = 0;
+
+    const updateActiveSection = () => {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(() => {
+        const marker = window.scrollY + window.innerHeight * 0.35;
+        let currentSection = sectionIds[0];
+
+        for (const sectionId of sectionIds) {
+          const section = document.getElementById(sectionId);
+          if (section && section.offsetTop <= marker) {
+            currentSection = sectionId;
+          }
+        }
+
+        setActiveSection(currentSection);
+      });
+    };
+
+    updateActiveSection();
+    window.addEventListener("scroll", updateActiveSection, { passive: true });
+    window.addEventListener("resize", updateActiveSection);
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      window.removeEventListener("scroll", updateActiveSection);
+      window.removeEventListener("resize", updateActiveSection);
+    };
+  }, [State]);
+
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: ProgressTracking },
     { href: "/feedbacks", label: "Feedback", icon: ShowFeedback },
@@ -138,6 +229,18 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
     { href: "/admin-account", label: "Account Settings", icon: AccountSettings },
     { href: "/affiliate", label: "Manage Affiliate", icon: Affiliate },
   ];
+
+  const publicNavItems = [
+    { href: "/#home", label: "Home" },
+    { href: "/#why-revview", label: "Why RevView" },
+    { href: "/#coverage", label: "Coverage" },
+    { href: "/#how-it-works", label: "How it works" },
+    { href: "/#products", label: "Products" },
+  ];
+
+  const hasScrollBehavior = State === "Home" || State === "Default";
+  const isTransparent =
+    hasScrollBehavior && isAtTop && !isMobileMenuOpen && !isProfileOpen;
 
   const handlePauseClick = async () => {
     if (!sessionId) return;
@@ -151,8 +254,8 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
 
       setIsPauseModalOpen(true);
       setIsPaused(true);
-      (window as any).setQuizPaused?.(true);
-    } catch (err: any) {
+      (window as QuizWindow).setQuizPaused?.(true);
+    } catch (err: unknown) {
       console.error("Pause failed:", err);
       toast.error("Failed to pause quiz");
     }
@@ -170,10 +273,10 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
 
       setIsPauseModalOpen(false);
       setIsPaused(false);
-      (window as any).setQuizPaused?.(false);
+      (window as QuizWindow).setQuizPaused?.(false);
 
       refetch();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Resume failed:", err);
       toast.error("Failed to resume quiz");
     }
@@ -184,7 +287,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
 
     setIsPauseModalOpen(false);
     setIsPaused(false);
-    (window as any).setQuizPaused?.(false);
+    (window as QuizWindow).setQuizPaused?.(false);
 
     try {
       const { error: e1 } = await supabase
@@ -214,7 +317,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
 
     setIsPauseModalOpen(false);
     setIsPaused(false);
-    (window as any).setQuizPaused?.(false);
+    (window as QuizWindow).setQuizPaused?.(false);
 
     try {
       const { error: e1 } = await supabase
@@ -237,19 +340,35 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 bg-background backdrop-blur-md border-b border-border z-50">
-        <div className="max-w-screen-3xl mx-auto px-4 md:px-6 lg:px-8 h-16 lg:h-20 flex items-center justify-between">
+      <nav
+        className={`fixed inset-x-0 top-0 z-50 transform-gpu transition-[transform,opacity,background-color,border-color,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+          isHeaderVisible || !hasScrollBehavior
+            ? "translate-y-0 opacity-100"
+            : "pointer-events-none -translate-y-full opacity-0"
+        } ${
+          isTransparent
+            ? "border-b border-transparent bg-transparent shadow-none"
+            : "border-b border-border/80 bg-background/90 shadow-sm backdrop-blur-xl"
+        }`}
+      >
+        <div className="relative mx-auto flex h-16 max-w-screen-3xl items-center justify-between px-4 md:px-6 lg:h-20 lg:px-8">
           {/* Logo + Brand */}
           <Link
             href={`${State === "OnQuiz" ? "" : "/"}`}
             className={`${State === "OnQuiz" ? "hidden md:block" : ""}`}
           >
             <Image
-              src="/Long-logo.svg"
+              src={
+                State === "Home" && isTransparent
+                  ? "/Long-logo-white.svg"
+                  : "/Long-logo.svg"
+              }
               alt="RevView Logo"
               width={40}
               height={40}
-              className="w-30 h-18 lg:w-40 lg:h-28"
+              className={`h-auto lg:w-40 ${
+                State === "Default" ? "w-20 sm:w-30" : "w-30"
+              }`}
               loading="eager"
             />
           </Link>
@@ -279,6 +398,44 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                   </Link>
                 );
               })}
+            </div>
+          )}
+
+          {State === "Home" && (
+            <div className="absolute left-1/2 hidden -translate-x-1/2 items-center justify-center gap-1 lg:flex xl:gap-2">
+              {publicNavItems.map((item) => {
+                const sectionId = item.href.split("#")[1];
+                const isActive = activeSection === sectionId;
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    aria-current={isActive ? "location" : undefined}
+                    className={`relative whitespace-nowrap rounded-full px-2.5 py-2 text-sm font-medium transition-colors after:absolute after:inset-x-2.5 after:bottom-0 after:h-0.5 after:origin-center after:rounded-full after:transition-transform after:duration-300 xl:px-3 xl:after:inset-x-3 ${
+                      isActive
+                        ? isTransparent
+                          ? "text-white after:scale-x-100 after:bg-white"
+                          : "text-primary after:scale-x-100 after:bg-primary"
+                        : isTransparent
+                        ? "text-white/80 hover:bg-white/10 hover:text-white"
+                        : "text-muted-foreground hover:bg-primary/8 hover:text-primary"
+                    } ${
+                      isActive ? "" : "after:scale-x-0"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+
+          {State === "Default" && (
+            <div className="pointer-events-none absolute left-1/2 w-[48%] -translate-x-1/2 text-center sm:w-auto sm:max-w-[55%]">
+              <p className="truncate text-xs font-semibold text-foreground sm:text-sm md:text-base lg:text-lg">
+                {title}
+              </p>
             </div>
           )}
 
@@ -364,10 +521,10 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                   {/* Profile Dropdown Trigger */}
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="p-2 rounded-full hover:bg-muted transition-colors bg-secondary/15 flex items-center justify-center"
+                    className={`p-2 rounded-full border transition-colors flex items-center justify-center ${isTransparent ? "text-muted border-muted hover:bg-white hover:border-muted-foreground hover:text-muted-foreground"  : "text-muted-foreground border-muted-foreground hover:bg-muted"}`}
                     aria-label="Profile menu"
                   >
-                    <User className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6 text-foreground/85" />
+                    <User className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                   </button>
 
                   {/* Profile Dropdown Menu */}
@@ -398,7 +555,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
               )
             ) : State === "SignIn" ? (
               <div className="flex items-center text-muted-foreground text-base">
-                <span className="hidden md:inline">Don't have an account?</span>
+                <span className="hidden md:inline">Don&apos;t have an account?</span>
                 <Link
                   href="/signup"
                   className="text-primary font-semibold hover:underline ml-1.5"
@@ -417,12 +574,65 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                 </Link>
               </div>
             ) : (
-              <div className="flex text-muted-foreground">
-                <p className="text-xs md:text-sm lg:text-base">{title}</p>
-              </div>
+              <Link
+                href="/"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary md:px-4 md:text-sm"
+              >
+                <Home className="h-4 w-4" />
+                <span className="hidden sm:inline">Back home</span>
+              </Link>
+            )}
+
+            {State === "Home" && (
+              <button
+                type="button"
+                className={`rounded-full border p-2 transition lg:hidden ${
+                  isTransparent
+                    ? "border-white/20 text-white hover:bg-white/10"
+                    : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+                onClick={() => setIsMobileMenuOpen((open) => !open)}
+                aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+                aria-expanded={isMobileMenuOpen}
+              >
+                {isMobileMenuOpen ? (
+                  <Close className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
+              </button>
             )}
           </div>
         </div>
+
+        {State === "Home" && isMobileMenuOpen && (
+          <div className="border-t border-border/80 bg-background/95 px-4 py-4 shadow-lg backdrop-blur-xl lg:hidden">
+            <nav
+              aria-label="Homepage sections"
+              className="mx-auto grid max-w-screen-3xl grid-cols-2 gap-2 sm:grid-cols-3"
+            >
+              {publicNavItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  aria-current={
+                    activeSection === item.href.split("#")[1]
+                      ? "location"
+                      : undefined
+                  }
+                  className={`rounded-xl px-3 py-3 text-sm font-medium transition hover:bg-primary/8 hover:text-primary ${
+                    activeSection === item.href.split("#")[1]
+                      ? "text-primary underline decoration-2 underline-offset-4"
+                      : "text-foreground"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        )}
 
         {/* MOBILE MENU */}
         {State === "LoggedIn" && isMobileMenuOpen && (

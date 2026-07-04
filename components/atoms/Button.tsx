@@ -19,6 +19,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       type = "button",
       className = "",
       isRounded = false,
+      restrict = false,
       ...rest
     },
     ref,
@@ -33,13 +34,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       ? "p-2 md:p-3 lg:p-4" // equal padding for circle buttons (or use p-0 if you want tight)
       : size
         ? {
-            lg: "text-[16px] gap-2 py-3 px-6",
-            md: "text-[14px] gap-1.5 py-2.5 px-5",
+            lg: "text-[16px] gap-2 py-3 px-3",
+            md: "text-[14px] gap-1.5 py-2.5 px-2.5",
             sm: "text-[12px] gap-1 py-2 px-2",
           }[size]
         : "text-[12px] gap-1 py-2 px-4 " +
-          "md:text-[14px] md:gap-1.5 md:py-2.5 md:px-5 " +
-          "lg:text-[16px] lg:gap-2 lg:py-3 lg:px-6";
+          "md:text-[14px] md:gap-1.5 md:py-2.5 md:px-2.5 " +
+          "lg:text-[16px] lg:gap-2 lg:py-3 lg:px-3";
 
     return (
       <button
@@ -48,19 +49,24 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         onClick={onClick}
         disabled={isDisabled}
         className={`
-          ${baseClasses}
-          ${radiusClasses}
-          ${sizeClasses}
-          ${textColor}
-          ${backgroundColor}
-          ${borderColor ? `border ${borderColor}` : ""}
-          ${className}
-        `}
+    ${baseClasses}
+    ${radiusClasses}
+    ${sizeClasses}
+    ${textColor}
+    ${backgroundColor}
+    ${borderColor ? `border ${borderColor}` : ""}
+    ${restrict ? "leading-none" : ""}
+    ${className}
+  `}
         {...rest}
       >
-        {leftIcon && <span className="">{leftIcon}</span>}
-        {children ? children : text}
-        {rightIcon && <span className="">{rightIcon}</span>}
+        {leftIcon && <span>{leftIcon}</span>}
+
+        <span className={restrict ? "line-clamp-1 leading-none" : ""}>
+          {children ? children : text}
+        </span>
+
+        {rightIcon && <span>{rightIcon}</span>}
       </button>
     );
   },
