@@ -24,6 +24,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) => {
+    const hasContent = Boolean(children ?? text);
     const baseClasses = `flex py-2 md:py-3 lg:py-4 items-center justify-center rounded-[8px] transition-colors duration-200 hover:brightness-90 cursor-pointer ${
       isDisabled ? "opacity-50 cursor-not-allowed" : ""
     }`;
@@ -60,13 +61,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   `}
         {...rest}
       >
-        {leftIcon && <span>{leftIcon}</span>}
+        {leftIcon && <span className={hasContent ? "" : "mx-auto"}>{leftIcon}</span>}
 
-        <span className={restrict ? "line-clamp-1 leading-none" : ""}>
-          {children ? children : text}
-        </span>
+        {hasContent && (
+          <span className={restrict ? "line-clamp-1 leading-none" : ""}>
+            {children ? children : text}
+          </span>
+        )}
 
-        {rightIcon && <span>{rightIcon}</span>}
+        {rightIcon && <span className={hasContent ? "" : "mx-auto"}>{rightIcon}</span>}
       </button>
     );
   },

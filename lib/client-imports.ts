@@ -33,12 +33,10 @@ export { default as CategoryProgress } from "@/components/ui/CategoryProgress";
 export { default as PerformanceOverview } from "@/components/ui/PerformanceOverview";
 export { default as RecentScores } from "@/components/ui/RecentScores";
 export { default as SummaryCards } from "@/components/ui/SummaryCards";
-export { default as AddEditQuestion } from "@/components/ui/AddEditQuestion";
-export { default as DeletePopup } from "@/components/ui/DeletePopup";
+export { default as Modal } from "@/components/atoms/Modal";
 export { default as ScoreRecord } from "@/components/ui/ScoreRecord";
 export { default as PauseModal } from "@/components/ui/PauseQuiz";
 export { default as RecentTestsInfinite } from "@/components/ui/RecentTests";
-export { default as AddEditAffiliate } from '@/components/ui/AddEditAffiliateItem';
 
 
 //Atom Components
