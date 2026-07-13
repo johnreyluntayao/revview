@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { Toaster } from 'sonner';
+import { Analytics } from "@vercel/analytics/next"
 
 import { AuthProvider } from "@/components/auth/AuthProvider";
 
@@ -39,6 +40,7 @@ export default function RootLayout({
       >
         <AuthProvider>
           {children}
+          <Analytics/>
           <Toaster 
             position="top-right"
             richColors       
