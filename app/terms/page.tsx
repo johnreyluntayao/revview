@@ -1,7 +1,23 @@
+import type { Metadata } from "next";
 import { Footer, NavBar } from "@/lib/client-imports";
 import LegalDocument, {
   type LegalSection,
 } from "@/components/ui/LegalDocument";
+
+export const metadata: Metadata = {
+  title: "Terms & Conditions",
+  description:
+    "Review RevView's Terms & Conditions for using quizzes, progress tools, feedback features, and recommended study products.",
+  alternates: {
+    canonical: "/terms",
+  },
+  openGraph: {
+    url: "/terms",
+    title: "Terms & Conditions | RevView",
+    description:
+      "Understand the rules and responsibilities that apply when using RevView.",
+  },
+};
 
 const termsSections: LegalSection[] = [
   {
@@ -110,8 +126,8 @@ const termsSections: LegalSection[] = [
           delivery, returns, warranties, and customer support.
         </p>
         <p>
-          Your transaction is with that third party and is governed by its
-          terms and privacy practices. Review those terms before purchasing.
+          Your transaction is with that third party and is governed by its terms
+          and privacy practices. Review those terms before purchasing.
         </p>
       </>
     ),
@@ -140,15 +156,15 @@ const termsSections: LegalSection[] = [
     content: (
       <>
         <p>
-          To the extent permitted by law, RevView is provided “as is” and “as
-          available,” without warranties that the content will be complete,
+          To the extent permitted by law, RevView is provided &ldquo;as is&rdquo; and &ldquo;as
+          available,&rdquo; without warranties that the content will be complete,
           accurate, or suitable for a particular purpose.
         </p>
         <p>
           To the extent permitted by law, RevView will not be responsible for
-          indirect, incidental, special, consequential, or punitive loss, or
-          for decisions, exam outcomes, or third-party transactions based on
-          use of the platform. Rights that cannot legally be excluded remain
+          indirect, incidental, special, consequential, or punitive loss, or for
+          decisions, exam outcomes, or third-party transactions based on use of
+          the platform. Rights that cannot legally be excluded remain
           unaffected.
         </p>
       </>
@@ -181,7 +197,7 @@ export default function TermsPage() {
       <LegalDocument
         eyebrow="The rules that keep RevView useful"
         title="Terms & Conditions"
-        summary="These terms explain how you may use RevView’s quizzes, progress tools, feedback features, and recommended study products, along with the responsibilities shared by you and the platform."
+        summary="These terms explain how you may use RevView's quizzes, progress tools, feedback features, and recommended study products, along with the responsibilities shared by you and the platform."
         effectiveDate="July 4, 2026"
         sections={termsSections}
         relatedHref="/privacy"

@@ -1,7 +1,23 @@
+import type { Metadata } from "next";
 import { Footer, NavBar } from "@/lib/client-imports";
 import LegalDocument, {
   type LegalSection,
 } from "@/components/ui/LegalDocument";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "Read RevView's Privacy Policy to understand what information is processed, how it is used, when it may be shared, and what choices are available to users.",
+  alternates: {
+    canonical: "/privacy",
+  },
+  openGraph: {
+    url: "/privacy",
+    title: "Privacy Policy | RevView",
+    description:
+      "Learn how RevView handles account, quiz, progress, analytics, and support information.",
+  },
+};
 
 const privacySections: LegalSection[] = [
   {
