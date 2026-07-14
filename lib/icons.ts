@@ -58,4 +58,5 @@ export {
     CornerRightUp as ExternalLink,
     Waypoints as Affiliate,
     ExternalLink as Redirect,
+    Newspaper as Blog,
 } from 'lucide-react';

@@ -21,6 +21,7 @@ const nextConfig: NextConfig = {
       "/feedbacks/:path*",
       "/login",
       "/manage-questions/:path*",
+      "/manage-blogs/:path*",
       "/quiz/:path*",
       "/quiz-result/:path*",
       "/quiz-selection/:path*",

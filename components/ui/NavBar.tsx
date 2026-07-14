@@ -17,6 +17,7 @@ import {
   Close,
   Username as User,
   Affiliate,
+  Blog,
   Home,
 } from "@/lib/icons";
 import { toast } from "sonner";
@@ -191,6 +192,8 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
       "coverage",
       "how-it-works",
       "products",
+      "coming-soon",
+      "blog",
     ];
     let animationFrame = 0;
 
@@ -226,6 +229,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
     { href: "/admin", label: "Dashboard", icon: ProgressTracking },
     { href: "/feedbacks", label: "Feedback", icon: ShowFeedback },
     { href: "/manage-questions", label: "Questions", icon: Questions },
+    { href: "/manage-blogs", label: "Blogs", icon: Blog },
     { href: "/admin-account", label: "Account Settings", icon: AccountSettings },
     { href: "/affiliate", label: "Manage Affiliate", icon: Affiliate },
   ];
@@ -236,6 +240,8 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
     { href: "/#coverage", label: "Coverage" },
     { href: "/#how-it-works", label: "How it works" },
     { href: "/#products", label: "Products" },
+    { href: "/#coming-soon", label: "Coming soon" },
+    { href: "/#blog", label: "Blog" },
   ];
 
   const hasScrollBehavior = State === "Home" || State === "Default";
@@ -375,16 +381,16 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
 
           {/* CENTER DESKTOP NAV – only when logged in */}
           {State === "LoggedIn" && (
-            <div className="hidden lg:flex items-center justify-center gap-1.5 lg:gap-2 absolute left-1/2 -translate-x-1/2">
+            <div className="absolute left-1/2 hidden -translate-x-1/2 items-center justify-center gap-0.5 xl:flex 2xl:gap-2">
               {navItems.map((item) => {
-                const isActive = pathname === item.href;
+                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     className={`
-                      flex items-center gap-1.5 
-                      px-4 py-2 text-base font-medium 
+                      flex items-center gap-1.5 whitespace-nowrap
+                      px-2.5 py-2 text-sm font-medium 2xl:px-4 2xl:text-base
                       transition-colors duration-150
                       ${
                         isActive
@@ -402,7 +408,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
           )}
 
           {State === "Home" && (
-            <div className="absolute left-1/2 hidden -translate-x-1/2 items-center justify-center gap-1 lg:flex xl:gap-2">
+            <div className="absolute left-1/2 hidden -translate-x-1/2 items-center justify-center gap-1 xl:flex xl:gap-2">
               {publicNavItems.map((item) => {
                 const sectionId = item.href.split("#")[1];
                 const isActive = activeSection === sectionId;
@@ -468,8 +474,8 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                   onClick={handleLogout}
                   disabled={isLoggingOut}
                   className={`
-                    hidden lg:flex items-center gap-2.5 px-4 py-2 
-                    text-base font-medium transition-opacity bg-destructive/10 rounded-lg
+                    hidden xl:flex items-center gap-2.5 px-3 2xl:px-4 py-2
+                    text-sm 2xl:text-base font-medium transition-opacity bg-destructive/10 rounded-lg
                     ${
                       isLoggingOut
                         ? "opacity-50 cursor-not-allowed"
@@ -483,7 +489,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
 
                 {/* Mobile Hamburger */}
                 <button
-                  className="lg:hidden p-2 -mr-2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="-mr-2 p-2 text-muted-foreground transition-colors hover:text-foreground xl:hidden"
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   aria-label="Toggle menu"
                 >
@@ -586,7 +592,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
             {State === "Home" && (
               <button
                 type="button"
-                className={`rounded-full border p-2 transition lg:hidden ${
+                className={`rounded-full border p-2 transition xl:hidden ${
                   isTransparent
                     ? "border-white/20 text-white hover:bg-white/10"
                     : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -606,7 +612,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
         </div>
 
         {State === "Home" && isMobileMenuOpen && (
-          <div className="border-t border-border/80 bg-background/95 px-4 py-4 shadow-lg backdrop-blur-xl lg:hidden">
+          <div className="border-t border-border/80 bg-background/95 px-4 py-4 shadow-lg backdrop-blur-xl xl:hidden">
             <nav
               aria-label="Homepage sections"
               className="mx-auto grid max-w-screen-3xl grid-cols-2 gap-2 sm:grid-cols-3"
@@ -636,10 +642,10 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
 
         {/* MOBILE MENU */}
         {State === "LoggedIn" && isMobileMenuOpen && (
-          <div className="lg:hidden fixed h-screen top-16 left-0 right-0 bottom-0 z-50 bg-white/75 border-t border-border animate-in fade-in slide-in-from-top-5 duration-200 transition-all">
-            <div className="mx-auto px-4 py-6 flex flex-col gap-2 h-auto bg-background/95 border border-border">
+          <div className="fixed inset-x-0 bottom-0 top-16 z-50 overflow-y-auto border-t border-border bg-white/75 transition-all animate-in fade-in slide-in-from-top-5 duration-200 lg:top-20 xl:hidden">
+            <div className="mx-auto flex min-h-full flex-col gap-2 border-border bg-background/95 px-4 py-5 sm:px-6">
               {navItems.map((item) => {
-                const isActive = pathname === item.href;
+                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
                 return (
                   <Link
                     key={item.href}
