@@ -73,15 +73,15 @@ export default function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-60 flex items-center justify-center bg-black/60 p-0 backdrop-blur-sm sm:p-4"
       onClick={handleBackdropClick}
     >
       <div
         ref={modalRef}
-        className={`w-full overflow-hidden rounded-2xl border border-border bg-background shadow-2xl ${sizeClasses[size]} ${panelClassName}`}
+        className={`flex max-h-[100dvh] w-full flex-col overflow-hidden rounded-none border border-border bg-background shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:rounded-2xl ${sizeClasses[size]} ${panelClassName}`}
       >
         {(title || showCloseButton) && (
-          <div className="flex items-start justify-between border-b border-border px-4 py-4 sm:px-6 sm:py-5">
+          <div className="flex shrink-0 items-start justify-between border-b border-border px-4 py-4 sm:px-6 sm:py-5">
             <div className="min-w-0">
               {typeof title === "string" ? (
                 <h2 className="text-lg font-semibold text-foreground">{title}</h2>
@@ -105,10 +105,10 @@ export default function Modal({
           </div>
         )}
 
-        <div className={`overflow-y-auto ${contentClassName}`}>{children}</div>
+        <div className={`min-h-0 flex-1 overscroll-contain overflow-y-auto ${contentClassName}`}>{children}</div>
 
         {footer ? (
-          <div className="border-t border-border bg-background/90 px-4 py-4 sm:px-6">
+          <div className="shrink-0 border-t border-border bg-background/95 px-4 py-3 sm:px-6 sm:py-4">
             {footer}
           </div>
         ) : null}
