@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
+import Image from "next/image";
 import { Upload } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
 
@@ -8,7 +9,7 @@ interface InsertImageProps {
   label?: string;
   value: string;
   onChange: (url: string) => void;
-  folder?: "img_question" | "img_options" | "img_explanation";
+  folder?: "img_question" | "img_options" | "img_explanation" | "blog_covers";
   placeholder?: string;
   maxSizeMB?: number;
   variant?: "default" | "compact";
@@ -27,7 +28,7 @@ const InsertImage: React.FC<InsertImageProps> = ({
 }) => {
   const supabase = createClient();
 
-  const [preview, setPreview] = useState<string | null>(value || null);
+  const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
 
@@ -87,10 +88,6 @@ const InsertImage: React.FC<InsertImageProps> = ({
     await uploadFile(file);
   };
 
-  useEffect(() => {
-    setPreview(value || null);
-  }, [value]);
-
   const clearImage = () => {
     setPreview(null);
     onChange("");
@@ -131,6 +128,7 @@ const InsertImage: React.FC<InsertImageProps> = ({
   };
 
   const isCompact = variant === "compact";
+  const displayedPreview = preview ?? (value || null);
 
   return (
     <div className="space-y-2">
@@ -177,11 +175,14 @@ const InsertImage: React.FC<InsertImageProps> = ({
         />
 
         {/* Preview Mode */}
-        {preview ? (
+        {displayedPreview ? (
           <div className="relative group">
-            <img
-              src={preview}
+            <Image
+              src={displayedPreview}
               alt="preview"
+              width={640}
+              height={360}
+              unoptimized
               className={`
                 w-auto place-self-center h-auto rounded-lg
                 ${isCompact ? "max-h-20" : "max-h-40"}
