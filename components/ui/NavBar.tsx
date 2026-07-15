@@ -487,14 +487,17 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
 
                 {/* Mobile Hamburger */}
                 <button
-                  className="-mr-2 p-2 text-muted-foreground transition-colors hover:text-foreground xl:hidden"
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  aria-label="Toggle menu"
+                  type="button"
+                  className="rounded-full border border-border p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground xl:hidden"
+                  onClick={() => setIsMobileMenuOpen((open) => !open)}
+                  aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+                  aria-expanded={isMobileMenuOpen}
+                  aria-controls="admin-mobile-navigation"
                 >
                   {isMobileMenuOpen ? (
-                    <Close className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
+                    <Close className="h-5 w-5" />
                   ) : (
-                    <Menu className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
+                    <Menu className="h-5 w-5" />
                   )}
                 </button>
               </>
@@ -642,59 +645,57 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
           </div>
         )}
 
-        {/* MOBILE MENU */}
-        {State === "LoggedIn" && isMobileMenuOpen && (
-          <div className="fixed inset-x-0 bottom-0 top-16 z-50 overflow-y-auto border-t border-border bg-white/75 transition-all animate-in fade-in slide-in-from-top-5 duration-200 lg:top-20 xl:hidden">
-            <div className="mx-auto flex min-h-full flex-col gap-2 border-border bg-background/95 px-4 py-5 sm:px-6">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`
-                      flex items-center gap-2 md:gap-3 px-4 md:px-5 py-3 md:py-4 font-medium 
-                      rounded-lg transition-colors text-sm md:text-base
-                      ${
-                        isActive
-                          ? "bg-primary/10 text-primary"
-                          : "text-foreground hover:bg-muted"
-                      }
-                    `}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <item.icon className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-
-              {/* Mobile Profile Section (My Account + Logout) */}
-              <div className="mt-4 pt-4 border-t border-border">
-
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  disabled={isLoggingOut}
-                  className={`
-                    w-full flex items-center gap-3 px-4 py-3 text-sm md:text-base font-medium rounded-lg bg-destructive/10 mt-2
-                    ${
-                      isLoggingOut
-                        ? "opacity-50 cursor-not-allowed"
-                        : "text-destructive"
-                    }
-                  `}
-                >
-                  <Logout className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
-                  <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </nav>
+
+      {/* Logged-in mobile and tablet navigation must sit outside the transformed header. */}
+      {State === "LoggedIn" && isMobileMenuOpen && (
+        <div
+          id="admin-mobile-navigation"
+          className="fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto border-t border-border bg-background/95 shadow-xl backdrop-blur-xl animate-in fade-in slide-in-from-top-3 duration-300 lg:top-20 xl:hidden"
+        >
+          <nav
+            aria-label="Admin navigation"
+            className="mx-auto flex min-h-full max-w-screen-3xl flex-col gap-1.5 px-4 py-5 sm:px-6 lg:px-8"
+          >
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`flex items-center gap-3 rounded-xl px-4 py-3.5 text-sm font-medium transition-colors md:px-5 md:py-4 md:text-base ${
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-muted"
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+
+            <div className="mt-auto border-t border-border pt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  handleLogout();
+                  setIsMobileMenuOpen(false);
+                }}
+                disabled={isLoggingOut}
+                className={`flex w-full items-center gap-3 rounded-xl bg-destructive/10 px-4 py-3.5 text-sm font-medium text-destructive transition hover:bg-destructive/15 md:px-5 md:py-4 md:text-base ${
+                  isLoggingOut ? "cursor-not-allowed opacity-50" : ""
+                }`}
+              >
+                <Logout className="h-5 w-5 shrink-0" />
+                <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+              </button>
+            </div>
+          </nav>
+        </div>
+      )}
 
       {State === "OnQuiz" && (
         <PauseModal
