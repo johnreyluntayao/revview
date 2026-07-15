@@ -223,6 +223,7 @@ export interface FeedbackProps {
   status?: "resolved" | "pending";
   onResolveToggle: () => void;
   onDelete: () => void;
+  isUpdating?: boolean;
 }
 
 interface ListItem {
