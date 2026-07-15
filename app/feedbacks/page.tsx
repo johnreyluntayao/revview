@@ -1,12 +1,12 @@
 import { ManageFeedback, NavBar } from "@/lib/client-imports";
 
-const page = () => {
+const FeedbackManagementPage = () => {
   return (
-    <main className="overflow-hidden">
-        <NavBar State="LoggedIn"/>
-        <ManageFeedback />
-    </main>
-  )
-}
+    <>
+      <NavBar State="LoggedIn" />
+      <ManageFeedback />
+    </>
+  );
+};
 
-export default page
+export default FeedbackManagementPage;
