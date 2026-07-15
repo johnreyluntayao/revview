@@ -9,10 +9,10 @@ export const metadata: Metadata = {
   description:
     "Review RevView's Terms & Conditions for using quizzes, progress tools, feedback features, and recommended study products.",
   alternates: {
-    canonical: "/terms",
+    canonical: "/terms-and-conditions",
   },
   openGraph: {
-    url: "/terms",
+    url: "/terms-and-conditions",
     title: "Terms & Conditions | RevView",
     description:
       "Understand the rules and responsibilities that apply when using RevView.",
@@ -200,7 +200,7 @@ export default function TermsPage() {
         summary="These terms explain how you may use RevView's quizzes, progress tools, feedback features, and recommended study products, along with the responsibilities shared by you and the platform."
         effectiveDate="July 4, 2026"
         sections={termsSections}
-        relatedHref="/privacy"
+        relatedHref="/privacy-policy"
         relatedLabel="Privacy Policy"
       />
       <Footer />
