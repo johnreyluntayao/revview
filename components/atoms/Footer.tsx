@@ -3,8 +3,8 @@ import Link from "next/link";
 
 const footerData = {
   menuItems: [
-    { name: "Privacy Policy", href: "/privacy" },
-    { name: "Terms & Conditions", href: "/terms" },
+    { name: "Privacy Policy", href: "/privacy-policy" },
+    { name: "Terms & Conditions", href: "/terms-and-conditions" },
   ],
 
   socialLinks: [
@@ -19,7 +19,7 @@ export default function Footer() {
 
   return (
     <footer className="w-full bg-hero2 px-4 py-10 text-white md:px-6 md:py-12 lg:px-8">
-      <div className="mx-auto flex max-w-screen-3xl flex-col gap-8 md:flex-row md:items-center md:justify-between">
+      <div className="mx-auto flex max-w-screen-3xl flex-col items-center gap-8 text-center md:flex-row md:justify-between md:text-left">
         <Link href="/" aria-label="RevView homepage" className="inline-flex w-fit">
           <Image
             src="/Long-logo-white.svg"
@@ -34,7 +34,7 @@ export default function Footer() {
 
         <nav
           aria-label="Footer navigation"
-          className="flex flex-wrap gap-x-8 gap-y-3 text-sm text-primary-foreground/80"
+          className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm text-primary-foreground/80"
         >
           {footerData.menuItems.map((item) => (
             <Link
@@ -47,7 +47,7 @@ export default function Footer() {
           ))}
         </nav>
 
-        <div className="flex gap-3">
+        <div className="flex justify-center gap-3">
           {footerData.socialLinks.map((social) => (
             <a
               key={social.name}

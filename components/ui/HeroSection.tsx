@@ -55,11 +55,11 @@ const HeroSection = () => {
   return (
     <section id="home" className="scroll-mt-16 lg:scroll-mt-20">
       <div
-        className="w-full min-h-screen
+        className="w-full min-h-[100svh]
         grid grid-cols-1 lg:grid-cols-2 
         bg-linear-to-r from-hero1 to-hero2
         items-center
-        py-12 md:py-20 lg:py-24
+        pb-12 pt-24 md:pb-20 md:pt-28 lg:py-24
         px-4 md:px-6 lg:px-8
         gap-8"
       >

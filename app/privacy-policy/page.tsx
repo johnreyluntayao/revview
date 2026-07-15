@@ -9,10 +9,10 @@ export const metadata: Metadata = {
   description:
     "Read RevView's Privacy Policy to understand what information is processed, how it is used, when it may be shared, and what choices are available to users.",
   alternates: {
-    canonical: "/privacy",
+    canonical: "/privacy-policy",
   },
   openGraph: {
-    url: "/privacy",
+    url: "/privacy-policy",
     title: "Privacy Policy | RevView",
     description:
       "Learn how RevView handles account, quiz, progress, analytics, and support information.",
@@ -181,7 +181,7 @@ export default function PrivacyPage() {
         summary="This policy explains what information RevView processes, why we use it, when it may be shared, and the choices available to you while using our exam-preparation platform."
         effectiveDate="July 4, 2026"
         sections={privacySections}
-        relatedHref="/terms"
+        relatedHref="/terms-and-conditions"
         relatedLabel="Terms & Conditions"
       />
       <Footer />

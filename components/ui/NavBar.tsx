@@ -357,11 +357,11 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
             : "border-b border-border/80 bg-background/90 shadow-sm backdrop-blur-xl"
         }`}
       >
-        <div className="relative mx-auto flex h-16 max-w-screen-3xl items-center justify-between px-4 md:px-6 lg:h-20 lg:px-8">
+        <div className="relative mx-auto flex min-h-16 max-w-screen-3xl flex-wrap items-center justify-between gap-y-1 px-4 py-2 md:flex-nowrap md:px-6 lg:min-h-20 lg:px-8">
           {/* Logo + Brand */}
           <Link
             href={`${State === "OnQuiz" ? "" : "/"}`}
-            className={`${State === "OnQuiz" ? "hidden md:block" : ""}`}
+            className="relative z-10"
           >
             <Image
               src={
@@ -372,9 +372,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
               alt="RevView Logo"
               width={40}
               height={40}
-              className={`h-auto lg:w-40 ${
-                State === "Default" ? "w-20 sm:w-30" : "w-30"
-              }`}
+              className="h-auto w-30 lg:w-40"
               loading="eager"
             />
           </Link>
@@ -399,7 +397,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                       }
                     `}
                   >
-                    <item.icon className="w-5 h-5" />
+                    <item.icon className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                     <span>{item.label}</span>
                   </Link>
                 );
@@ -438,8 +436,8 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
           )}
 
           {State === "Default" && (
-            <div className="pointer-events-none absolute left-1/2 w-[48%] -translate-x-1/2 text-center sm:w-auto sm:max-w-[55%]">
-              <p className="truncate text-xs font-semibold text-foreground sm:text-sm md:text-base lg:text-lg">
+            <div className="pointer-events-none absolute inset-y-0 left-1/2 z-0 hidden w-1/2 min-w-0 -translate-x-1/2 items-center justify-center md:flex md:max-w-xl">
+              <p className="w-full truncate text-center text-base font-semibold text-foreground lg:text-lg">
                 {title}
               </p>
             </div>
@@ -447,13 +445,13 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
 
           {/* Quiz Title in Center */}
           {State === "OnQuiz" && (
-            <div className="flex-1 text-start md:text-center text-sm md:text-base lg:text-lg font-bold text-foreground">
+            <div className="hidden flex-1 text-center text-base font-bold text-foreground md:block lg:text-lg">
               {quizCategoryName}
             </div>
           )}
 
           {/* RIGHT SIDE */}
-          <div className="flex items-center gap-2 md:gap-3 lg:gap-4">
+          <div className="relative z-10 flex items-center gap-2 md:gap-3 lg:gap-4">
             {State === "OnQuiz" && remainingSeconds !== null ? (
               <>
                 <CountDownTimer
@@ -484,19 +482,22 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                   `}
                 >
                   <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
-                  <Logout className="w-4 h-4" />
+                  <Logout className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                 </button>
 
                 {/* Mobile Hamburger */}
                 <button
-                  className="-mr-2 p-2 text-muted-foreground transition-colors hover:text-foreground xl:hidden"
-                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  aria-label="Toggle menu"
+                  type="button"
+                  className="rounded-full border border-border p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground xl:hidden"
+                  onClick={() => setIsMobileMenuOpen((open) => !open)}
+                  aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+                  aria-expanded={isMobileMenuOpen}
+                  aria-controls="admin-mobile-navigation"
                 >
                   {isMobileMenuOpen ? (
-                    <Close className="w-6 h-6" />
+                    <Close className="h-5 w-5" />
                   ) : (
-                    <Menu className="w-6 h-6" />
+                    <Menu className="h-5 w-5" />
                   )}
                 </button>
               </>
@@ -541,7 +542,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                         className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-muted transition-colors"
                         onClick={() => setIsProfileOpen(false)}
                       >
-                        <User className="w-4 h-4" />
+                        <User className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                         <span>My Account</span>
                       </Link>
                       <button
@@ -552,7 +553,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                         disabled={isLoggingOut}
                         className="w-full flex items-center gap-3 px-4 py-3 text-sm text-destructive hover:bg-muted transition-colors disabled:opacity-50"
                       >
-                        <Logout className="w-4 h-4" />
+                        <Logout className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                         <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
                       </button>
                     </div>
@@ -584,7 +585,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                 href="/"
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary md:px-4 md:text-sm"
               >
-                <Home className="h-4 w-4" />
+                <Home className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                 <span className="hidden sm:inline">Back home</span>
               </Link>
             )}
@@ -592,23 +593,27 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
             {State === "Home" && (
               <button
                 type="button"
-                className={`rounded-full border p-2 transition xl:hidden ${
-                  isTransparent
-                    ? "border-white/20 text-white hover:bg-white/10"
-                    : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
+                className={`rounded-full border p-2 transition xl:hidden ${isTransparent ? "text-muted border-muted hover:bg-white hover:border-muted-foreground hover:text-muted-foreground"  : "text-muted-foreground border-muted-foreground hover:bg-muted"}`}
                 onClick={() => setIsMobileMenuOpen((open) => !open)}
                 aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
                 aria-expanded={isMobileMenuOpen}
               >
                 {isMobileMenuOpen ? (
-                  <Close className="h-5 w-5" />
+                  <Close className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                 ) : (
-                  <Menu className="h-5 w-5" />
+                  <Menu className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                 )}
               </button>
             )}
           </div>
+
+          {(State === "Default" || State === "OnQuiz") && (
+            <div className="flex w-full basis-full items-center justify-center px-2 pb-0.5 pt-1 md:hidden">
+              <p className="w-full text-center text-sm font-semibold leading-snug text-foreground">
+                {State === "OnQuiz" ? quizCategoryName : title}
+              </p>
+            </div>
+          )}
         </div>
 
         {State === "Home" && isMobileMenuOpen && (
@@ -640,59 +645,57 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
           </div>
         )}
 
-        {/* MOBILE MENU */}
-        {State === "LoggedIn" && isMobileMenuOpen && (
-          <div className="fixed inset-x-0 bottom-0 top-16 z-50 overflow-y-auto border-t border-border bg-white/75 transition-all animate-in fade-in slide-in-from-top-5 duration-200 lg:top-20 xl:hidden">
-            <div className="mx-auto flex min-h-full flex-col gap-2 border-border bg-background/95 px-4 py-5 sm:px-6">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`
-                      flex items-center gap-2 md:gap-3 px-4 md:px-5 py-3 md:py-4 font-medium 
-                      rounded-lg transition-colors text-sm md:text-base
-                      ${
-                        isActive
-                          ? "bg-primary/10 text-primary"
-                          : "text-foreground hover:bg-muted"
-                      }
-                    `}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <item.icon className="w-4 h-4 md:w-5 md:h-5" />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-
-              {/* Mobile Profile Section (My Account + Logout) */}
-              <div className="mt-4 pt-4 border-t border-border">
-
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  disabled={isLoggingOut}
-                  className={`
-                    w-full flex items-center gap-3 px-4 py-3 text-sm md:text-base font-medium rounded-lg bg-destructive/10 mt-2
-                    ${
-                      isLoggingOut
-                        ? "opacity-50 cursor-not-allowed"
-                        : "text-destructive"
-                    }
-                  `}
-                >
-                  <Logout className="w-5 h-5" />
-                  <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </nav>
+
+      {/* Logged-in mobile and tablet navigation must sit outside the transformed header. */}
+      {State === "LoggedIn" && isMobileMenuOpen && (
+        <div
+          id="admin-mobile-navigation"
+          className="fixed inset-x-0 bottom-0 top-16 z-40 overflow-y-auto border-t border-border bg-background/95 shadow-xl backdrop-blur-xl animate-in fade-in slide-in-from-top-3 duration-300 lg:top-20 xl:hidden"
+        >
+          <nav
+            aria-label="Admin navigation"
+            className="mx-auto flex min-h-full max-w-screen-3xl flex-col gap-1.5 px-4 py-5 sm:px-6 lg:px-8"
+          >
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`flex items-center gap-3 rounded-xl px-4 py-3.5 text-sm font-medium transition-colors md:px-5 md:py-4 md:text-base ${
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-foreground hover:bg-muted"
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+
+            <div className="mt-auto border-t border-border pt-4">
+              <button
+                type="button"
+                onClick={() => {
+                  handleLogout();
+                  setIsMobileMenuOpen(false);
+                }}
+                disabled={isLoggingOut}
+                className={`flex w-full items-center gap-3 rounded-xl bg-destructive/10 px-4 py-3.5 text-sm font-medium text-destructive transition hover:bg-destructive/15 md:px-5 md:py-4 md:text-base ${
+                  isLoggingOut ? "cursor-not-allowed opacity-50" : ""
+                }`}
+              >
+                <Logout className="h-5 w-5 shrink-0" />
+                <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+              </button>
+            </div>
+          </nav>
+        </div>
+      )}
 
       {State === "OnQuiz" && (
         <PauseModal
