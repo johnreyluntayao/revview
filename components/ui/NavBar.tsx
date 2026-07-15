@@ -357,11 +357,11 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
             : "border-b border-border/80 bg-background/90 shadow-sm backdrop-blur-xl"
         }`}
       >
-        <div className="relative mx-auto flex h-16 max-w-screen-3xl items-center justify-between px-4 md:px-6 lg:h-20 lg:px-8">
+        <div className="relative mx-auto flex min-h-16 max-w-screen-3xl flex-wrap items-center justify-between gap-y-1 px-4 py-2 md:flex-nowrap md:px-6 lg:min-h-20 lg:px-8">
           {/* Logo + Brand */}
           <Link
             href={`${State === "OnQuiz" ? "" : "/"}`}
-            className={`${State === "OnQuiz" ? "hidden md:block" : ""}`}
+            className="relative z-10"
           >
             <Image
               src={
@@ -372,9 +372,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
               alt="RevView Logo"
               width={40}
               height={40}
-              className={`h-auto lg:w-40 ${
-                State === "Default" ? "w-20 sm:w-30" : "w-30"
-              }`}
+              className="h-auto w-30 lg:w-40"
               loading="eager"
             />
           </Link>
@@ -399,7 +397,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                       }
                     `}
                   >
-                    <item.icon className="w-5 h-5" />
+                    <item.icon className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                     <span>{item.label}</span>
                   </Link>
                 );
@@ -438,8 +436,8 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
           )}
 
           {State === "Default" && (
-            <div className="pointer-events-none absolute left-1/2 w-[48%] -translate-x-1/2 text-center sm:w-auto sm:max-w-[55%]">
-              <p className="truncate text-xs font-semibold text-foreground sm:text-sm md:text-base lg:text-lg">
+            <div className="pointer-events-none absolute inset-y-0 left-1/2 z-0 hidden w-1/2 min-w-0 -translate-x-1/2 items-center justify-center md:flex md:max-w-xl">
+              <p className="w-full truncate text-center text-base font-semibold text-foreground lg:text-lg">
                 {title}
               </p>
             </div>
@@ -447,13 +445,13 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
 
           {/* Quiz Title in Center */}
           {State === "OnQuiz" && (
-            <div className="flex-1 text-start md:text-center text-sm md:text-base lg:text-lg font-bold text-foreground">
+            <div className="hidden flex-1 text-center text-base font-bold text-foreground md:block lg:text-lg">
               {quizCategoryName}
             </div>
           )}
 
           {/* RIGHT SIDE */}
-          <div className="flex items-center gap-2 md:gap-3 lg:gap-4">
+          <div className="relative z-10 flex items-center gap-2 md:gap-3 lg:gap-4">
             {State === "OnQuiz" && remainingSeconds !== null ? (
               <>
                 <CountDownTimer
@@ -484,7 +482,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                   `}
                 >
                   <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
-                  <Logout className="w-4 h-4" />
+                  <Logout className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                 </button>
 
                 {/* Mobile Hamburger */}
@@ -494,9 +492,9 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                   aria-label="Toggle menu"
                 >
                   {isMobileMenuOpen ? (
-                    <Close className="w-6 h-6" />
+                    <Close className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                   ) : (
-                    <Menu className="w-6 h-6" />
+                    <Menu className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                   )}
                 </button>
               </>
@@ -541,7 +539,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                         className="flex items-center gap-3 px-4 py-3 text-sm hover:bg-muted transition-colors"
                         onClick={() => setIsProfileOpen(false)}
                       >
-                        <User className="w-4 h-4" />
+                        <User className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                         <span>My Account</span>
                       </Link>
                       <button
@@ -552,7 +550,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                         disabled={isLoggingOut}
                         className="w-full flex items-center gap-3 px-4 py-3 text-sm text-destructive hover:bg-muted transition-colors disabled:opacity-50"
                       >
-                        <Logout className="w-4 h-4" />
+                        <Logout className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                         <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
                       </button>
                     </div>
@@ -584,7 +582,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                 href="/"
                 className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2 text-xs font-semibold text-muted-foreground transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary md:px-4 md:text-sm"
               >
-                <Home className="h-4 w-4" />
+                <Home className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                 <span className="hidden sm:inline">Back home</span>
               </Link>
             )}
@@ -592,23 +590,27 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
             {State === "Home" && (
               <button
                 type="button"
-                className={`rounded-full border p-2 transition xl:hidden ${
-                  isTransparent
-                    ? "border-white/20 text-white hover:bg-white/10"
-                    : "border-border text-muted-foreground hover:bg-muted hover:text-foreground"
-                }`}
+                className={`rounded-full border p-2 transition xl:hidden ${isTransparent ? "text-muted border-muted hover:bg-white hover:border-muted-foreground hover:text-muted-foreground"  : "text-muted-foreground border-muted-foreground hover:bg-muted"}`}
                 onClick={() => setIsMobileMenuOpen((open) => !open)}
                 aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
                 aria-expanded={isMobileMenuOpen}
               >
                 {isMobileMenuOpen ? (
-                  <Close className="h-5 w-5" />
+                  <Close className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                 ) : (
-                  <Menu className="h-5 w-5" />
+                  <Menu className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                 )}
               </button>
             )}
           </div>
+
+          {(State === "Default" || State === "OnQuiz") && (
+            <div className="flex w-full basis-full items-center justify-center px-2 pb-0.5 pt-1 md:hidden">
+              <p className="w-full text-center text-sm font-semibold leading-snug text-foreground">
+                {State === "OnQuiz" ? quizCategoryName : title}
+              </p>
+            </div>
+          )}
         </div>
 
         {State === "Home" && isMobileMenuOpen && (
@@ -661,7 +663,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                     `}
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    <item.icon className="w-4 h-4 md:w-5 md:h-5" />
+                    <item.icon className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                     <span>{item.label}</span>
                   </Link>
                 );
@@ -685,7 +687,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                     }
                   `}
                 >
-                  <Logout className="w-5 h-5" />
+                  <Logout className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6" />
                   <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
                 </button>
               </div>
