@@ -18,6 +18,16 @@ interface RecentTestsInfiniteProps {
   initialTests: RecentTest[];
 }
 
+interface QuizResultRow {
+  id: string;
+  user_id: string;
+  category_id: string | null;
+  total_questions: number | null;
+  date_taken: string;
+  percentage: number | null;
+  categories: { name: string } | { name: string }[] | null;
+}
+
 const getScoreTextColor = (score: number) => {
   if (score >= 80) return "text-success";
   if (score >= 60) return "text-primary";
@@ -33,7 +43,7 @@ const getScoreBgColor = (score: number) => {
 };
 
 const getFirstLetter = (userName: string | null | undefined): string =>
-  userName?.trim().charAt(0).toUpperCase() || '';
+  userName?.trim().charAt(0).toUpperCase() || "?";
 
 function formatTimestamp(date: string | Date): string {
   const d = new Date(date);
@@ -49,13 +59,21 @@ function formatTimestamp(date: string | Date): string {
     .replace(", ", ", ");
 }
 
+function getCategoryName(result: QuizResultRow): string {
+  const category = Array.isArray(result.categories)
+    ? result.categories[0]
+    : result.categories;
+
+  return category?.name || (result.category_id ? "Unknown Category" : "All Categories");
+}
+
 export default function RecentTestsInfinite({ initialTests }: RecentTestsInfiniteProps) {
   const [tests, setTests] = useState<RecentTest[]>(initialTests);
   const [offset, setOffset] = useState(10);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(initialTests.length === 10);
 
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
 
   const { ref, inView } = useInView({
     threshold: 0.5,
@@ -97,24 +115,26 @@ export default function RecentTestsInfinite({ initialTests }: RecentTestsInfinit
       return;
     }
 
-    const userIds = [...new Set(recentResultsRaw.map((r: any) => r.user_id))];
+    const recentResults = recentResultsRaw as unknown as QuizResultRow[];
+    const userIds = [...new Set(recentResults.map((result) => result.user_id))];
 
     const { data: usersData } = await supabase
       .from("users")
       .select("id, name")
       .in("id", userIds);
 
-    const userMap = new Map(usersData?.map((u: any) => [u.id, u.name]) || []);
+    const userMap = new Map(
+      (usersData ?? []).map((profile) => [profile.id, profile.name] as const),
+    );
 
-    const newTests: RecentTest[] = recentResultsRaw.map((r: any) => {
-      const categoryName = r.categories?.name || (r.category_id ? "Unknown Category" : "All Categories");
+    const newTests: RecentTest[] = recentResults.map((result) => {
       return {
-        id: r.id,
-        userName: userMap.get(r.user_id) || "Unknown User",
-        category: categoryName,
-        percentage: r.percentage || 0,
-        totalQuestions: r.total_questions || 0,
-        timestamp: formatTimestamp(r.date_taken),
+        id: result.id,
+        userName: userMap.get(result.user_id) || "Unknown User",
+        category: getCategoryName(result),
+        percentage: result.percentage || 0,
+        totalQuestions: result.total_questions || 0,
+        timestamp: formatTimestamp(result.date_taken),
       };
     });
 
@@ -125,79 +145,62 @@ export default function RecentTestsInfinite({ initialTests }: RecentTestsInfinit
   }, [offset, loading, hasMore, supabase]);
 
   useEffect(() => {
-    if (inView && hasMore && !loading) {
-      loadMore();
-    }
+    if (!inView || !hasMore || loading) return;
+
+    const loadTimer = window.setTimeout(() => {
+      void loadMore();
+    }, 0);
+
+    return () => window.clearTimeout(loadTimer);
   }, [inView, hasMore, loading, loadMore]);
 
   return (
-    <div className="space-y-1 md:space-y-2 lg:space-y-3 max-h-[75vh] overflow-y-auto">
+    <div className="max-h-[38rem] overflow-y-auto overscroll-contain pr-0.5">
+      <div className="sticky top-0 z-10 mb-1 hidden grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(10rem,0.85fr)_5rem] gap-4 rounded-lg bg-muted/90 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground backdrop-blur md:grid">
+        <span>Learner</span>
+        <span>Quiz</span>
+        <span>Completed</span>
+        <span className="text-center">Score</span>
+      </div>
+
       {tests.map((test) => (
         <div
           key={test.id}
-          className="group relative bg-linear-to-br from-primary/5 to-secondary/5 border border-border rounded-xl p-4 md:p-5 lg:p-6 hover:shadow-md hover:border-primary/30 transition duration-300"
+          className="group mb-2 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-border/80 bg-background p-3 transition hover:border-primary/20 hover:bg-primary/[0.025] md:mb-0 md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)_minmax(10rem,0.85fr)_5rem] md:gap-4 md:rounded-none md:border-x-0 md:border-b md:border-t-0 md:px-4 md:py-3.5 md:last:border-b-0"
         >
-          <div className="flex justify-between items-start">
-            <div className="flex-1 space-y-2 md:space-y-3 lg:space-y-4">
-              <div className="flex gap-2 md:gap-3 lg:gap-4 items-center">
-                <div className="w-10 h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 rounded-full bg-linear-to-br from-primary/90 to-secondary/90 flex items-center justify-center text-white font-bold text-xs md:text-sm lg:text-base shrink-0">
-                  {getFirstLetter(test.userName)}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm md:text-base lg:text-lg font-semibold text-foreground">
-                    {test.userName}
-                  </p>
-                  <p className="text-[10px] md:text-xs lg:text-sm text-muted-foreground mt-0 md:mt-0.5 lg:mt-1">
-                    {test.category}
-                  </p>
-                </div>
-              </div>
-
-              <p className="flex items-center gap-1 text-muted-foreground text-[10px] md:text-xs lg:text-sm">
-                <Calendar className="w-2 h-2 md:w-2.5 md:h-2.5 lg:w-3 lg:h-3" />
-                {test.timestamp}
-              </p>
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-primary to-secondary text-xs font-bold text-white shadow-sm">
+              {getFirstLetter(test.userName)}
             </div>
-
-            <div className="flex flex-col space-y-1.5 items-end">
-              <div className="text-right">
-                <p
-                  className={`text-base md:text-lg lg:text-2xl font-bold ${getScoreTextColor(
-                    test.percentage
-                  )} ${getScoreBgColor(test.percentage)} rounded-xl w-16 h-10 md:w-20 md:h-12 lg:w-24 lg:h-14 flex items-center justify-center text-center shrink-0 transition-all group-hover:scale-105`}
-                >
-                  {test.percentage}%
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-xs md:text-sm lg:text-base font-bold text-muted-foreground">
-                  {test.totalQuestions} <span className="font-normal">Questions</span>
-                </p>
-              </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-foreground">{test.userName}</p>
+              <p className="mt-0.5 truncate text-xs text-muted-foreground md:hidden">{test.category}</p>
             </div>
           </div>
 
-          <div className="mt-3 md:mt-4 w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-            <div
-              className={`h-full transition-all duration-500 ${
-                test.percentage >= 80
-                  ? "bg-success"
-                  : test.percentage >= 60
-                  ? "bg-primary"
-                  : test.percentage >= 40
-                  ? "bg-warning"
-                  : "bg-destructive"
-              }`}
-              style={{ width: `${test.percentage}%` }}
-            />
+          <div className="hidden min-w-0 md:block">
+            <p className="truncate text-sm font-medium text-foreground">{test.category}</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">{test.totalQuestions} questions</p>
+          </div>
+
+          <p className="hidden items-center gap-1.5 text-xs leading-relaxed text-muted-foreground md:flex">
+            <Calendar className="size-3.5 shrink-0" />
+            {test.timestamp}
+          </p>
+
+          <div className="flex flex-col items-end gap-1 md:items-center">
+            <span className={`inline-flex min-w-14 items-center justify-center rounded-lg px-2 py-1.5 text-sm font-bold ${getScoreTextColor(test.percentage)} ${getScoreBgColor(test.percentage)}`}>
+              {test.percentage}%
+            </span>
+            <span className="text-[10px] text-muted-foreground md:hidden">{test.totalQuestions} questions</span>
           </div>
         </div>
       ))}
 
-      <div ref={ref} className="py-4 md:py-5 lg:py-6 text-center">
-        {loading && <p className="text-xs md:text-sm lg:text-base text-muted-foreground">Loading more tests...</p>}
+      <div ref={ref} className="py-4 text-center">
+        {loading && <p className="text-xs text-muted-foreground">Loading more activity...</p>}
         {!hasMore && tests.length > 0 && (
-          <p className="text-xs md:text-sm lg:text-base text-muted-foreground">No more recent tests to load.</p>
+          <p className="text-xs text-muted-foreground">You&apos;ve reached the end of the activity list.</p>
         )}
       </div>
     </div>
