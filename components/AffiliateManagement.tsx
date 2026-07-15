@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Chip, Modal, Card, InputField } from "@/lib/client-imports";
-import { Add, Delete, Edit, Redirect, Eye, EyeOff } from "@/lib/icons";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Button, Chip, InputField, Modal } from "@/lib/client-imports";
+import {
+  Add,
+  Affiliate,
+  AverageScore,
+  Delete,
+  Edit,
+  Eye,
+  EyeOff,
+  Redirect,
+  Sparkles,
+} from "@/lib/icons";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-
-const supabase = createClient();
 
 interface AffiliateItem {
   id: string;
@@ -17,6 +25,17 @@ interface AffiliateItem {
   imageUrl: string;
   affiliateLink: string;
   status: "Active" | "Inactive";
+}
+
+interface AffiliateRow {
+  id: string;
+  title: string;
+  description: string | null;
+  category: string | null;
+  price: number | string;
+  img_url: string | null;
+  affiliate_link: string;
+  is_active: boolean;
 }
 
 interface AffiliateFormData {
@@ -38,7 +57,9 @@ const defaultFormData: AffiliateFormData = {
 };
 
 const AffiliateManagement = () => {
+  const [supabase] = useState(() => createClient());
   const [items, setItems] = useState<AffiliateItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState<AffiliateFormData>(defaultFormData);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<AffiliateItem | null>(null);
@@ -54,11 +75,38 @@ const AffiliateManagement = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [priceFilter, setPriceFilter] = useState("all");
 
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const fetchItems = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from("affiliate")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      const formatted: AffiliateItem[] = ((data ?? []) as AffiliateRow[]).map((item) => ({
+        id: item.id,
+        title: item.title,
+        description: item.description ?? "",
+        category: item.category ?? "",
+        price: Number(item.price),
+        imageUrl: item.img_url ?? "",
+        affiliateLink: item.affiliate_link,
+        status: item.is_active ? "Active" : "Inactive",
+      }));
+
+      setItems(formatted);
+    } catch (error: unknown) {
+      console.error("Failed to load affiliate items:", error);
+      toast.error("Failed to load affiliate items");
+    } finally {
+      setLoading(false);
+    }
+  }, [supabase]);
 
   useEffect(() => {
-    fetchItems();
-  }, []);
+    void fetchItems();
+  }, [fetchItems]);
 
   useEffect(() => {
     if (!bulkMode) {
@@ -68,7 +116,14 @@ const AffiliateManagement = () => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key.toLowerCase() === "s") {
+      const target = event.target as HTMLElement;
+      const isTyping =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        target.isContentEditable;
+
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s" && !isTyping) {
         event.preventDefault();
         setBulkMode(true);
       }
@@ -77,31 +132,6 @@ const AffiliateManagement = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
-
-  const fetchItems = async () => {
-    const { data, error } = await supabase
-      .from("affiliate")
-      .select("*")
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      toast.error("Failed to load items");
-      return;
-    }
-
-    const formatted: AffiliateItem[] = (data || []).map((item: any) => ({
-      id: item.id,
-      title: item.title,
-      description: item.description,
-      category: item.category,
-      price: Number(item.price),
-      imageUrl: item.img_url,
-      affiliateLink: item.affiliate_link,
-      status: item.is_active ? "Active" : "Inactive",
-    }));
-
-    setItems(formatted);
-  };
 
   const handleAddItem = async (data: AffiliateFormData) => {
     const { error } = await supabase.from("affiliate").insert({
@@ -254,24 +284,6 @@ const AffiliateManagement = () => {
     setSelectedIds((prev) => (prev.includes(id) ? prev.filter((entry) => entry !== id) : [...prev, id]));
   };
 
-  const handleLongPressStart = (id: string) => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-    }
-
-    longPressTimer.current = setTimeout(() => {
-      setBulkMode(true);
-      toggleSelectItem(id);
-    }, 350);
-  };
-
-  const handleLongPressEnd = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  };
-
   const handleMoveSelected = async () => {
     if (!bulkMoveCategory || selectedIds.length === 0) return;
 
@@ -330,57 +342,94 @@ const AffiliateManagement = () => {
   const getCategoryClasses = (category: string) => {
     const normalized = category.toLowerCase();
 
-    if (normalized.includes("book")) return "bg-blue-600 text-white";
-    if (normalized.includes("course")) return "bg-purple-600 text-white";
-    if (normalized.includes("material")) return "bg-amber-600 text-white";
+    if (normalized.includes("book")) return "bg-primary/10 text-primary";
+    if (normalized.includes("course")) return "bg-secondary/10 text-secondary";
+    if (normalized.includes("material")) return "bg-warning/10 text-warning";
 
-    return "bg-slate-600 text-white";
+    return "bg-muted text-muted-foreground";
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-20 md:px-6 md:py-24 lg:px-8 lg:py-28">
-      <div className="mx-auto flex max-w-7xl flex-col gap-6">
-        <div className="flex flex-col gap-4 rounded-2xl border border-border bg-white/90 p-5 shadow-sm md:flex-row md:items-end md:justify-between md:p-6">
+    <main className="min-h-screen bg-primary/[0.025] px-4 pb-10 pt-20 md:px-6 md:pb-12 md:pt-24 lg:px-8 lg:pt-28">
+      <div className="mx-auto flex max-w-screen-2xl flex-col gap-5 md:gap-6">
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-foreground md:text-3xl">Affiliate Management</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Manage your affiliate marketing materials in one place.
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
+              <Sparkles className="size-3.5" />
+              Product partnerships
+            </div>
+            <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground md:text-3xl">Manage affiliates</h1>
+            <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground md:text-base">
+              Organize recommended products, control visibility, and maintain affiliate destinations.
             </p>
           </div>
-        </div>
+          <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row">
+            <button
+              type="button"
+              onClick={() => setBulkMode((current) => !current)}
+              className="inline-flex min-h-10 items-center justify-center rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:border-primary/20 hover:bg-primary/5 hover:text-primary"
+            >
+              {bulkMode ? "Cancel selection" : "Select multiple"}
+            </button>
+            <Button
+              onClick={handleOpenAddModal}
+              text="Add affiliate item"
+              backgroundColor="bg-primary"
+              textColor="text-white"
+              leftIcon={<Add className="size-4" />}
+              className="w-full sm:w-auto"
+            />
+          </div>
+        </header>
 
-        <div className="grid gap-4 xl:grid-cols-[1fr_3fr]">
-          <div className="grid gap-4 md:grid-cols-3 xl:flex xl:flex-col xl:gap-4">
-            <div className="flex h-28 flex-col justify-between rounded-2xl border border-border bg-linear-to-br from-primary to-secondary p-4 text-white shadow-sm">
-              <div className="text-sm font-medium opacity-90">Total Items</div>
-              <div className="text-2xl font-semibold">{totalItems}</div>
-            </div>
-            <div className="flex h-28 flex-col justify-between rounded-2xl border border-border bg-linear-to-br from-emerald-500 to-green-600 p-4 text-white shadow-sm">
-              <div className="text-sm font-medium opacity-90">Active Items</div>
-              <div className="text-2xl font-semibold">{activeItems}</div>
-            </div>
-            <div className="flex h-28 flex-col justify-between rounded-2xl border border-border bg-linear-to-br from-slate-700 to-slate-900 p-4 text-white shadow-sm">
-              <div className="text-sm font-medium opacity-90">Total Value</div>
-              <div className="text-xl font-semibold">
-                {new Intl.NumberFormat("en-PH", {
-                  style: "currency",
-                  currency: "PHP",
-                }).format(totalValue)}
+        <div className="space-y-4">
+          <section aria-label="Affiliate summary" className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm md:p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="text-xs font-medium text-muted-foreground md:text-sm">Total products</div>
+                  <div className="mt-2 text-2xl font-bold tracking-tight text-foreground">{loading ? "—" : totalItems}</div>
+                </div>
+                <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><Affiliate className="size-5" /></div>
               </div>
             </div>
-          </div>
+            <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm md:p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="text-xs font-medium text-muted-foreground md:text-sm">Active products</div>
+                  <div className="mt-2 text-2xl font-bold tracking-tight text-foreground">{loading ? "—" : activeItems}</div>
+                </div>
+                <div className="flex size-10 items-center justify-center rounded-xl bg-success/10 text-success"><Eye className="size-5" /></div>
+              </div>
+            </div>
+            <div className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm md:p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-xs font-medium text-muted-foreground md:text-sm">Catalog value</div>
+                  <div className="mt-2 truncate text-xl font-bold tracking-tight text-foreground md:text-2xl">
+                    {loading ? "—" : new Intl.NumberFormat("en-PH", {
+                  style: "currency",
+                  currency: "PHP",
+                  maximumFractionDigits: 0,
+                }).format(totalValue)}
+                  </div>
+                </div>
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary/10 text-secondary"><AverageScore className="size-5" /></div>
+              </div>
+            </div>
+          </section>
 
-          <div className="space-y-4 rounded-2xl border border-border bg-white p-4 shadow-sm md:p-6">
-            <div className="grid gap-3 md:grid-cols-[1.5fr_1fr_1fr_auto]">
+          <section className="space-y-4 rounded-2xl border border-border/80 bg-card p-4 shadow-sm md:p-6">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(16rem,1.5fr)_1fr_1fr]">
               <InputField
-                label="Search affiliates"
-                placeholder="Search by title, category, or description"
+                label="Search products"
+                placeholder="Search title, category, or description"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
               />
 
               <div className="space-y-2">
-                <label className="block text-[10px] font-medium text-gray-700 md:text-xs lg:text-sm">
+                <label className="block text-xs font-medium text-foreground md:text-sm">
                   Category
                 </label>
                 <select
@@ -397,9 +446,9 @@ const AffiliateManagement = () => {
                 </select>
               </div>
 
-              <div className="space-y-2">
-                <label className="block text-[10px] font-medium text-gray-700 md:text-xs lg:text-sm">
-                  Max price
+              <div className="space-y-2 sm:col-span-2 lg:col-span-1">
+                <label className="block text-xs font-medium text-foreground md:text-sm">
+                  Maximum price
                 </label>
                 <select
                   value={priceFilter}
@@ -414,20 +463,10 @@ const AffiliateManagement = () => {
                 </select>
               </div>
 
-              <div className="flex items-end">
-                <Button
-                  onClick={handleOpenAddModal}
-                  text="Add Affiliate Item"
-                  backgroundColor="bg-primary"
-                  textColor="text-white"
-                  leftIcon={<Add />}
-                  className="w-full md:w-auto"
-                />
-              </div>
             </div>
 
             {bulkMode && (
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-slate-50 px-4 py-3">
+              <div className="mt-4 flex flex-col gap-3 rounded-xl border border-primary/15 bg-primary/5 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm text-foreground">
                   {selectedIds.length > 0
                     ? `${selectedIds.length} items selected`
@@ -461,7 +500,110 @@ const AffiliateManagement = () => {
               </div>
             )}
 
-            <div className="mt-4 overflow-hidden rounded-2xl border border-border">
+            <div className="space-y-3 md:hidden">
+              {loading
+                ? Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="h-48 animate-pulse rounded-xl border border-border bg-muted/40" />
+                  ))
+                : filteredItems.map((item) => {
+                    const isSelected = selectedIds.includes(item.id);
+
+                    return (
+                      <article
+                        key={item.id}
+                        className={`rounded-xl border p-4 transition ${
+                          isSelected ? "border-primary/30 bg-primary/5" : "border-border/80 bg-background"
+                        }`}
+                        onClick={() => bulkMode && toggleSelectItem(item.id)}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              {bulkMode && (
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={() => toggleSelectItem(item.id)}
+                                  onClick={(event) => event.stopPropagation()}
+                                  className="size-4 rounded border-border text-primary focus:ring-primary"
+                                  aria-label={`Select ${item.title}`}
+                                />
+                              )}
+                              <h2 className="truncate text-sm font-semibold text-foreground">{item.title}</h2>
+                            </div>
+                            <p className="mt-1 text-lg font-bold text-foreground">₱{item.price.toLocaleString()}</p>
+                          </div>
+                          <Chip text={item.category || "Uncategorized"} className={getCategoryClasses(item.category)} />
+                        </div>
+
+                        <p className="mt-3 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                          {item.description || "No description provided."}
+                        </p>
+
+                        <div className="mt-4 flex items-center justify-between gap-3 border-t border-border/70 pt-3">
+                          <button
+                            type="button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              void toggleStatus(item);
+                            }}
+                            className={`inline-flex min-h-9 items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition ${
+                              item.status === "Active"
+                                ? "bg-success/10 text-success hover:bg-success/15"
+                                : "bg-muted text-muted-foreground hover:bg-muted/80"
+                            }`}
+                          >
+                            {item.status === "Active" ? <Eye className="size-4" /> : <EyeOff className="size-4" />}
+                            {item.status}
+                          </button>
+
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                handleOpenEditModal(item);
+                              }}
+                              className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary transition hover:bg-primary/15"
+                              aria-label={`Edit ${item.title}`}
+                            >
+                              <Edit className="size-4" />
+                            </button>
+                            <a
+                              href={item.affiliateLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(event) => event.stopPropagation()}
+                              className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary transition hover:bg-primary/15"
+                              aria-label={`Open affiliate link for ${item.title}`}
+                            >
+                              <Redirect className="size-4" />
+                            </a>
+                            <button
+                              type="button"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                openDeletePopup(item.id);
+                              }}
+                              className="flex size-9 items-center justify-center rounded-lg bg-destructive/10 text-destructive transition hover:bg-destructive/15"
+                              aria-label={`Delete ${item.title}`}
+                            >
+                              <Delete className="size-4" />
+                            </button>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+
+              {!loading && filteredItems.length === 0 && (
+                <div className="rounded-xl border border-dashed border-border bg-muted/20 px-4 py-12 text-center text-sm text-muted-foreground">
+                  No affiliate products match the current filters.
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 hidden overflow-hidden rounded-xl border border-border md:block">
               <div className="overflow-x-auto">
                 <table className="min-w-full border-collapse bg-white text-sm">
                   <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
@@ -487,12 +629,6 @@ const AffiliateManagement = () => {
                               toggleSelectItem(item.id);
                             }
                           }}
-                          onTouchStart={() => handleLongPressStart(item.id)}
-                          onTouchEnd={handleLongPressEnd}
-                          onTouchCancel={handleLongPressEnd}
-                          onMouseDown={() => handleLongPressStart(item.id)}
-                          onMouseUp={handleLongPressEnd}
-                          onMouseLeave={handleLongPressEnd}
                         >
                           {bulkMode && (
                             <td className="px-3 py-4">
@@ -588,8 +724,8 @@ const AffiliateManagement = () => {
 
                     {filteredItems.length === 0 && (
                       <tr>
-                        <td colSpan={bulkMode ? 6 : 5} className="px-4 py-12 text-center text-sm text-slate-500">
-                          No affiliate items match the current filters.
+                        <td colSpan={bulkMode ? 6 : 5} className="px-4 py-12 text-center text-sm text-muted-foreground">
+                          {loading ? "Loading affiliate products..." : "No affiliate products match the current filters."}
                         </td>
                       </tr>
                     )}
@@ -597,7 +733,7 @@ const AffiliateManagement = () => {
                 </table>
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </div>
 
@@ -761,7 +897,7 @@ const AffiliateManagement = () => {
           )}
         </div>
       </Modal>
-    </div>
+    </main>
   );
 };
 

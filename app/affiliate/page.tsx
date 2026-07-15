@@ -1,13 +1,12 @@
-import { AdminAffiliate } from "@/lib/client-imports" 
-import { NavBar } from '@/lib/client-imports'
+import { AdminAffiliate, NavBar } from "@/lib/client-imports";
 
-const page = () => {
+const AffiliateManagementPage = () => {
   return (
-    <main>
-        <NavBar State="LoggedIn" />
-        <AdminAffiliate />
-    </main>
-  )
-}
+    <>
+      <NavBar State="LoggedIn" />
+      <AdminAffiliate />
+    </>
+  );
+};
 
-export default page
+export default AffiliateManagementPage;
