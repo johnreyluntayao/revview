@@ -1,13 +1,13 @@
-import { SubmitFeedback } from '@/lib/client-imports'
-import { UserDashboard } from '@/lib/server-imports'
+import { SubmitFeedback } from "@/lib/client-imports";
+import { UserDashboard } from "@/lib/server-imports";
 
-const page = () => {
+const DashboardPage = () => {
   return (
-    <main className='min-h-screen'>
+    <>
       <UserDashboard />
       <SubmitFeedback />
-    </main>
-  )
-}
+    </>
+  );
+};
 
-export default page
+export default DashboardPage;

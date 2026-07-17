@@ -1,36 +1,46 @@
-import { Progress } from '@/lib/client-imports'
-
 interface CategoryItem {
-  title: string
-  value: number
-  testCount: number
+  title: string;
+  value: number;
+  testCount: number;
 }
 
 interface CategoryProgressProps {
-  categories: CategoryItem[]
+  categories: CategoryItem[];
 }
 
-const CategoryProgress = ({ categories }: CategoryProgressProps) => {
-  return (
-    <section>
-      <div className="w-full flex flex-col gap-2 md:gap-3 lg:gap-4 p-4 md:p-5 lg:p-6 rounded-xl border-border border bg-card">
-        <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground mb-2 md:mb-4 lg:mb-6">
-          Category Progress
-        </h1>
+const CategoryProgress = ({ categories }: CategoryProgressProps) => (
+  <section className="h-full rounded-2xl border border-border/80 bg-card p-4 shadow-sm md:p-6">
+    <header className="mb-5">
+      <h2 className="text-base font-semibold text-foreground md:text-lg">Category progress</h2>
+      <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">Your average result in each review area</p>
+    </header>
 
-        {categories.map((cat) => (
-          <div key={cat.title} className="w-full">
-            <Progress
-              variant="percent"
-              percentage={cat.value}
-              label={cat.title}
-              subLabel={`${cat.testCount} test completed`}
-            />
+    <div className="space-y-4">
+      {categories.map((category) => {
+        const percentage = Math.min(100, Math.max(0, category.value));
+
+        return (
+          <div key={category.title}>
+            <div className="mb-1.5 flex items-end justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-foreground">{category.title}</p>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  {category.testCount} {category.testCount === 1 ? "quiz" : "quizzes"} completed
+                </p>
+              </div>
+              <span className="text-sm font-bold text-primary">{percentage}%</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-muted">
+              <div
+                className="h-full rounded-full bg-linear-to-r from-primary to-secondary transition-[width] duration-500"
+                style={{ width: `${percentage}%` }}
+              />
+            </div>
           </div>
-        ))}
-      </div>
-    </section>
-  )
-}
+        );
+      })}
+    </div>
+  </section>
+);
 
-export default CategoryProgress
+export default CategoryProgress;

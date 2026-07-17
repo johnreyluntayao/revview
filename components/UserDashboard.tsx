@@ -3,10 +3,18 @@ import {
   PerformanceOverview,
   RecentScores,
   SummaryCards,
-  Button
-} from "@/lib/client-imports"
-import { AverageScore, BestCategory, StudyTime, StartQuiz, TotalTests } from '@/lib/icons';
-import { createClient } from "@/lib/supabase/server"
+} from "@/lib/client-imports";
+import Link from "next/link";
+import {
+  ArrowRight,
+  AverageScore,
+  BestCategory,
+  Sparkles,
+  StartQuiz,
+  StudyTime,
+  TotalTests,
+} from "@/lib/icons";
+import { createClient } from "@/lib/supabase/server";
 
 const formatTime = (seconds: number): string => {
   const h = Math.floor(seconds / 3600);
@@ -260,38 +268,53 @@ const UserDashboard = async () => {
   ]
 
   return (
-    <div className="p-4 md:p-6 lg:p-8 gap-4 md:gap-6 lg:gap-8 flex flex-col bg-primary/3">
+    <main className="min-h-screen bg-primary/[0.025] px-4 py-5 md:px-6 md:py-6 lg:px-8 lg:py-8">
+      <div className="mx-auto flex max-w-screen-2xl flex-col gap-5 md:gap-6">
+        <section className="relative overflow-hidden rounded-2xl border border-primary/10 bg-card px-5 py-6 shadow-sm md:px-7 md:py-7">
+          <div className="pointer-events-none absolute -right-16 -top-20 size-56 rounded-full bg-primary/8 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 right-24 size-48 rounded-full bg-secondary/8 blur-3xl" />
+          <div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
+                <Sparkles className="size-3.5" />
+                Learning overview
+              </div>
+              <h1 className="text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+                Welcome back, {name}
+              </h1>
+              <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
+                Keep building momentum with another focused review session.
+              </p>
+            </div>
+            <Link
+              href="/quiz-selection"
+              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-primary/90 sm:w-auto"
+            >
+              <StartQuiz className="size-4" />
+              Start a review
+              <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        </section>
 
-      <div className="">
-        <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground">
-          Welcome Back, {name}!
-        </h1>
-        <p className="text-xs md:text-sm lg:text-base text-muted-foreground">
-          Here is your learning progress and recent quiz scores
-        </p>
+        <SummaryCards cards={summaryCards} />
+
+        <div className="grid grid-cols-1 items-stretch gap-5 xl:grid-cols-2">
+          <CategoryProgress categories={categoryProgress} />
+
+          <PerformanceOverview
+            overallScore={overallScore}
+            overallScoreSub={String(totalTests)}
+            bestScore={bestScore}
+            lowestScore={lowestScore}
+            scoreImprovement={scoreImprovement}
+          />
+        </div>
+
+        <RecentScores scores={recentScores} />
       </div>
+    </main>
+  );
+};
 
-      {/* SUMMARY CARDS */}
-      <SummaryCards cards={summaryCards} />
-
-      {/* CATEGORY + PERFORMANCE */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
-        <CategoryProgress categories={categoryProgress} />
-
-        <PerformanceOverview
-          overallScore={overallScore}
-          overallScoreSub={String(totalTests)}
-          bestScore={bestScore}
-          lowestScore={lowestScore}
-          scoreImprovement={scoreImprovement}
-        />
-      </div>
-
-      {/* RECENT SCORES */}
-      <RecentScores scores={recentScores} />
-
-    </div>
-  )
-}
-
-export default UserDashboard
+export default UserDashboard;
