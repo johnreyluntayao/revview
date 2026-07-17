@@ -1,8 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Add, Delete, Edit, Search, Image as ImageIcon } from "@/lib/icons";
+import {
+  Add,
+  Delete,
+  Edit,
+  Image as ImageIcon,
+  Questions as QuestionsIcon,
+  Search,
+  Sparkles,
+  Success,
+  ToDelete,
+  TotalTests,
+} from "@/lib/icons";
 import {
   Button,
   Chip,
@@ -56,6 +67,77 @@ interface QuestionEditorModalProps {
   onClose: () => void;
 }
 
+const formatDate = (iso: string): string =>
+  new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(iso));
+
+const getDateRange = (
+  filter: string,
+): { from: string | null; to: string | null } => {
+  const now = new Date();
+  let from: Date | null = null;
+  let to: Date | null = null;
+
+  switch (filter) {
+    case "All Time":
+      return { from: null, to: null };
+    case "Last 3 months":
+      from = new Date();
+      from.setMonth(now.getMonth() - 3);
+      to = now;
+      break;
+    case "Last 6 months":
+      from = new Date();
+      from.setMonth(now.getMonth() - 6);
+      to = new Date();
+      to.setMonth(now.getMonth() - 3);
+      break;
+    case "Last 1 year":
+      from = new Date();
+      from.setFullYear(now.getFullYear() - 1);
+      to = new Date();
+      to.setMonth(now.getMonth() - 6);
+      break;
+    case "Last 1 year and 6 months":
+      from = new Date();
+      from.setFullYear(now.getFullYear() - 1);
+      from.setMonth(now.getMonth() - 6);
+      to = new Date();
+      to.setFullYear(now.getFullYear() - 1);
+      break;
+    case "Last 2 years":
+      from = new Date();
+      from.setFullYear(now.getFullYear() - 2);
+      to = new Date();
+      to.setFullYear(now.getFullYear() - 1);
+      break;
+    case "Last 2 years and 6 months":
+      from = new Date();
+      from.setFullYear(now.getFullYear() - 2);
+      from.setMonth(now.getMonth() - 6);
+      to = new Date();
+      to.setFullYear(now.getFullYear() - 2);
+      break;
+    case "Last 3 years and on":
+      from = new Date(0);
+      to = new Date();
+      to.setFullYear(now.getFullYear() - 2);
+      break;
+  }
+
+  return { from: from?.toISOString() || null, to: to?.toISOString() || null };
+};
+
+const getJoinedCategoryName = (
+  categories: { name?: string } | { name?: string }[] | null,
+) => {
+  const category = Array.isArray(categories) ? categories[0] : categories;
+  return category?.name || "Unknown";
+};
+
 function QuestionEditorModal({
   isOpen,
   isEdit = false,
@@ -88,7 +170,7 @@ function QuestionEditorModal({
   } | null>(null);
   const [pendingPayload, setPendingPayload] = useState<QuestionFormData | null>(null);
 
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   const initializedRef = useRef(false);
 
   const hasAnyText = [optionA, optionB, optionC, optionD, optionE].some((value) =>
@@ -113,6 +195,8 @@ function QuestionEditorModal({
 
   useEffect(() => {
     if (isOpen && !initializedRef.current) {
+      // Opening the editor intentionally hydrates its local draft from the selected question.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuestionText(initialData.questionText || "");
       setQuestionImage(initialData.questionImage || "");
       setOptionA(initialData.optionA || "");
@@ -240,7 +324,7 @@ function QuestionEditorModal({
         return;
       }
 
-      const duplicate = existingQuestions?.find((item: any) => isLikelyDuplicate(payload, item));
+      const duplicate = existingQuestions?.find((item) => isLikelyDuplicate(payload, item));
 
       if (duplicate) {
         setPendingPayload(payload);
@@ -277,11 +361,18 @@ function QuestionEditorModal({
         onClose={onClose}
         size="xl"
         title={
-          <div className="flex items-center gap-2">
-            {isEdit ? <Edit className="text-secondary" /> : <Add className="text-primary" />}
-            <span className="text-base font-semibold md:text-lg lg:text-xl">
-              {isEdit ? "Edit Question" : "Add New Question"}
-            </span>
+          <div className="flex items-center gap-3">
+            <div className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${isEdit ? "bg-secondary/10 text-secondary" : "bg-primary/10 text-primary"}`}>
+              {isEdit ? <Edit className="size-5" /> : <Add className="size-5" />}
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-foreground md:text-lg">
+                {isEdit ? "Edit question" : "Add a new question"}
+              </h2>
+              <p className="mt-0.5 text-xs font-normal text-muted-foreground">
+                Complete the question, choices, answer, and explanation.
+              </p>
+            </div>
           </div>
         }
         footer={
@@ -290,25 +381,34 @@ function QuestionEditorModal({
               text="Cancel"
               onClick={onClose}
               textColor="text-foreground"
-              backgroundColor="bg-white"
-              borderColor="border-foreground/50"
+              backgroundColor="bg-muted"
               className="w-full sm:w-auto"
             />
             <Button
-              text={isEdit ? "Update" : "Save"}
-              onClick={handleSave}
+              text={isEdit ? "Update question" : "Save question"}
+              onClick={() => void handleSave()}
               textColor="text-white"
               backgroundColor={isEdit ? "bg-secondary" : "bg-primary"}
               className="w-full sm:w-auto"
             />
           </div>
         }
-        contentClassName="max-h-[80vh]"
+        contentClassName="bg-muted/15"
       >
-        <div className="space-y-8 p-4 md:p-5 lg:p-6">
-          <div className="space-y-2 md:space-y-4 lg:space-y-4">
+        <div className="space-y-4 p-4 sm:p-5 md:space-y-5 md:p-6">
+          <section className="rounded-2xl border border-border/80 bg-background p-4 shadow-sm md:p-5">
+            <div className="mb-4 flex items-center gap-3">
+              <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">1</span>
+              <div>
+                <h3 className="text-sm font-semibold text-foreground md:text-base">Question prompt</h3>
+                <p className="text-xs text-muted-foreground">Enter the prompt and include an image only when useful.</p>
+              </div>
+            </div>
+            <div className="space-y-4">
             <InputField
-              label="Question Text *"
+              label="Question text *"
+              type="textarea"
+              placeholder="Write the complete question..."
               value={questionText}
               onChange={(e) => setQuestionText(e.target.value)}
             />
@@ -318,13 +418,22 @@ function QuestionEditorModal({
               onChange={setQuestionImage}
               folder="img_question"
             />
-          </div>
+            </div>
+          </section>
 
-          <div className="space-y-3 border-y border-foreground/15 p-2 md:space-y-4 md:p-3 lg:space-y-5 lg:p-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold md:text-base lg:text-lg">Options</h3>
+          <section className="rounded-2xl border border-border/80 bg-background p-4 shadow-sm md:p-5">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">2</span>
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground md:text-base">Answer choices</h3>
+                  <p className="text-xs text-muted-foreground">Use one consistent format for every option.</p>
+                </div>
+              </div>
               <div className="flex rounded-lg bg-muted p-1">
                 <button
+                  type="button"
+                  aria-pressed={optionType === "text"}
                   onClick={() => {
                     if (hasAnyImage) {
                       toast.warning("Remove all images first before switching to text");
@@ -332,11 +441,13 @@ function QuestionEditorModal({
                     }
                     setOptionType("text");
                   }}
-                  className={`rounded-md px-3 py-1 text-[10px] transition md:px-3.5 md:py-1.5 md:text-xs lg:px-4 lg:py-2 lg:text-sm ${optionType === "text" ? "bg-primary text-white" : ""}`}
+                  className={`rounded-md px-3 py-2 text-xs font-semibold transition ${optionType === "text" ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
-                  Texts
+                  Text
                 </button>
                 <button
+                  type="button"
+                  aria-pressed={optionType === "image"}
                   onClick={() => {
                     if (hasAnyText) {
                       toast.warning("Remove all texts first before switching to images");
@@ -344,14 +455,14 @@ function QuestionEditorModal({
                     }
                     setOptionType("image");
                   }}
-                  className={`rounded-md px-3 py-1 text-[10px] transition md:px-3.5 md:py-1.5 md:text-xs lg:px-4 lg:py-2 lg:text-sm ${optionType === "image" ? "bg-primary text-white" : ""}`}
+                  className={`rounded-md px-3 py-2 text-xs font-semibold transition ${optionType === "image" ? "bg-background text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
                 >
-                  Images
+                  Image
                 </button>
               </div>
             </div>
 
-            <div className="grid gap-2 md:grid-cols-2 md:gap-3 lg:gap-4">
+            <div className="grid gap-3 md:grid-cols-2">
               {(["A", "B", "C", "D", "E"] as const).map((label, index) => {
                 const texts = [optionA, optionB, optionC, optionD, optionE];
                 const setters = [setOptionA, setOptionB, setOptionC, setOptionD, setOptionE];
@@ -359,7 +470,7 @@ function QuestionEditorModal({
                 const imgSetters = [setOptionAImage, setOptionBImage, setOptionCImage, setOptionDImage, setOptionEImage];
 
                 return (
-                  <div key={label} className="space-y-2 rounded-xl border p-2 md:space-y-2.5 md:p-3 lg:space-y-3 lg:p-4">
+                  <div key={label} className="rounded-xl border border-border/80 bg-muted/20 p-3 md:p-4">
                     {optionType === "text" ? (
                       <InputField
                         label={`Option ${label}`}
@@ -380,11 +491,19 @@ function QuestionEditorModal({
                 );
               })}
             </div>
-          </div>
+          </section>
 
-          <div className="grid gap-2 border-b pb-2 md:grid-cols-2 md:gap-3 md:pb-3 lg:gap-4 lg:pb-4">
+          <section className="rounded-2xl border border-border/80 bg-background p-4 shadow-sm md:p-5">
+            <div className="mb-4 flex items-center gap-3">
+              <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">3</span>
+              <div>
+                <h3 className="text-sm font-semibold text-foreground md:text-base">Answer and category</h3>
+                <p className="text-xs text-muted-foreground">Choose the correct choice and where this question belongs.</p>
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
             <ComboBox
-              label="Correct Answer *"
+              label="Correct answer *"
               options={["A", "B", "C", "D", "E"]}
               value={correctAnswer}
               onChange={setCorrectAnswer}
@@ -395,11 +514,22 @@ function QuestionEditorModal({
               value={category}
               onChange={setCategory}
             />
-          </div>
+            </div>
+          </section>
 
-          <div className="space-y-2 md:space-y-3 lg:space-y-4">
+          <section className="rounded-2xl border border-border/80 bg-background p-4 shadow-sm md:p-5">
+            <div className="mb-4 flex items-center gap-3">
+              <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">4</span>
+              <div>
+                <h3 className="text-sm font-semibold text-foreground md:text-base">Explanation</h3>
+                <p className="text-xs text-muted-foreground">Help learners understand why the selected answer is correct.</p>
+              </div>
+            </div>
+            <div className="space-y-4">
             <InputField
-              label="Explanation"
+              label="Explanation *"
+              type="textarea"
+              placeholder="Explain the correct answer..."
               value={explanationText}
               onChange={(event) => setExplanationText(event.target.value)}
             />
@@ -409,7 +539,8 @@ function QuestionEditorModal({
               onChange={setExplanationImage}
               folder="img_explanation"
             />
-          </div>
+            </div>
+          </section>
         </div>
       </Modal>
 
@@ -418,20 +549,28 @@ function QuestionEditorModal({
         onClose={handleCancelDuplicate}
         size="md"
         closeOnBackdrop={false}
-        title="Possible duplicate found"
-        description="This question appears to already exist. Review it below before saving."
+        title={
+          <div className="flex items-center gap-3">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-warning/10 text-warning">
+              <ToDelete className="size-5" />
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-foreground md:text-lg">Possible duplicate</h2>
+              <p className="mt-0.5 text-xs font-normal text-muted-foreground">Review the similar question before continuing.</p>
+            </div>
+          </div>
+        }
         footer={
           <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button
               text="Cancel"
               onClick={handleCancelDuplicate}
               textColor="text-foreground"
-              backgroundColor="bg-white"
-              borderColor="border-foreground/50"
+              backgroundColor="bg-muted"
               className="w-full sm:w-auto"
             />
             <Button
-              text="Proceed Add"
+              text="Add anyway"
               onClick={handleProceedWithDuplicate}
               textColor="text-white"
               backgroundColor="bg-primary"
@@ -440,24 +579,28 @@ function QuestionEditorModal({
           </div>
         }
       >
-        <div className="space-y-4 px-4 py-4 sm:px-6 sm:py-5">
-          <div className="rounded-xl border border-border bg-muted/30 p-4">
-            <p className="text-sm font-semibold text-foreground">Existing question</p>
-            <p className="mt-2 text-sm text-foreground/90">{duplicateMatch?.text || "No question text available."}</p>
+        <div className="space-y-4 p-4 sm:p-6">
+          <div className="rounded-xl border border-warning/20 bg-warning/5 p-3 text-xs leading-relaxed text-muted-foreground">
+            Adding very similar questions can make quizzes repetitive. Continue only if this is intentional.
           </div>
-          <div className="rounded-xl border border-border bg-muted/20 p-4">
-            <p className="text-sm font-semibold text-foreground">Existing choices</p>
-            <ul className="mt-2 space-y-2 text-sm text-foreground/90">
+          <div className="rounded-xl border border-border/80 bg-background p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Existing question</p>
+            <p className="mt-2 text-sm font-medium leading-relaxed text-foreground">{duplicateMatch?.text || "No question text available."}</p>
+          </div>
+          <div className="rounded-xl border border-border/80 bg-muted/20 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Existing choices</p>
+            <ol className="mt-3 space-y-2 text-sm text-foreground/90">
               {duplicateMatch?.options?.filter(Boolean).length ? (
                 duplicateMatch.options.filter(Boolean).map((option, index) => (
-                  <li key={`${option}-${index}`} className="rounded-lg bg-background px-3 py-2">
-                    {option}
+                  <li key={`${option}-${index}`} className="flex gap-3 rounded-lg border border-border/70 bg-background px-3 py-2.5">
+                    <span className="font-semibold text-primary">{String.fromCharCode(65 + index)}.</span>
+                    <span>{option}</span>
                   </li>
                 ))
               ) : (
                 <li className="rounded-lg bg-background px-3 py-2">No choices available.</li>
               )}
-            </ul>
+            </ol>
           </div>
         </div>
       </Modal>
@@ -466,10 +609,6 @@ function QuestionEditorModal({
 }
 
 export default function ManageQuestions() {
-  const [selectedQuestion, setSelectedQuestion] = useState<QuestionRow | null>(
-    null,
-  );
-
   const [questions, setQuestions] = useState<QuestionRow[]>([]);
   const [categories, setCategories] = useState<{ id: string; name: string }[]>(
     [],
@@ -498,14 +637,7 @@ export default function ManageQuestions() {
     null,
   );
   const [bulkMoveCategoryId, setBulkMoveCategoryId] = useState<string>("");
-  const [lastDeletedQuestions, setLastDeletedQuestions] = useState<QuestionRow[]>(
-    [],
-  );
-  const [pressTimer, setPressTimer] = useState<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
-
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
 
   useEffect(() => {
     async function loadCategories() {
@@ -522,92 +654,9 @@ export default function ManageQuestions() {
       }
     }
     loadCategories();
-  }, []);
+  }, [supabase]);
 
-  const formatDate = (iso: string): string => {
-    const d = new Date(iso);
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
-  };
-
-  const getDateRange = (
-    filter: string,
-  ): { from: string | null; to: string | null } => {
-    const now = new Date();
-    let from = null;
-    let to = null;
-
-    switch (filter) {
-      case "All Time":
-        return { from: null, to: null };
-
-      case "Last 3 months":
-        from = new Date();
-        from.setMonth(now.getMonth() - 3);
-        to = now;
-        break;
-
-      case "Last 6 months":
-        from = new Date();
-        from.setMonth(now.getMonth() - 6);
-        to = new Date();
-        to.setMonth(now.getMonth() - 3);
-        break;
-
-      case "Last 1 year":
-        from = new Date();
-        from.setFullYear(now.getFullYear() - 1);
-        to = new Date();
-        to.setMonth(now.getMonth() - 6);
-        break;
-
-      case "Last 1 year and 6 months":
-        from = new Date();
-        from.setFullYear(now.getFullYear() - 1);
-        from.setMonth(now.getMonth() - 6);
-        to = new Date();
-        to.setFullYear(now.getFullYear() - 1);
-        break;
-
-      case "Last 2 years":
-        from = new Date();
-        from.setFullYear(now.getFullYear() - 2);
-        to = new Date();
-        to.setFullYear(now.getFullYear() - 1);
-        break;
-
-      case "Last 2 years and 6 months":
-        from = new Date();
-        from.setFullYear(now.getFullYear() - 2);
-        from.setMonth(now.getMonth() - 6);
-        to = new Date();
-        to.setFullYear(now.getFullYear() - 2);
-        break;
-
-      case "Last 3 years and on":
-        from = new Date(0);
-        to = new Date();
-        to.setFullYear(now.getFullYear() - 2);
-        break;
-    }
-
-    return { from: from?.toISOString() || null, to: to?.toISOString() || null };
-  };
-
-  const fetchQuestions = async () => {
+  const fetchQuestions = useCallback(async () => {
     setLoading(true);
 
     const start = (page - 1) * pageSize;
@@ -650,9 +699,11 @@ export default function ManageQuestions() {
       toast.error("Failed to load questions");
       console.error(error);
     } else {
-      const formatted = (data || []).map((q: any) => ({
+      const formatted = (data || []).map((q) => ({
         ...q,
-        category_name: q.categories?.name || "Unknown",
+        category_name: getJoinedCategoryName(
+          q.categories as unknown as { name?: string } | { name?: string }[] | null,
+        ),
         date_added: formatDate(q.date_added),
         date_added_raw: q.date_added,
         options: q.options || [],
@@ -664,7 +715,7 @@ export default function ManageQuestions() {
     }
 
     setLoading(false);
-  };
+  }, [page, searchTerm, selectedCategoryId, selectedTime, supabase]);
 
   useEffect(() => {
     setPage(1);
@@ -677,7 +728,14 @@ export default function ManageQuestions() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key.toLowerCase() === "s") {
+      const target = event.target as HTMLElement;
+      const isTyping =
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        target.isContentEditable;
+
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s" && !isTyping) {
         event.preventDefault();
         setBulkMode((prev) => !prev);
         setSelectedIds([]);
@@ -692,8 +750,8 @@ export default function ManageQuestions() {
 
   // Fetch when page or filters change
   useEffect(() => {
-    fetchQuestions();
-  }, [page, searchTerm, selectedCategoryId, selectedTime]);
+    void fetchQuestions();
+  }, [fetchQuestions]);
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
@@ -798,24 +856,6 @@ export default function ManageQuestions() {
     );
   };
 
-  const handleLongPressStart = (id: string) => {
-    if (pressTimer) clearTimeout(pressTimer);
-
-    const timer = setTimeout(() => {
-      setBulkMode(true);
-      toggleSelectQuestion(id);
-    }, 350);
-
-    setPressTimer(timer);
-  };
-
-  const handleLongPressEnd = () => {
-    if (pressTimer) {
-      clearTimeout(pressTimer);
-      setPressTimer(null);
-    }
-  };
-
   const handleSelectAllVisible = () => {
     if (questions.length > 0 && selectedIds.length === questions.length) {
       setSelectedIds([]);
@@ -854,7 +894,7 @@ export default function ManageQuestions() {
 
       const paths: string[] = [];
 
-      (questionsToDelete || []).forEach((question: any) => {
+      (questionsToDelete || []).forEach((question) => {
         if (question.img_url) {
           const p = extractPath(question.img_url);
           if (p) paths.push(p);
@@ -892,7 +932,7 @@ export default function ManageQuestions() {
 
       if (deleteError) throw deleteError;
 
-      const deletedItems = (questionsToDelete || []).map((q: any) => ({
+      const deletedItems = (questionsToDelete || []).map((q) => ({
         ...q,
         category_name: "",
         options: q.options || [],
@@ -901,8 +941,6 @@ export default function ManageQuestions() {
         date_added: formatDate(q.date_added),
         date_added_raw: q.date_added,
       })) as QuestionRow[];
-
-      setLastDeletedQuestions(deletedItems);
 
       toast.success(
         deleteMode === "bulk" ? "Selected questions deleted" : "Question deleted",
@@ -933,7 +971,7 @@ export default function ManageQuestions() {
     setBulkActionMode(null);
   };
 
-  const handleSaveQuestion = async (formData: any) => {
+  const handleSaveQuestion = async (formData: QuestionFormData) => {
     const payload = {
       text: formData.questionText?.trim() || null,
       img_url: formData.questionImage?.trim() || null,
@@ -1053,19 +1091,70 @@ export default function ManageQuestions() {
     : "grid-cols-[1fr_100px] md:grid-cols-[3.2fr_1.5fr_160px] lg:grid-cols-[3.2fr_1fr_90px_0.8fr_140px]";
 
   return (
-    <div className="w-full px-4 py-20 md:px-6 md:py-24 lg:px-8 lg:py-28">
-      <div className="flex flex-col gap-4 md:gap-6 lg:gap-8">
-        <div className="space-y-2">
-          <h1 className="text-xl font-bold text-foreground md:text-2xl lg:text-3xl">
-            Manage Questions
-          </h1>
-          <p className="mt-1 text-xs text-muted-foreground md:text-sm lg:text-base">
-            Add, Edit, and Delete your quiz questions here. Use the filters to
-            find specific questions or view all of them.
-          </p>
-        </div>
+    <main className="min-h-screen bg-primary/[0.025] px-4 pb-10 pt-20 md:px-6 md:pb-12 md:pt-24 lg:px-8 lg:pt-28">
+      <div className="mx-auto flex max-w-screen-2xl flex-col gap-5 md:gap-6">
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
+              <Sparkles className="size-3.5" />
+              Question bank
+            </div>
+            <h1 className="mt-3 text-2xl font-bold tracking-tight text-foreground md:text-3xl">Manage questions</h1>
+            <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground md:text-base">
+              Create, organize, and maintain the questions learners use throughout RevView.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 items-end gap-2 rounded-xl border border-border bg-white p-4 md:grid-cols-2 md:gap-3 md:p-6 lg:grid-cols-5 lg:gap-4 lg:p-6">
+          <div className="flex w-full flex-col-reverse gap-2 sm:w-auto sm:flex-row">
+            <button
+              type="button"
+              onClick={toggleBulkMode}
+              className="inline-flex min-h-10 items-center justify-center rounded-xl border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:border-primary/20 hover:bg-primary/5 hover:text-primary"
+            >
+              {bulkMode ? "Cancel selection" : "Select multiple"}
+            </button>
+            <Button
+              text="Add question"
+              backgroundColor="bg-primary"
+              textColor="text-white"
+              leftIcon={<Add className="size-4" />}
+              onClick={handleAdd}
+              className="w-full sm:w-auto"
+            />
+          </div>
+        </header>
+
+        <section aria-label="Question summary" className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <article className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm md:p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-medium text-muted-foreground md:text-sm">Matching questions</p>
+                <p className="mt-2 text-2xl font-bold tracking-tight text-foreground">{loading ? "—" : totalCount}</p>
+              </div>
+              <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><QuestionsIcon className="size-5" /></div>
+            </div>
+          </article>
+          <article className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm md:p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-medium text-muted-foreground md:text-sm">Categories</p>
+                <p className="mt-2 text-2xl font-bold tracking-tight text-foreground">{categories.length}</p>
+              </div>
+              <div className="flex size-10 items-center justify-center rounded-xl bg-secondary/10 text-secondary"><TotalTests className="size-5" /></div>
+            </div>
+          </article>
+          <article className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm md:p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-medium text-muted-foreground md:text-sm">Current page</p>
+                <p className="mt-2 text-2xl font-bold tracking-tight text-foreground">{page}<span className="text-sm font-medium text-muted-foreground"> / {Math.max(totalPages, 1)}</span></p>
+              </div>
+              <div className="flex size-10 items-center justify-center rounded-xl bg-success/10 text-success"><Success className="size-5" /></div>
+            </div>
+          </article>
+        </section>
+
+        <section className="grid grid-cols-1 items-end gap-3 rounded-2xl border border-border/80 bg-card p-4 shadow-sm md:grid-cols-2 md:p-5 lg:grid-cols-4 lg:p-6">
           <div className="w-full col-span-1 md:col-span-2">
             <InputField
               label="Search Question"
@@ -1102,30 +1191,29 @@ export default function ManageQuestions() {
             />
           </div>
 
-          <div className="w-full flex justify-end md:col-span-2 lg:col-span-1">
-            <Button
-              text="Add New Question"
-              backgroundColor="bg-linear-to-r from-primary to-secondary"
-              textColor="text-white"
-              leftIcon={<Add />}
-              onClick={handleAdd}
-            />
-          </div>
-        </div>
+        </section>
 
         {loading ? (
-          <div className="text-center py-12 text-muted-foreground">
-            Loading...
+          <div className="space-y-3 rounded-2xl border border-border/80 bg-card p-4 shadow-sm" aria-label="Loading questions">
+            {Array.from({ length: 5 }).map((_, index) => (
+              <div key={index} className="h-16 animate-pulse rounded-xl bg-muted/50" />
+            ))}
           </div>
         ) : questions.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            No questions found
+          <div className="flex min-h-72 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card px-4 text-center shadow-sm">
+            <div className="mb-3 flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <QuestionsIcon className="size-5" />
+            </div>
+            <h2 className="text-sm font-semibold text-foreground">No questions found</h2>
+            <p className="mt-1 max-w-sm text-xs leading-relaxed text-muted-foreground">
+              Try changing your filters or add a new question to the bank.
+            </p>
           </div>
         ) : (
           <>
             {bulkMode && (
-              <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
-                <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="rounded-xl border border-primary/15 bg-primary/5 px-4 py-3 shadow-sm">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="text-sm text-foreground">
                     {selectedIds.length > 0
                       ? `${selectedIds.length} items are selected. Do you wish to modify or delete them?`
@@ -1152,8 +1240,80 @@ export default function ManageQuestions() {
               </div>
             )}
 
+            <div className="space-y-3 md:hidden">
+              {questions.map((question) => {
+                const isSelected = selectedIds.includes(question.id);
+
+                return (
+                  <article
+                    key={question.id}
+                    className={`rounded-xl border p-4 transition ${
+                      isSelected ? "border-primary/30 bg-primary/5" : "border-border/80 bg-card"
+                    }`}
+                    onClick={() => bulkMode && toggleSelectQuestion(question.id)}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex min-w-0 items-start gap-2">
+                        {bulkMode && (
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleSelectQuestion(question.id)}
+                            onClick={(event) => event.stopPropagation()}
+                            className="mt-0.5 size-4 shrink-0 rounded border-border text-primary focus:ring-primary"
+                            aria-label={`Select ${question.text || "question"}`}
+                          />
+                        )}
+                        <h2 className="line-clamp-3 text-sm font-semibold leading-relaxed text-foreground">
+                          {question.text || "Image-only question"}
+                        </h2>
+                      </div>
+                      {(question.img_url || question.explanation_img_url) && (
+                        <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                          <ImageIcon className="size-4" />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <Chip text={question.category_name} variant={getCategoryVariant(question.category_name)} />
+                      <span className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-medium text-muted-foreground">
+                        Answer: {question.correct_answer}
+                      </span>
+                      <span className="text-[10px] text-muted-foreground">{question.date_added}</span>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-2 gap-2 border-t border-border/70 pt-3">
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleEdit(question);
+                        }}
+                        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-primary/10 px-3 py-2 text-xs font-semibold text-primary transition hover:bg-primary/15"
+                      >
+                        <Edit className="size-4" />
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleDeleteClick(question.id, question.text);
+                        }}
+                        className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive transition hover:bg-destructive/15"
+                      >
+                        <Delete className="size-4" />
+                        Delete
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+
             {/* Table */}
-            <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
+            <div className="hidden overflow-x-auto rounded-xl border border-border/80 bg-card shadow-sm md:block">
               <div className={`min-w-full grid ${tableGridClassName} divide-y divide-border`}>
 
                 <div className="contents text-xs md:text-sm lg:text-base">
@@ -1190,14 +1350,7 @@ export default function ManageQuestions() {
                 {questions.map((q) => (
                   <div
                     key={q.id}
-                    className="contents group hover:bg-muted/20 transition-colors cursor-pointer"
-                    onClick={() => setSelectedQuestion(q)}
-                    onTouchStart={() => handleLongPressStart(q.id)}
-                    onTouchEnd={handleLongPressEnd}
-                    onTouchCancel={handleLongPressEnd}
-                    onMouseDown={() => handleLongPressStart(q.id)}
-                    onMouseUp={handleLongPressEnd}
-                    onMouseLeave={handleLongPressEnd}
+                    className="contents group transition-colors hover:bg-muted/20"
                   >
                     {bulkMode && (
                       <div className="py-3 px-2 flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
@@ -1374,45 +1527,56 @@ export default function ManageQuestions() {
         size="md"
         title={
           <div className="flex items-center gap-3">
-            <Delete className="h-7 w-7 shrink-0 text-destructive md:h-8 md:w-8" />
-            <span className="text-xl font-semibold text-foreground">
-              {bulkActionMode === "move" ? "Move Selected?" : "Delete Item?"}
-            </span>
+            <div className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${bulkActionMode === "move" ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"}`}>
+              {bulkActionMode === "move" ? <QuestionsIcon className="size-5" /> : <Delete className="size-5" />}
+            </div>
+            <div>
+              <h2 className="text-base font-semibold text-foreground md:text-lg">
+                {bulkActionMode === "move"
+                  ? "Move selected questions"
+                  : deleteMode === "bulk"
+                    ? "Delete selected questions"
+                    : "Delete question"}
+              </h2>
+              <p className="mt-0.5 text-xs font-normal text-muted-foreground">
+                {bulkActionMode === "move" ? "Choose a destination category." : "This permanently removes the selected content."}
+              </p>
+            </div>
           </div>
         }
-        description={
-          bulkActionMode === "move"
-            ? `Move ${selectedIds.length} selected question${selectedIds.length === 1 ? "" : "s"} to a different category?`
-            : deleteMode === "bulk"
-              ? `Delete ${selectedIds.length} selected question${selectedIds.length === 1 ? "" : "s"}? This action cannot be undone.`
-              : "Are you sure you want to delete this item? This action cannot be undone."
-        }
         footer={
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            <Button text="Cancel" onClick={() => {
-              setDeleteOpen(false);
-              setDeleteId(null);
-              setDeleteIds([]);
-              setDeleteText("");
-              setDeleteMode(null);
-              setBulkActionMode(null);
-            }} />
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <Button
-              text={bulkActionMode === "move" ? "Move Selected" : "Delete"}
+              text="Cancel"
+              backgroundColor="bg-muted"
+              textColor="text-foreground"
+              className="w-full sm:w-auto"
+              onClick={() => {
+                setDeleteOpen(false);
+                setDeleteId(null);
+                setDeleteIds([]);
+                setDeleteText("");
+                setDeleteMode(null);
+                setBulkActionMode(null);
+              }}
+            />
+            <Button
+              text={bulkActionMode === "move" ? "Move questions" : deleteMode === "bulk" ? "Delete questions" : "Delete question"}
               backgroundColor={bulkActionMode === "move" ? "bg-primary" : "bg-destructive"}
               textColor="text-white"
-              borderColor={bulkActionMode === "move" ? "border-primary" : "border-destructive"}
-              onClick={bulkActionMode === "move" ? handleMoveSelected : confirmDelete}
+              leftIcon={bulkActionMode === "move" ? <QuestionsIcon className="size-4" /> : <Delete className="size-4" />}
+              onClick={bulkActionMode === "move" ? () => void handleMoveSelected() : () => void confirmDelete()}
+              isDisabled={bulkActionMode === "move" && !bulkMoveCategoryId}
+              className="w-full sm:w-auto"
             />
           </div>
         }
       >
-        <div className="space-y-4 px-4 py-4 sm:px-6 sm:py-5">
+        <div className="space-y-4 p-4 sm:p-6">
           {bulkActionMode === "move" && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Choose a category</label>
+            <div className="rounded-xl border border-border/80 bg-muted/20 p-4">
               <ComboBox
-                label=""
+                label="Destination category"
                 placeholder="Select category"
                 options={categories.map((c) => ({ value: c.id, label: c.name }))}
                 value={bulkMoveCategoryId}
@@ -1422,14 +1586,16 @@ export default function ManageQuestions() {
             </div>
           )}
 
-          {deleteText && (
-            <div className="rounded-md border border-border bg-muted/40 p-3 text-sm text-foreground/90 line-clamp-3">
-              “{deleteText}”
+          {deleteText && bulkActionMode !== "move" && (
+            <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-destructive">You are deleting</p>
+              <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-foreground">“{deleteText}”</p>
+              <p className="mt-3 text-xs text-muted-foreground">Deleted questions can only be restored immediately using the undo notification.</p>
             </div>
           )}
         </div>
       </Modal>
 
-    </div>
+    </main>
   );
 }
