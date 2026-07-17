@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react'
-import { RadioButton, InputField } from '@/lib/client-imports';
+import { useState } from "react";
+import { InputField, RadioButton } from "@/lib/client-imports";
 
-const questionOptions = [5,10,15,20,25,30,40,50];
+const questionOptions = [5, 10, 15, 20, 25, 30, 40, 50];
 
 interface Props {
   selected: number;
@@ -13,47 +13,53 @@ interface Props {
 const SelectNumQuestions = ({ selected, setSelected }: Props) => {
   const [custom, setCustom] = useState("");
 
-  const handleCustom = (val: string) => {
-    const num = Number(val);
-    setCustom(val);
+  const handlePreset = (value: number) => {
+    setCustom("");
+    setSelected(value);
+  };
 
-    if (num > 0 && num <= 120) {
-      setSelected(num);
-    }
+  const handleCustom = (value: string) => {
+    setCustom(value);
+    const count = Number(value);
+    setSelected(count >= 1 && count <= 120 ? count : 0);
   };
 
   return (
-    <section>
-      <div className="w-full flex flex-col gap-1 md:gap-1.5 lg:gap-2 p-4 md:p-5 lg:p-6 rounded-xl border-border border bg-card">
-        <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground mb-2 md:mb-4 lg:mb-6">
-          2. Number of Questions
-        </h1>
-
-        <div className="flex-wrap gap-2 md:gap-3 lg:gap-4 grid grid-cols-4">
-          {questionOptions.map((value) => (
-            <RadioButton
-              key={value}
-              variant="pill"
-              value={value}
-              label={value.toString()}
-              isSelected={selected === value}
-              onSelect={() => setSelected(value)}
-            />
-          ))}
+    <section className="rounded-2xl border border-border/70 bg-card p-4 shadow-sm sm:p-5 lg:p-6">
+      <div className="mb-4 flex items-start gap-3 sm:mb-5">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">2</span>
+        <div>
+          <h2 className="text-base font-bold text-foreground sm:text-lg">Set the quiz length</h2>
+          <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground sm:text-sm">Choose a quick drill or a longer review session.</p>
         </div>
+      </div>
 
-        {/* Custom */}
-        <div className="mt-4">
-          <InputField
-            placeholder="Custom (max 120)"
-            type="number"
-            value={custom}
-            onChange={(e) => handleCustom(e.target.value)}
-            max={120}
-            min={0}
-            step={5}
+      <div className="grid grid-cols-4 gap-2 sm:grid-cols-8">
+        {questionOptions.map((value) => (
+          <RadioButton
+            key={value}
+            variant="pill"
+            value={value}
+            label={value.toString()}
+            isSelected={selected === value && custom === ""}
+            onSelect={() => handlePreset(value)}
+            className="!min-h-11 !p-2"
           />
-        </div>
+        ))}
+      </div>
+
+      <div className="mt-4 grid items-end gap-2 sm:grid-cols-[minmax(0,14rem)_1fr]">
+        <InputField
+          label="Custom amount"
+          placeholder="1–120 questions"
+          type="number"
+          value={custom}
+          onChange={(event) => handleCustom(event.target.value)}
+          max={120}
+          min={1}
+          step={1}
+        />
+        <p className="pb-2 text-xs leading-relaxed text-muted-foreground">Up to 120 questions per practice session.</p>
       </div>
     </section>
   );

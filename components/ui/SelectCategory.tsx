@@ -1,70 +1,63 @@
-'use client'
+"use client";
 
-import { AllCategories, Analytical, General, Numerical, Verbal } from '@/lib/icons';
-import { RadioButton } from '@/lib/client-imports';
-import { QuizCategory } from '@/lib/types';
+import { AllCategories, Analytical, General, Numerical, Verbal } from "@/lib/icons";
+import { RadioButton } from "@/lib/client-imports";
+import { QuizCategory } from "@/lib/types";
 
 interface Props {
   categories: QuizCategory[];
   selected: string | null;
   setSelected: (value: string | null) => void;
+  isLoading?: boolean;
 }
 
-const icons = [
-  <Numerical />,   
-  <Analytical />, 
-  <Verbal />,  
-  <General />, 
-];
+const icons = [<Numerical key="numerical" />, <Analytical key="analytical" />, <Verbal key="verbal" />, <General key="general" />];
+const backgrounds = ["bg-blue-600", "bg-violet-600", "bg-emerald-600", "bg-amber-600"];
 
-const backgrounds = [
-  "bg-blue-700",
-  "bg-violet-700",
-  "bg-green-700", 
-  "bg-orange-700",
-];
+const SelectCategory = ({ categories, selected, setSelected, isLoading = false }: Props) => (
+  <section className="rounded-2xl border border-border/70 bg-card p-4 shadow-sm sm:p-5 lg:p-6">
+    <div className="mb-4 flex items-start gap-3 sm:mb-5">
+      <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">1</span>
+      <div>
+        <h2 className="text-base font-bold text-foreground sm:text-lg">Choose a category</h2>
+        <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground sm:text-sm">Focus on one subject or build a mixed practice set.</p>
+      </div>
+    </div>
 
-const SelectCategory = ({ categories, selected, setSelected }: Props) => {
-  return (
-    <section>
-      <div className="w-full flex flex-col gap-1 md:gap-1.5 lg:gap-2 p-4 md:p-5 lg:p-6 rounded-xl border-border border bg-card">
-        <h1 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground mb-2 md:mb-4 lg:mb-6">
-          1. Select Category
-        </h1>
-
-        {/* ALL */}
+    {isLoading ? (
+      <div className="grid gap-2 sm:grid-cols-2" aria-label="Loading categories">
+        {[1, 2, 3, 4].map((item) => <div key={item} className="h-17 animate-pulse rounded-xl bg-muted" />)}
+      </div>
+    ) : (
+      <div className="grid gap-2 sm:grid-cols-2">
         <RadioButton
           variant="boxed"
           value="all"
           label="All Categories"
-          description="Mixed questions from all categories"
+          description="A balanced mix of every subject"
           icon={<AllCategories />}
-          boxedBG="bg-purple-700"
+          boxedBG="bg-primary"
           isSelected={selected === null}
           onSelect={() => setSelected(null)}
+          className="!gap-3 !p-3"
         />
-
-        {categories.map((category, index) => {
-          const icon = icons[index] ?? null;
-          const bg = backgrounds[index] ?? "bg-gray-700";
-
-          return (
-            <RadioButton
-              key={category.id}
-              variant="boxed"
-              value={category.id}
-              label={category.name}
-              description={category.description || ""}
-              icon={icon}
-              boxedBG={bg}
-              isSelected={selected === category.id}
-              onSelect={() => setSelected(category.id)}
-            />
-          );
-        })}
+        {categories.map((category, index) => (
+          <RadioButton
+            key={category.id}
+            variant="boxed"
+            value={category.id}
+            label={category.name}
+            description={category.description || "Practice this category"}
+            icon={icons[index] ?? <General />}
+            boxedBG={backgrounds[index] ?? "bg-slate-600"}
+            isSelected={selected === category.id}
+            onSelect={() => setSelected(category.id)}
+            className="!gap-3 !p-3"
+          />
+        ))}
       </div>
-    </section>
-  );
-};
+    )}
+  </section>
+);
 
 export default SelectCategory;
