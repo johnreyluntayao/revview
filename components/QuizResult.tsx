@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { ScoreCard, Card, QuizAccordion } from "@/lib/client-imports";
 import { toast } from "sonner";
-import AdsSection from "./ui/AdsSection";
 
 type Question = {
   id: string;
@@ -28,7 +27,7 @@ interface QuizResultProps {
 }
 
 const QuizResult = ({ sessionId }: QuizResultProps) => {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
 
   const [score, setScore] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
@@ -123,7 +122,7 @@ const QuizResult = ({ sessionId }: QuizResultProps) => {
 
         if (qError) throw qError;
 
-        const formattedQuestions: Question[] = qData.map((q: any) => ({
+        const formattedQuestions: Question[] = qData.map((q) => ({
           id: q.id,
           text: q.text,
           options: q.options || [],
@@ -143,14 +142,14 @@ const QuizResult = ({ sessionId }: QuizResultProps) => {
 
         if (aError) throw aError;
 
-        const formattedAnswers: Answer[] = answerData.map((a: any) => ({
+        const formattedAnswers: Answer[] = answerData.map((a) => ({
           questionId: a.question_id,
           selectedOption: a.selected_option,
           isCorrect: a.is_correct,
         }));
 
         setAnswers(formattedAnswers);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error loading quiz result:", err);
         toast.error("Failed to load quiz results. Please try again.");
       } finally {
@@ -170,7 +169,7 @@ const QuizResult = ({ sessionId }: QuizResultProps) => {
   }
 
   return (
-    <div className="px-4 md:px-6 lg:px-40 py-20 lg:py-24 space-y-4 md:space-y-6 lg:space-y-8 bg-linear-to-br from-primary/5 to-secondary/5">
+    <div className="min-h-screen space-y-4 bg-linear-to-br from-primary/5 to-secondary/5 px-4 pb-10 pt-28 md:space-y-6 md:px-6 md:pt-24 lg:space-y-8 lg:px-40 lg:pt-28">
       <div>
         <ScoreCard
           score={score}

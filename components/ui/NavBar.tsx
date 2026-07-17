@@ -81,7 +81,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
   const accumulatedScroll = useRef(0);
   const lastDirection = useRef<"up" | "down" | null>(null);
 
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
 
   // ✅ HYBRID TIMER
   const {
@@ -445,7 +445,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
 
           {/* Quiz Title in Center */}
           {State === "OnQuiz" && (
-            <div className="hidden flex-1 text-center text-base font-bold text-foreground md:block lg:text-lg">
+            <div className="hidden min-w-0 flex-1 px-3 text-center text-base font-bold text-foreground md:block lg:text-lg">
               {quizCategoryName}
             </div>
           )}
