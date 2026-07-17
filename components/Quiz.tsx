@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useHybridQuizTimer } from "@/lib/hooks/useHybridQuizTimer";
 import { CorrectAnswer, IncorrectAnswer } from "@/lib/icons";
 import Image from "next/image";
+import { ArrowRight, Check, Clock3, Lightbulb, LoaderCircle } from "lucide-react";
 
 type Question = {
   option_images: (string | null)[];
@@ -48,8 +49,13 @@ interface QuizProps {
   sessionId: string;
 }
 
+type QuizWindow = Window &
+  typeof globalThis & {
+    setQuizPaused?: (paused: boolean) => void;
+  };
+
 export default function Quiz({ sessionId }: QuizProps) {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
   const router = useRouter();
 
   const [quizData, setQuizData] = useState<QuizData | null>(null);
@@ -60,11 +66,13 @@ export default function Quiz({ sessionId }: QuizProps) {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isSavingAnswer, setIsSavingAnswer] = useState(false);
+  const [isSubmittingQuiz, setIsSubmittingQuiz] = useState(false);
 
   const questionStartTimeRef = useRef<number>(Date.now());
   const hasSubmittedRef = useRef(false);
 
-  const { timeLeft, isPaused, setIsPaused } = useHybridQuizTimer({
+  const { isPaused, setIsPaused } = useHybridQuizTimer({
     sessionId,
     onExpire: async () => {
       toast.error("Time's up! Submitting quiz...");
@@ -72,9 +80,15 @@ export default function Quiz({ sessionId }: QuizProps) {
     },
   });
 
+  const currentQuestion = quizData?.questions[currentIndex];
+  const isLastQuestion = currentIndex === (quizData?.questions.length ?? 1) - 1;
+  const answeredCount = Object.values(userAnswers).filter(
+    (value) => value !== null,
+  ).length;
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (answerSubmitted || isPaused) return;
+      if (answerSubmitted || isPaused || isSavingAnswer) return;
 
       const key = e.key.toLowerCase();
 
@@ -91,7 +105,8 @@ export default function Quiz({ sessionId }: QuizProps) {
         selectedValue = String.fromCharCode(64 + num);
       }
 
-      if (selectedValue) {
+      const optionIndex = selectedValue ? selectedValue.charCodeAt(0) - 65 : -1;
+      if (selectedValue && optionIndex < (currentQuestion?.options.length ?? 0)) {
         setSelectedOption(selectedValue);
       }
     };
@@ -101,7 +116,7 @@ export default function Quiz({ sessionId }: QuizProps) {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [answerSubmitted, isPaused]);
+  }, [answerSubmitted, currentQuestion?.options.length, isPaused, isSavingAnswer]);
 
   useEffect(() => {
     async function fetchQuizData() {
@@ -135,7 +150,7 @@ export default function Quiz({ sessionId }: QuizProps) {
         setIsPaused(typedData.session.is_paused || false);
 
         questionStartTimeRef.current = Date.now();
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Quiz load error:", err);
         toast.error("Could not load quiz. Redirecting...");
         router.replace("/dashboard?error=quiz_load_failed");
@@ -147,19 +162,8 @@ export default function Quiz({ sessionId }: QuizProps) {
     fetchQuizData();
   }, [sessionId, router, supabase, setIsPaused]);
 
-  const handleTimeExpired = useCallback(async () => {
-    toast.error("Time's up! Submitting quiz...");
-    await submitQuiz(true);
-  }, []);
-
-  const currentQuestion = quizData?.questions[currentIndex];
-  const isLastQuestion = currentIndex === (quizData?.questions.length ?? 1) - 1;
-  const answeredCount = Object.values(userAnswers).filter(
-    (v) => v !== null,
-  ).length;
-
   const handleChoice = (value: string | number | null) => {
-    if (answerSubmitted || isPaused) return;
+    if (answerSubmitted || isPaused || isSavingAnswer) return;
     if (value === null || value === undefined) return;
 
     const selectedValue =
@@ -178,13 +182,8 @@ export default function Quiz({ sessionId }: QuizProps) {
     );
     const isCorrect = selectedOption === currentQuestion.correct_answer;
 
-    setUserAnswers((prev) => ({
-      ...prev,
-      [currentQuestion.id]: selectedOption,
-    }));
-    setAnswerSubmitted(true);
-
     try {
+      setIsSavingAnswer(true);
       const { error } = await supabase.from("quiz_answers").upsert(
         {
           quiz_session_id: sessionId,
@@ -197,9 +196,16 @@ export default function Quiz({ sessionId }: QuizProps) {
       );
 
       if (error) throw error;
+      setUserAnswers((prev) => ({
+        ...prev,
+        [currentQuestion.id]: selectedOption,
+      }));
+      setAnswerSubmitted(true);
     } catch (err) {
       console.error("Failed to save answer:", err);
-      toast.error("Could not save your answer");
+      toast.error("Could not save your answer. Please try again.");
+    } finally {
+      setIsSavingAnswer(false);
     }
   };
 
@@ -214,19 +220,20 @@ export default function Quiz({ sessionId }: QuizProps) {
 
   const submitQuiz = useCallback(
     async (timedOut = false) => {
+      if (!quizData) return;
       if (hasSubmittedRef.current) return;
       hasSubmittedRef.current = true;
 
-      if (!quizData) return;
-
       try {
+        setIsSubmittingQuiz(true);
         const correctCount = quizData.questions.filter((q) => {
           const selected = userAnswers[q.id];
           return selected && selected === q.correct_answer;
         }).length;
 
-        const answered = Object.keys(userAnswers).length;
+        const answered = Object.values(userAnswers).filter(Boolean).length;
         const wrongCount = answered - correctCount;
+        const skippedCount = quizData.session.total_questions - answered;
 
         const scorePercentage = quizData.session.total_questions
           ? Math.round((correctCount / quizData.session.total_questions) * 100)
@@ -271,7 +278,7 @@ export default function Quiz({ sessionId }: QuizProps) {
             total_questions: quizData.session.total_questions,
             correct_answers: correctCount,
             wrong_answers: wrongCount,
-            skipped_answers: 0,
+            skipped_answers: skippedCount,
             time_taken_seconds: Math.max(0, totalTimeTaken),
             percentage: scorePercentage,
             date_taken: new Date().toISOString(),
@@ -279,7 +286,7 @@ export default function Quiz({ sessionId }: QuizProps) {
 
         if (resultError) throw resultError;
 
-        await supabase
+        const { error: sessionUpdateError } = await supabase
           .from("quiz_sessions")
           .update({
             is_completed: true,
@@ -287,41 +294,55 @@ export default function Quiz({ sessionId }: QuizProps) {
           })
           .eq("id", sessionId);
 
+        if (sessionUpdateError) throw sessionUpdateError;
+
         toast.success(
           timedOut ? "Time's up — quiz submitted!" : "Quiz completed!",
         );
-        router.push(`/quiz-result/${sessionId}`);
-      } catch (err: any) {
+        router.replace(`/quiz-result/${sessionId}`);
+      } catch (err: unknown) {
         console.error("Finish quiz error:", err);
         toast.error("Failed to submit quiz.");
 
         hasSubmittedRef.current = false;
+        setIsSubmittingQuiz(false);
       }
     },
     [quizData, userAnswers, sessionId, router, supabase],
   );
 
   useEffect(() => {
-    (window as any).setQuizPaused = (paused: boolean) => {
+    (window as QuizWindow).setQuizPaused = (paused: boolean) => {
       setIsPaused(paused);
     };
     return () => {
-      delete (window as any).setQuizPaused;
+      delete (window as QuizWindow).setQuizPaused;
     };
   }, [setIsPaused]);
 
   if (loading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <p className="text-lg text-muted-foreground">Loading your quiz...</p>
+      <div className="flex min-h-screen items-center justify-center bg-linear-to-b from-primary/5 to-background px-4">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <span className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <LoaderCircle className="size-6 animate-spin" />
+          </span>
+          <div>
+            <p className="font-semibold text-foreground">Preparing your quiz</p>
+            <p className="mt-1 text-sm text-muted-foreground">Loading your questions and saved progress…</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!quizData || !currentQuestion) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <p className="text-lg text-destructive">Quiz data not found</p>
+      <div className="flex min-h-screen items-center justify-center px-4">
+        <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-6 text-center">
+          <p className="font-semibold text-destructive">Quiz data could not be found.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Return to the dashboard and start a new session.</p>
+        </div>
       </div>
     );
   }
@@ -329,43 +350,58 @@ export default function Quiz({ sessionId }: QuizProps) {
   const confirmedAnswer = userAnswers[currentQuestion.id] ?? null;
   const isCorrect = confirmedAnswer === currentQuestion.correct_answer;
 
-  const optionImage = currentQuestion.option_images?.some((img) => img !== null);
+  const optionImage = currentQuestion.option_images?.some(Boolean);
 
   return (
-    <div className="px-4 md:px-6 lg:px-8 py-20 lg:py-24 place-self-center max-w-4xl w-full transition-all">
-      <Progress
-        variant="default"
-        current={answeredCount}
-        total={quizData.session.total_questions}
-        label={`${answeredCount} of ${quizData.session.total_questions} answered`}
-      />
+    <div className="min-h-screen bg-linear-to-b from-primary/5 via-background to-background px-4 pb-10 pt-32 sm:px-6 md:pt-28 lg:px-8">
+      <div className="mx-auto w-full max-w-5xl">
+        <div className="mb-4 rounded-2xl border border-border/70 bg-card p-4 shadow-sm sm:mb-5 sm:p-5">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">Quiz progress</p>
+              <p className="mt-1 text-sm font-semibold text-foreground">Question {currentIndex + 1} of {quizData.session.total_questions}</p>
+            </div>
+            <div className="rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+              {answeredCount} answered
+            </div>
+          </div>
+          <Progress
+            variant="default"
+            current={answeredCount}
+            total={quizData.session.total_questions}
+            className="!p-0"
+          />
+        </div>
 
-      <div className="flex flex-col gap-4 md:gap-6 lg:gap-8 mt-4 md:mt-5 lg:mt-6 p-4 md:p-6 lg:p-8 border border-border rounded-xl bg-card shadow-sm overflow-hidden transition-all">
-        <div className="pb-4 md:pb-5 lg:pb-6 border-b border-border">
-          <h2 className="text-sm md:text-base lg:text-lg font-semibold leading-tight text-muted-foreground">
-            Question {currentIndex + 1}: <span className="text-foreground">{currentQuestion.text}</span>
-          </h2>
+        <article className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-sm">
+          <div className="border-b border-border/70 p-5 sm:p-7 lg:p-8">
+            <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+              <span className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">{currentIndex + 1}</span>
+              Select the best answer
+            </div>
+            <h1 className="text-lg font-bold leading-relaxed text-foreground sm:text-xl lg:text-2xl">
+              {currentQuestion.text}
+            </h1>
           {currentQuestion.img_url && (
-            <div className="mt-2 md:mt-3 lg:mt-4 flex justify-center border border-border w-full h-56 md:h-60 lg:h-64 p-2 md:p-3 lg:p-4 bg-linear-to-br from-primary/15 to-secondary/15 rounded-lg">
+            <div className="mt-5 flex h-56 w-full justify-center rounded-xl border border-border/70 bg-muted/40 p-3 sm:h-72">
               <Image
                 src={currentQuestion.img_url}
                 alt="Question illustration"
-                className="object-contain rounded-lg w-full h-full"
+                className="h-full w-full rounded-lg object-contain"
                 width={1000}
                 height={1000}
               />
             </div>
           )}
-        </div>
+          </div>
 
         <div
           className={`${
             optionImage
-              ? "grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 lg:gap-4"
-              : "space-y-2 md:space-y-3 lg:space-y-4"
-          } pb-4 md:pb-5 lg:pb-6 border-b border-border`}
+              ? "grid grid-cols-1 gap-3 sm:grid-cols-2"
+              : "grid grid-cols-1 gap-3"
+          } p-5 sm:p-7 lg:p-8`}
         >
-
           {currentQuestion.options.map((optionText, idx) => {
             const value = String.fromCharCode(65 + idx);
             const isSelected = selectedOption === value;
@@ -405,84 +441,84 @@ export default function Quiz({ sessionId }: QuizProps) {
                   value={value}
                   label={optionText}
                   image={
-                    individualOptionImage ||
-                    (currentQuestion.img_url && !individualOptionImage
-                      ? currentQuestion.img_url!
-                      : undefined)
+                    individualOptionImage || undefined
                   }
                   isSelected={isSelected || isConfirmed || isCorrectAnswer}
                   onSelect={handleChoice}
-                  disabled={answerSubmitted || isPaused}
+                  disabled={answerSubmitted || isPaused || isSavingAnswer}
                   indicator={indicator}
                   selectedColor={selectedColor}
                   rightIcon={rightIcon}
+                  className={individualOptionImage ? "!p-3" : "!min-h-14 !p-3 sm:!p-4"}
                 />
             );
           })}
         </div>
 
         {answerSubmitted && (
-          <div className="p-4 md:p-5 lg:p-6 border border-primary/25 rounded-xl bg-primary/5 transition-all space-y-3 md:space-y-4">
-            {/* RESULT HEADER */}
-            <div className="flex items-center gap-2 md:gap-2.5 lg:gap-3">
+          <div className={`border-t p-5 sm:p-7 lg:p-8 ${isCorrect ? "border-success/20 bg-success/5" : "border-destructive/20 bg-destructive/5"}`}>
+            <div className="flex items-center gap-3">
               {isCorrect ? (
-                <CorrectAnswer className="text-success" />
+                <span className="flex size-9 items-center justify-center rounded-full bg-success/15 text-success"><Check className="size-5" /></span>
               ) : (
-                <IncorrectAnswer className="text-destructive" />
+                <span className="flex size-9 items-center justify-center rounded-full bg-destructive/15"><IncorrectAnswer className="text-destructive" /></span>
               )}
-              <span className="text-sm md:text-base lg:text-lg font-bold text-foreground">
+              <div>
+              <p className="text-base font-bold text-foreground sm:text-lg">
                 {isCorrect ? "Correct!" : "Incorrect"}
-              </span>
+              </p>
+              {!isCorrect && <p className="text-xs text-muted-foreground">The correct answer is {currentQuestion.correct_answer}.</p>}
+              </div>
             </div>
 
-            {/* EXPLANATION TEXT */}
-            <p className="text-muted-foreground leading-relaxed text-xs md:text-sm lg:text-base">
-              {currentQuestion.explanation}
-            </p>
-
-            {currentQuestion.img_url && (
-              <div className="flex justify-center">
-                <Image
-                  src={currentQuestion.img_url}
-                  alt="Explanation illustration"
-                  className="h-44 md:h-48 lg:h-52 w-auto object-contain rounded-lg border border-border"
-                  width={1000}
-                  height={1000}
-                />
+            <div className="mt-4 flex items-start gap-3 rounded-xl border border-border/60 bg-card/70 p-4">
+              <Lightbulb className="mt-0.5 size-5 shrink-0 text-primary" />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide text-primary">Explanation</p>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground sm:text-base">{currentQuestion.explanation}</p>
               </div>
-            )}
+            </div>
           </div>
         )}
-      </div>
+        </article>
 
-      <div className="mt-4 md:mt-6 lg:mt-8 flex justify-end items-center gap-2 md:gap-3 lg:gap-4">
-        <div className="flex gap-4 w-full sm:w-auto">
+        <div className="sticky bottom-3 z-10 mt-4 rounded-2xl border border-border/70 bg-background/90 p-3 shadow-lg backdrop-blur-xl sm:static sm:mt-5 sm:flex sm:items-center sm:justify-between sm:bg-transparent sm:p-0 sm:shadow-none">
+          <div className="p-2 md:p-2.5 lg:p-3 hidden items-center gap-2 text-xs text-muted-foreground sm:flex">
+            <Clock3 className="size-4" /> Your answer is saved before you continue.
+          </div>
+          <div className="w-full sm:w-auto sm:min-w-44">
           {!answerSubmitted ? (
             <Button
-              text="Submit Answer"
+              text={isSavingAnswer ? "Saving answer…" : "Submit answer"}
+              leftIcon={isSavingAnswer ? <LoaderCircle className="size-4 animate-spin" /> : <Check className="size-4" />}
               backgroundColor="bg-primary"
               textColor="text-primary-foreground"
-              isDisabled={!selectedOption || isPaused}
+              isDisabled={!selectedOption || isPaused || isSavingAnswer}
               onClick={submitCurrentAnswer}
-              className="flex-1 sm:flex-none"
+              className="min-h-12 w-full font-semibold"
             />
           ) : isLastQuestion ? (
             <Button
-              text="Finish Quiz"
-              backgroundColor="bg-primary"
+              text={isSubmittingQuiz ? "Submitting quiz…" : "Finish quiz"}
+              leftIcon={isSubmittingQuiz ? <LoaderCircle className="size-4 animate-spin" /> : undefined}
+              rightIcon={!isSubmittingQuiz ? <Check className="size-4" /> : undefined}
+              backgroundColor="bg-linear-to-r from-primary to-secondary"
               textColor="text-primary-foreground"
+              isDisabled={isSubmittingQuiz}
               onClick={() => submitQuiz()}
-              className="flex-1 sm:flex-none"
+              className="min-h-12 w-full font-semibold"
             />
           ) : (
             <Button
-              text="Next Question"
+              text="Next question"
+              rightIcon={<ArrowRight className="size-4" />}
               backgroundColor="bg-primary"
               textColor="text-primary-foreground"
               onClick={goToNextQuestion}
-              className="flex-1 sm:flex-none"
+              className="min-h-12 w-full font-semibold"
             />
           )}
+          </div>
         </div>
       </div>
     </div>

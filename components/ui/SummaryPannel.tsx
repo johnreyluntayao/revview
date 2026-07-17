@@ -73,7 +73,7 @@ export default function SummaryPanel({
             backgroundColor="bg-linear-to-r from-primary to-secondary"
             textColor="text-primary-foreground"
             className="min-h-12 w-full font-semibold shadow-sm hover:shadow-md"
-            rightIcon={<Play />}
+            rightIcon={!isStarting ? <Play className="size-4 fill-current" /> : undefined}
           >
             {isStarting ? (
               <><span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" /> Starting quiz…</>
