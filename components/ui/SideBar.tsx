@@ -28,7 +28,6 @@ interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
   items?: NavItem[];
-  adHide?: boolean;
 }
 
 const defaultItems: NavItem[] = [
@@ -74,10 +73,10 @@ export default function Sidebar({
       href={item.href}
       onClick={onClose}
       aria-current={isActive(item) ? "page" : undefined}
-      className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+      className={`relative flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:transition-colors ${
         isActive(item)
-          ? "bg-primary/10 text-primary"
-          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+          ? "bg-primary/10 text-primary before:bg-primary"
+          : "text-muted-foreground before:bg-transparent hover:bg-muted hover:text-foreground"
       }`}
     >
       {item.icon && <item.icon className="size-4.5 shrink-0" />}
@@ -88,14 +87,15 @@ export default function Sidebar({
   return (
     <aside
       id="learner-sidebar"
-      className={`fixed inset-y-0 left-0 z-50 w-72 transform border-r border-border/80 bg-card shadow-xl transition-transform duration-300 ease-in-out lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-64 lg:translate-x-0 lg:shadow-none ${
+      aria-label="Learner sidebar"
+      className={`fixed inset-y-0 left-0 z-50 w-[min(20rem,88vw)] transform rounded-r-2xl border-r border-border/80 bg-card shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-64 lg:translate-x-0 lg:rounded-none lg:shadow-none ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       }`}
     >
       <div className="flex h-full flex-col">
         <button
           type="button"
-          className="absolute right-4 top-4 rounded-full border border-border p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground lg:hidden"
+          className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:bg-muted hover:text-foreground lg:hidden"
           onClick={onClose}
           aria-label="Close dashboard navigation"
         >
@@ -122,7 +122,7 @@ export default function Sidebar({
           </nav>
         </div>
 
-        <div className="shrink-0 space-y-3 border-t border-border px-4 py-4 lg:px-5">
+        <div className="shrink-0 space-y-3 border-t border-border px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 lg:px-5 lg:pb-4">
           <div className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
             <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-primary to-secondary text-sm font-bold text-white">
               {(name || "U").trim().charAt(0).toUpperCase()}
