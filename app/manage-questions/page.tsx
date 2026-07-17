@@ -1,12 +1,12 @@
 import { ManageQuestions, NavBar } from "@/lib/client-imports";
 
-const page = () => {
+const QuestionManagementPage = () => {
   return (
-    <main className="bg-primary/5 min-h-screen">
-        <NavBar State="LoggedIn"/>
-        <ManageQuestions />
-    </main>
-  )
-}
+    <>
+      <NavBar State="LoggedIn" />
+      <ManageQuestions />
+    </>
+  );
+};
 
-export default page
+export default QuestionManagementPage;
