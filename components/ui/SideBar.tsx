@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import Image from "next/image";
-
 import {
-  Logout,
   AccountSettings,
-  Close,
-  StartQuiz,
-  ProgressTracking,
   AverageScore,
+  Close,
+  Logout,
+  ProgressTracking,
+  StartQuiz,
 } from "@/lib/icons";
 
 type NavItem = {
@@ -28,14 +28,13 @@ interface SidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
   items?: NavItem[];
-  adHide?: boolean;
 }
 
 const defaultItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: ProgressTracking, section: "main", exact: true },
-  { href: "/quiz-selection", label: "Start Review", section: "main", icon: StartQuiz, exact: false },
-  { href: "/results-history", label: "Results History", section: "main", icon: AverageScore, exact: true },
-  { href: "/user-account", label: "Account Settings", icon: AccountSettings, section: "account", exact: true },
+  { href: "/quiz-selection", label: "Start review", icon: StartQuiz, section: "main" },
+  { href: "/results-history", label: "Results history", icon: AverageScore, section: "main", exact: true },
+  { href: "/user-account", label: "Account settings", icon: AccountSettings, section: "account", exact: true },
 ];
 
 export default function Sidebar({
@@ -43,156 +42,108 @@ export default function Sidebar({
   isOpen = false,
   onClose = () => {},
   items = defaultItems,
-  adHide = false
 }: SidebarProps) {
   const pathname = usePathname();
+  const [supabase] = useState(() => createClient());
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const isActive = (item: NavItem) =>
     item.exact ? pathname === item.href : pathname.startsWith(item.href);
-
-  const close = () => onClose();
-
-  const mainItems = items.filter((i) => i.section !== "account");
-  const accountItems = items.filter((i) => i.section === "account");
+  const mainItems = items.filter((item) => item.section !== "account");
+  const accountItems = items.filter((item) => item.section === "account");
 
   const handleLogout = async () => {
     if (isLoggingOut) return;
-
     setIsLoggingOut(true);
 
     try {
-      const supabase = createClient();
       const { error } = await supabase.auth.signOut();
-
-      if (error) {
-        console.error("Logout failed:", error.message);
-        alert("Failed to sign out. Please try again.");
-        return;
-      }
+      if (error) throw error;
       window.location.href = "/login";
-    } catch (err) {
-      console.error("Unexpected logout error:", err);
-      window.location.href = "/login";
-    } finally {
+    } catch (error: unknown) {
+      console.error("Failed to sign out:", error);
+      toast.error("Failed to sign out. Please try again.");
       setIsLoggingOut(false);
     }
   };
 
+  const renderLink = (item: NavItem) => (
+    <Link
+      key={item.href}
+      href={item.href}
+      onClick={onClose}
+      aria-current={isActive(item) ? "page" : undefined}
+      className={`relative flex min-h-11 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:transition-colors ${
+        isActive(item)
+          ? "bg-primary/10 text-primary before:bg-primary"
+          : "text-muted-foreground before:bg-transparent hover:bg-muted hover:text-foreground"
+      }`}
+    >
+      {item.icon && <item.icon className="size-4.5 shrink-0" />}
+      <span>{item.label}</span>
+    </Link>
+  );
+
   return (
-    <>
-      <aside
-        className={`
-          fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-border
-          transform transition-transform duration-300 ease-in-out
-          ${isOpen ? "translate-x-0" : "-translate-x-full"}
-          lg:sticky lg:top-0 lg:translate-x-0 lg:h-screen lg:z-auto
-        `}
-      >
-        <div className="flex flex-col h-full">
-          {/* Mobile close button */}
-          <button
-            className="lg:hidden absolute top-4 right-4 text-muted-foreground hover:text-foreground rounded-md hover:bg-muted/50"
-            onClick={close}
-            aria-label="Close sidebar"
-          >
-            <Close className="w-6 h-6" />
-          </button>
+    <aside
+      id="learner-sidebar"
+      aria-label="Learner sidebar"
+      className={`fixed inset-y-0 left-0 z-50 w-[min(20rem,88vw)] transform rounded-r-2xl border-r border-border/80 bg-card shadow-2xl transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:w-64 lg:translate-x-0 lg:rounded-none lg:shadow-none ${
+        isOpen ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
+      <div className="flex h-full flex-col">
+        <button
+          type="button"
+          className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-full border border-border text-muted-foreground transition hover:bg-muted hover:text-foreground lg:hidden"
+          onClick={onClose}
+          aria-label="Close dashboard navigation"
+        >
+          <Close className="size-5" />
+        </button>
 
-          {/* Logo / Brand – pinned at top */}
-          <div className="shrink-0 px-4 md:px-5 lg:px-6">
-            {/* Logo + Brand – left side */}
-              <Link href="/">
-                <Image
-                src="/Long-logo.svg"
-                alt="RevView Logo"
-                width={40}
-                height={40}
-                className="w-32 h-20 lg:w-36 lg:h-24"
-                />
-              </Link>
-          </div>
-
-          {/* Scrollable navigation area */}
-          <div className="flex-1 overflow-y-auto px-4 md:px-5 lg:px-6 pb-4 md:pb-5 lg:pb-6">
-            <nav className="space-y-1.5">
-              {mainItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={close}
-                  className={`
-                    flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 rounded-lg font-medium transition-colors text-sm md:text-base
-                    ${
-                      isActive(item)
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    }
-                  `}
-                >
-                  {item.icon && <item.icon className="w-4 h-4 md:w-5 md:h-5" />}
-                  <span>{item.label}</span>
-                </Link>
-              ))}
-
-              {/* Account Section */}
-              {accountItems.length > 0 && (
-                <div className="pt-6 md:pt-8 mt-2 md:mt-4 border-t border-border">
-                  <p className="px-2 md:px-4 mb-2 md:mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Account
-                  </p>
-                  {accountItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={close}
-                      className={`
-                        flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 rounded-lg font-medium transition-colors text-sm md:text-base
-                        ${
-                          isActive(item)
-                            ? "bg-primary/10 text-primary"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                        }
-                      `}
-                    >
-                      {item.icon && <item.icon className="w-4 h-4 md:w-5 md:h-5" />}
-                      <span>{item.label}</span>
-                    </Link>
-                  ))}
-                </div>
-              )}
-
-            </nav>
-          </div>
-
-          {/* User info + Logout – pinned at bottom */}
-          <div className="shrink-0 px-4 md:px-6 pt-3 md:pt-4 pb-4 md:pb-6 border-t border-border space-y-4">
-            <div className="px-2 md:px-4">
-              <p className="text-xs text-muted-foreground">Logged in as</p>
-              <p className="font-medium text-foreground truncate max-w-full text-sm md:text-base">
-                {name || "User"}
-              </p>
-            </div>
-
-            <button
-              className={`
-                w-full flex items-center gap-2 md:gap-3 px-3 md:px-4 py-2 md:py-2.5 rounded-lg 
-                font-medium transition-colors text-sm md:text-base
-                ${
-                  isLoggingOut
-                    ? "opacity-60 cursor-not-allowed bg-destructive/5"
-                    : "text-destructive hover:bg-destructive/10"
-                }
-              `}
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-            >
-              <Logout className="w-4 h-4 md:w-5 md:h-5" />
-              <span>{isLoggingOut ? "Signing out..." : "Sign Out"}</span>
-            </button>
-          </div>
+        <div className="shrink-0 px-5 py-4 lg:px-6">
+          <Link href="/" aria-label="RevView homepage">
+            <Image src="/Long-logo.svg" alt="RevView Logo" width={160} height={64} className="h-auto w-36" priority />
+          </Link>
         </div>
-      </aside>
-    </>
+
+        <div className="flex-1 overflow-y-auto px-4 pb-5 lg:px-5">
+          <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Learning</p>
+          <nav aria-label="Learner navigation" className="space-y-1">
+            {mainItems.map(renderLink)}
+
+            {accountItems.length > 0 && (
+              <div className="mt-5 border-t border-border pt-5">
+                <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Account</p>
+                {accountItems.map(renderLink)}
+              </div>
+            )}
+          </nav>
+        </div>
+
+        <div className="shrink-0 space-y-3 border-t border-border px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 lg:px-5 lg:pb-4">
+          <div className="flex items-center gap-3 rounded-xl bg-muted/50 p-3">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-primary to-secondary text-sm font-bold text-white">
+              {(name || "U").trim().charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="text-[11px] text-muted-foreground">Signed in as</p>
+              <p className="truncate text-sm font-semibold text-foreground">{name || "User"}</p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-destructive transition hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-60"
+            onClick={() => void handleLogout()}
+            disabled={isLoggingOut}
+          >
+            <Logout className="size-4.5" />
+            <span>{isLoggingOut ? "Signing out..." : "Sign out"}</span>
+          </button>
+        </div>
+      </div>
+    </aside>
   );
 }

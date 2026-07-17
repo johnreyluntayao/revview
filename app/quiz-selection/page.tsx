@@ -1,12 +1,12 @@
-import { CustomizeQuiz, SubmitFeedback } from '@/lib/client-imports'
+import { CustomizeQuiz, SubmitFeedback } from "@/lib/client-imports";
 
-const page = () => {
+const QuizSelectionPage = () => {
   return (
-    <main>
-        <CustomizeQuiz/>
-        <SubmitFeedback />
+    <main className="min-h-screen">
+      <CustomizeQuiz />
+      <SubmitFeedback />
     </main>
-  )
-}
+  );
+};
 
-export default page
+export default QuizSelectionPage;

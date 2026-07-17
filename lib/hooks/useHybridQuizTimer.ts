@@ -9,7 +9,7 @@ interface UseHybridQuizTimerProps {
 }
 
 export function useHybridQuizTimer({ sessionId, onExpire }: UseHybridQuizTimerProps) {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
 
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [isPaused, setIsPaused] = useState(false);
@@ -47,7 +47,11 @@ export function useHybridQuizTimer({ sessionId, onExpire }: UseHybridQuizTimerPr
 
   // 🔹 Initial load
   useEffect(() => {
-    fetchFromServer();
+    const timeout = window.setTimeout(() => {
+      void fetchFromServer();
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
   }, [fetchFromServer]);
 
   // 🔹 Smooth countdown (client)

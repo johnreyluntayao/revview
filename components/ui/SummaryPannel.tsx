@@ -1,16 +1,16 @@
 import Link from "next/link";
-import { BeginQuiz } from "@/lib/icons";
+import { ArrowLeft, BookOpen, Clock3, Gauge, ListChecks, Play } from "lucide-react";
 import { QuizCategory } from "@/lib/types";
-import { Button } from "@/lib/client-imports"
-import AdsSection from "./AdsSection";
+import { Button } from "@/lib/client-imports";
 
 interface SummaryPanelProps {
   categories: QuizCategory[];
   selectedCategory: string | null;
   selectedQuestions: number;
   selectedDifficulty: string;
-  totalTime: number | string;
+  totalTime: number;
   isStarting: boolean;
+  canStart: boolean;
   handleStartQuiz: () => void;
 }
 
@@ -21,131 +21,74 @@ export default function SummaryPanel({
   selectedDifficulty,
   totalTime,
   isStarting,
+  canStart,
   handleStartQuiz,
 }: SummaryPanelProps) {
-  const categoryName =
-  selectedCategory === null
+  const categoryName = selectedCategory === null
     ? "All Categories"
-    : categories.find((c) => c.id === selectedCategory)?.name || "Not selected";
+    : categories.find((category) => category.id === selectedCategory)?.name || "Not selected";
+
+  const details = [
+    { label: "Category", value: categoryName, icon: BookOpen },
+    { label: "Questions", value: selectedQuestions ? `${selectedQuestions} questions` : "Not selected", icon: ListChecks },
+    { label: "Difficulty", value: selectedDifficulty || "Not selected", icon: Gauge },
+  ];
 
   return (
-    <div className="lg:sticky lg:top-20 h-fit w-full">
-      <div className="bg-linear-to-br from-primary/10 to-secondary/10 rounded-2xl p-4 md:p-5 lg:p-6 border border-border">
-        <h3 className="text-lg md:text-xl lg:text-2xl font-bold text-foreground mb-4 md:mb-5 lg:mb-6">
-          Quiz Summary
-        </h3>
+    <aside className="h-fit xl:sticky xl:top-6">
+      <div className="overflow-hidden rounded-2xl border border-primary/20 bg-card shadow-sm">
+        <div className="bg-linear-to-br from-primary/15 via-primary/8 to-secondary/15 p-5 sm:p-6">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Ready when you are</p>
+          <h2 className="mt-1 text-xl font-bold text-foreground">Your quiz plan</h2>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">Review your choices before beginning the timed session.</p>
+        </div>
 
-        <div className="space-y-4 md:space-y-5 lg:space-y-6 mb-4 md:mb-6 lg:mb-8">
-          {/* Category */}
-          <div>
-            <p className="text-[10px] md:text-xs lg:text-sm text-muted-foreground mb-0.5 md:mb-1 lg:mb-1.5">Category</p>
-            <p className="font-semibold text-foreground text-sm md:text-base lg:text-lg">
-              {categoryName}
-            </p>
-          </div>
+        <div className="p-5 sm:p-6">
+          <dl className="space-y-4">
+            {details.map(({ label, value, icon: Icon }) => (
+              <div key={label} className="flex items-center gap-3">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><Icon className="size-4.5" /></span>
+                <div className="min-w-0">
+                  <dt className="text-xs text-muted-foreground">{label}</dt>
+                  <dd className="truncate text-sm font-semibold capitalize text-foreground">{value}</dd>
+                </div>
+              </div>
+            ))}
+          </dl>
 
-          {/* Questions count */}
-          <div>
-            <p className="text-[10px] md:text-xs lg:text-sm text-muted-foreground mb-0.5 md:mb-1 lg:mb-1.5">Questions</p>
-            <p className="font-semibold text-foreground text-sm md:text-base lg:text-lg">
-              {selectedQuestions} questions
-            </p>
-          </div>
-
-          {/* Difficulty */}
-          <div>
-            <p className="text-[10px] md:text-xs lg:text-sm text-muted-foreground mb-0.5 md:mb-1 lg:mb-1.5">Difficulty</p>
-            <p className="font-semibold text-foreground text-sm md:text-base lg:text-lg capitalize">
-              {selectedDifficulty || "—"}
-            </p>
-          </div>
-
-          {/* Estimated Time */}
-          <div className="border-t border-border pt-4 md:pt-5 lg:pt-6">
-            <p className="text-[10px] text-xs lg:text-sm text-muted-foreground mb-1 md:mb-1.5 lg:mb-2">
-              Estimated Time
-            </p>
-            <div className="flex items-baseline gap-1 md:gap-1.5 lg:gap-2">
-              <span className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary">
-                {totalTime}
-              </span>
-              <span className="text-foreground text-base md:text-lg lg:text-xl">minutes</span>
+          <div className="my-5 flex items-center justify-between rounded-xl border border-border/70 bg-muted/40 p-4">
+            <div className="flex items-center gap-3">
+              <Clock3 className="size-5 text-primary" />
+              <div>
+                <p className="text-xs text-muted-foreground">Estimated time</p>
+                <p className="text-sm font-semibold text-foreground">{totalTime > 0 ? `${totalTime} minutes` : "—"}</p>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground mt-1 md:mt-1.5 lg:mt-2">
-              You can finish early by clicking "Finish Quiz" anytime.
-            </p>
+            {totalTime > 0 && <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">Timed</span>}
           </div>
-        </div>
 
-        {/* Actions */}
-        <div className="space-y-2 md:space-y-3 lg:space-y-4 mt-1 md:mt-1.5 lg:mt-2">
-        <Button
+          <Button
             onClick={handleStartQuiz}
-            isDisabled={isStarting}
-            backgroundColor="bg-gradient-to-r from-primary to-secondary"
+            isDisabled={!canStart || isStarting}
+            backgroundColor="bg-linear-to-r from-primary to-secondary"
             textColor="text-primary-foreground"
-            className="
-            w-full 
-            font-semibold 
-            shadow-sm hover:shadow-md hover:shadow-primary/30 
-            transition-all duration-300
-            disabled:opacity-60
-            "
-            isRounded={false}
-        >
+            className="min-h-12 w-full font-semibold shadow-sm hover:shadow-md"
+            rightIcon={!isStarting ? <Play className="size-4 fill-current" /> : undefined}
+          >
             {isStarting ? (
-            <>
-                <svg
-                className="animate-spin h-5 w-5"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                >
-                <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="none"
-                />
-                <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-                </svg>
-                <span>Starting...</span>
-            </>
+              <><span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" /> Starting quiz…</>
             ) : (
-            <>
-                Start Quiz
-                <BeginQuiz className="w-5 h-5" /> 
-            </>
+              <>Start quiz</>
             )}
-        </Button>
+          </Button>
 
-        <Link
-            href="/dashboard"
-            className="
-            flex h-13 sm:h-14 md:h-15
-            w-full items-center justify-center
-            rounded-xl border border-border
-            text-foreground
-            hover:bg-muted/70 active:bg-muted
-            transition-colors text-sm sm:text-base 
-                gap-2 sm:gap-2.5 
-                font-medium
-            "
-        >
-            Back to Dashboard
-        </Link>
+          {!canStart && <p className="mt-2 text-center text-xs text-muted-foreground">Choose a question count and difficulty to continue.</p>}
 
+          <Link href="/dashboard" className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-border text-sm font-medium text-foreground transition-colors hover:bg-muted">
+            <ArrowLeft className="size-4" /> Back to dashboard
+          </Link>
         </div>
       </div>
-      <div className="py-2 md:py-3 lg:py-4">
-        {/* <AdsSection variant="card" keyId="29453454"/> */}
-      </div>
-    </div>
+    </aside>
   );
 }
