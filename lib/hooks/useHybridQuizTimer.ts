@@ -56,7 +56,7 @@ export function useHybridQuizTimer({ sessionId, onExpire }: UseHybridQuizTimerPr
 
   // 🔹 Smooth countdown (client)
   useEffect(() => {
-    if (timeLeft === null || isPaused) return;
+    if (timeLeft === null || timeLeft <= 0 || isPaused) return;
 
     const interval = setInterval(() => {
       setTimeLeft((prev) => {

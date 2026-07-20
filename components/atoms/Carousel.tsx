@@ -1,7 +1,9 @@
 'use client';
 
-import  { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from "next/image";
+import { normalizeImageUrl } from "@/lib/safe-url";
 import { Button } from "@/lib/client-imports";
 import { ArrowRight, ArrowLeft } from "@/lib/icons"
 
@@ -41,21 +43,19 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
   const [isPaused, setIsPaused] = useState(false);
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [cardsWithColor, setCardsWithColor] = useState<any[]>([]);
-
   const totalCards = cards.length;
   const extendedCards = [...cards, ...cards, ...cards];
-
-  useEffect(() => {
-    const coloredCards = cards.map((card) => ({
-      ...card,
-      color: gradientOptions[Math.floor(Math.random() * gradientOptions.length)],
-    }));
-    setCardsWithColor(coloredCards);
-  }, []);
+  const cardsWithColor = useMemo(
+    () =>
+      cards.map((card, index) => ({
+        ...card,
+        color: gradientOptions[index % gradientOptions.length],
+      })),
+    [cards],
+  );
 
   const slideToCenter = useCallback((targetIndex: number) => {
-    if (!carouselRef.current) return;
+    if (!carouselRef.current || totalCards === 0) return;
 
     const normalizedIndex = ((targetIndex % totalCards) + totalCards) % totalCards;
     const cardElements = carouselRef.current.children;
@@ -77,8 +77,14 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
     }
   }, [totalCards]);
 
-  const goToPrevious = () => slideToCenter((currentIndex - 1 + totalCards) % totalCards);
-  const goToNext = () => slideToCenter((currentIndex + 1) % totalCards);
+  const goToPrevious = useCallback(
+    () => slideToCenter((currentIndex - 1 + totalCards) % totalCards),
+    [currentIndex, slideToCenter, totalCards],
+  );
+  const goToNext = useCallback(
+    () => slideToCenter((currentIndex + 1) % totalCards),
+    [currentIndex, slideToCenter, totalCards],
+  );
 
   const autoCenterClosestCard = useCallback(() => {
     if (!carouselRef.current) return;
@@ -210,9 +216,11 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
                   role="link"
                   tabIndex={0}
                 >
-                  <img
-                    src={card.img_url || '/icon.svg'}
+                  <Image
+                    src={card.img_url ? normalizeImageUrl(card.img_url) ?? '/Icon.svg' : '/Icon.svg'}
                     alt={card.title}
+                    fill
+                    sizes="(max-width: 768px) 17.5rem, (max-width: 1024px) 22.5rem, 30rem"
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover/card:scale-110"
                   />
 

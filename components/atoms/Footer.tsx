@@ -6,12 +6,6 @@ const footerData = {
     { name: "Privacy Policy", href: "/privacy-policy" },
     { name: "Terms & Conditions", href: "/terms-and-conditions" },
   ],
-
-  socialLinks: [
-    { name: "Facebook", label: "f", href: "https://facebook.com" },
-    { name: "X", label: "X", href: "https://twitter.com" },
-    { name: "LinkedIn", label: "in", href: "https://linkedin.com" },
-  ],
 };
 
 export default function Footer() {
@@ -47,20 +41,6 @@ export default function Footer() {
           ))}
         </nav>
 
-        <div className="flex justify-center gap-3">
-          {footerData.socialLinks.map((social) => (
-            <a
-              key={social.name}
-              href={social.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-10 w-10 items-center justify-center rounded-md bg-white/10 text-sm font-semibold transition hover:bg-white/20"
-              aria-label={social.name}
-            >
-              {social.label}
-            </a>
-          ))}
-        </div>
       </div>
 
       <div className="mx-auto mt-8 max-w-screen-3xl border-t border-primary-foreground/20 pt-6 text-center text-xs text-primary-foreground/70 md:text-sm">

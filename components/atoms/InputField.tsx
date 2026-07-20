@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useId, useState } from "react";
 import { EyeOff, Eye } from "@/lib/icons";
 import { InputFieldProps } from "@/lib/types";
 
@@ -36,6 +36,9 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
   ...rest
 }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const generatedId = useId();
+  const inputId = rest.id ?? `${generatedId}-field`;
+  const errorId = `${inputId}-error`;
 
   const isTextarea = type === "textarea";
   const isUsername = type === "username";
@@ -127,7 +130,7 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
   return (
     <div className={`space-y-2 ${className}`}>
       {label && (
-        <label className="block font-medium text-gray-700 text-[10px] md:text-xs lg:text-sm">
+        <label htmlFor={inputId} className="block text-[10px] font-medium text-foreground md:text-xs lg:text-sm">
           {label}
         </label>
       )}
@@ -147,7 +150,8 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
 
         {isTextarea ? (
           <textarea
-            {...rest}
+            {...(rest as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+            id={inputId}
             name={name}
             value={displayValue}
             onChange={
@@ -159,6 +163,8 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
             readOnly={isReadOnly && !isDisabled}
             placeholder={placeholder}
             rows={4}
+            aria-invalid={hasError || undefined}
+            aria-describedby={hasError ? errorId : undefined}
             className={`
               w-full rounded-lg transition-all duration-150 resize-none
               focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500
@@ -180,6 +186,7 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
         ) : (
           <input
             {...rest}
+            id={inputId}
             type={effectiveType}
             name={name}
             value={displayValue}
@@ -196,6 +203,8 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
             min={type === "number" ? min : undefined}
             max={type === "number" ? max : undefined}
             step={type === "number" ? step : undefined}
+            aria-invalid={hasError || undefined}
+            aria-describedby={hasError ? errorId : undefined}
             className={`
               w-full rounded-lg transition-all duration-150 text-xs md:text-sm lg:text-base
               focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500
@@ -236,7 +245,7 @@ const InputField: React.FC<ExtendedInputFieldProps> = ({
       </div>
 
       {error && (
-        <p className="text-destructive text-[10px] md:text-xs lg:text-sm mt-1 font-medium">
+        <p id={errorId} className="text-destructive text-[10px] md:text-xs lg:text-sm mt-1 font-medium">
           {error}
         </p>
       )}

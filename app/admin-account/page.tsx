@@ -1,15 +1,11 @@
-import { redirect } from "next/navigation";
 import { AccountSettings, NavBar } from "@/lib/client-imports";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/auth-guards";
 
 const AdminAccountPage = async () => {
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
+  const user = await requireAdmin();
 
   const { data: profile } = await supabase
     .from("users")

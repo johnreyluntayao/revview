@@ -15,7 +15,6 @@
     "framer-motion": "^12.38.0",
     "lucide-react": "^0.567.0",
     "next": "^16.2.2",
-    "node-modules": "^0.0.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-intersection-observer": "^10.0.3",
@@ -30,5 +29,8 @@
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "postcss": "8.5.19"
   }
 }

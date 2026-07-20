@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Home, LibraryBig, SearchX } from "lucide-react";
+import { ArrowRight, Home, LibraryBig, SearchX } from "@/lib/icons";
 import { Button } from "@/lib/client-imports";
 
 const NotFoundContent = () => {
