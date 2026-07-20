@@ -90,18 +90,18 @@ const ComprehensiveCoverage = () => {
         className="w-full flex flex-col justify-center text-pretty py-8.5 md:py-15 lg:py-22.5 px-4 md:px-6 lg:px-32 gap-8 md:gap-12 lg:gap-16 bg-primary/5"
       >
         <div className="flex flex-col items-center gap-2 md:gap-3 lg:gap-4 text-center">
-          <motion.h1
+          <motion.h2
             variants={fadeUp}
             className="text-2xl md:text-[32px] lg:text-5xl font-bold text-foreground"
           >
-            Comprehensive Coverage
-          </motion.h1>
+            Philippine Civil Service Exam Coverage
+          </motion.h2>
 
           <motion.p
             variants={fadeUp}
             className="text-sm md:text-base lg:text-xl text-muted-foreground text-center"
           >
-            Master all four exam categories with detailed content and practice
+            Practice Numerical, Analytical, Verbal, and General Information topics for the CSE-PPT
           </motion.p>
         </div>
 

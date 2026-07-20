@@ -67,18 +67,18 @@ const HowItWorks = () => {
         className="w-full flex flex-col items-center justify-center text-pretty gap-8 md:gap-12 lg:gap-16 py-7.5 md:py-15 lg:py-22.5 px-4 md:px-6 lg:px-32"
       >
         <div className="flex flex-col items-center gap-2 md:gap-3 lg:gap-4">
-          <motion.h1
+          <motion.h2
             variants={fadeUp}
             className="text-2xl md:text-[32px] lg:text-5xl font-bold text-foreground"
           >
             How It Works
-          </motion.h1>
+          </motion.h2>
 
           <motion.p
             variants={fadeUp}
             className="text-sm md:text-base lg:text-xl text-muted-foreground text-center"
           >
-            Simple 4-step process to ace your exam
+            A simple four-step process for focused Civil Service Exam preparation
           </motion.p>
         </div>
 
