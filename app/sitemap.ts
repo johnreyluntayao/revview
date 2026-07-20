@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 const baseUrl = "https://revview.online";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const lastModified = new Date("2026-07-14");
+  const lastModified = new Date("2026-07-20");
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {

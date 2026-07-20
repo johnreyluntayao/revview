@@ -90,18 +90,18 @@ const WhyChoose = () => {
       >
 
         <div className="flex flex-col items-center gap-2 md:gap-3 lg:gap-4">
-          <motion.h1
+          <motion.h2
             variants={fadeUp}
             className="text-2xl md:text-[32px] lg:text-5xl font-bold text-foreground"
           >
             Why Choose RevView?
-          </motion.h1>
+          </motion.h2>
 
           <motion.p
             variants={fadeUp}
             className="text-xs md:text-base lg:text-xl text-muted-foreground text-center"
           >
-            Everything you need for successful exam preparation in one platform
+            Everything you need to prepare for the Philippine CSE-PPT in one focused platform
           </motion.p>
         </div>
 

@@ -104,16 +104,15 @@ const HeroSection = () => {
             <div className="tracking-wide">
               <motion.h1
                 variants={fadeUp}
-                className="text-[36px] md:text-5xl lg:text-6xl font-black"
+                className="text-[36px] font-black leading-tight md:text-5xl lg:text-6xl"
               >
-                Master your
-              </motion.h1>
-
-              <motion.h1
-                variants={fadeScale}
-                className="inline-block text-[36px] md:text-5xl lg:text-6xl font-black bg-linear-to-r from-text1 via-text2 to-text3 bg-clip-text text-transparent"
-              >
-                Board Exam
+                <span className="block">Prepare smarter for the</span>
+                <motion.span
+                  variants={fadeScale}
+                  className="inline-block bg-linear-to-r from-text1 via-text2 to-text3 bg-clip-text text-transparent"
+                >
+                  Philippine Civil Service Exam
+                </motion.span>
               </motion.h1>
             </div>
           </div>
@@ -121,9 +120,9 @@ const HeroSection = () => {
             variants={fadeUp}
             className="text-base md:text-lg lg:text-xl text-white/80 mt-6 md:mt-7 lg:mt-8"
           >
-            The most intelligent online reviewer platform featuring adaptive
-            learning algorithms, comprehensive analytics, and real-time feedback
-            to accelerate your exam preparation.
+            Build confidence for the CSE-PPT Professional or Subprofessional
+            level with focused practice questions, clear answer explanations,
+            progress tracking, and realistic quiz sessions.
           </motion.p>
 
           <motion.div
@@ -160,9 +159,9 @@ const HeroSection = () => {
               variants={fadeUp}
               className="flex-1 px-0 lg:px-3 py-0 border-l-none lg:border-l-4 border-primary300 space-y-2 md:space-y-2.5 lg:space-y-3"
             >
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary300">
+              <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary300">
                 Expert
-              </h1>
+              </p>
               <p className="block text-[10px] md:text-xs lg:text-sm text-white/80">
                 Crafted Content
               </p>
@@ -172,9 +171,9 @@ const HeroSection = () => {
               variants={fadeUp}
               className="flex-1 px-0 lg:px-3 py-0 border-l-none lg:border-l-4 border-purple300 space-y-2 md:space-y-2.5 lg:space-y-3"
             >
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-purple300">
+              <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-purple300">
                 100+
-              </h1>
+              </p>
               <p className="block text-[10px] md:text-xs lg:text-sm text-white/80">
                 Practice Questions
               </p>
@@ -184,9 +183,9 @@ const HeroSection = () => {
               variants={fadeUp}
               className="flex-1 px-0 lg:px-3 py-0 border-l-none lg:border-l-4 border-cyan400 space-y-2 md:space-y-2.5 lg:space-y-3"
             >
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-cyan400">
+              <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-cyan400">
                 Realistic
-              </h1>
+              </p>
               <p className="block text-[10px] md:text-xs lg:text-sm text-white/80">
                 Exam Simulation
               </p>

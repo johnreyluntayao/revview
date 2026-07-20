@@ -75,12 +75,12 @@ const BoostPreparation = () => {
               />
             </motion.div>
 
-            <motion.h1
+            <motion.h2
               variants={fadeUp}
               className="text-2xl md:text-[32px] lg:text-5xl font-bold text-foreground mb-2 md:mb-3 lg:mb-4 text-center"
             >
               Boost Your Preparation
-            </motion.h1>
+            </motion.h2>
 
             <motion.p
               variants={fadeUp}
@@ -117,12 +117,12 @@ const BoostPreparation = () => {
             />
           </motion.div>
 
-          <motion.h1
+          <motion.h2
             variants={fadeUp}
             className="text-2xl md:text-[32px] lg:text-5xl font-bold text-foreground mb-2 md:mb-3 lg:mb-4 text-center"
           >
             Boost Your Preparation
-          </motion.h1>
+          </motion.h2>
 
           <motion.p
             variants={fadeUp}
