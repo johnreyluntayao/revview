@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { Toaster } from 'sonner';
@@ -11,13 +10,6 @@ const siteUrl = new URL("https://revview.online");
 const siteTitle = "RevView | Civil Service Exam Reviewer & Practice Tests";
 const siteDescription =
   "Practice smarter for the Civil Service Exam with RevView's quizzes, progress tracking, explanations, and curated review resources.";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
-});
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
@@ -100,7 +92,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`
-          ${inter.variable}
           antialiased
           min-h-screen
           bg-background

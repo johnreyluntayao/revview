@@ -273,7 +273,7 @@ export default function BlogManagement() {
   };
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-slate-50 px-4 pb-10 pt-20 md:px-6 md:pb-14 md:pt-24 lg:px-8 lg:pb-16 lg:pt-28">
+    <main className="min-h-screen overflow-x-hidden bg-background px-4 pb-10 pt-20 md:px-6 md:pb-14 md:pt-24 lg:px-8 lg:pb-16 lg:pt-28">
       <div className="mx-auto max-w-7xl space-y-6">
         <section className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-5 shadow-sm md:flex-row md:items-end md:justify-between md:p-7">
           <div>
@@ -342,7 +342,7 @@ export default function BlogManagement() {
 
           <div className="mt-5 space-y-3 md:hidden">
             {filteredPosts.map((post) => (
-              <article key={post.id} className="min-w-0 rounded-xl border border-border bg-white p-4 shadow-sm">
+              <article key={post.id} className="min-w-0 rounded-xl border border-border bg-card p-4 shadow-sm">
                 <div className="flex min-w-0 items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <h2 className="text-sm font-semibold leading-snug text-foreground">{post.title}</h2>
@@ -406,7 +406,7 @@ export default function BlogManagement() {
 
           <div className="mt-5 hidden overflow-hidden rounded-xl border border-border md:block">
             <div className="overflow-x-auto">
-              <table className="w-full table-fixed bg-white text-left text-sm">
+              <table className="w-full table-fixed bg-card text-left text-sm">
                 <thead className="bg-slate-50 text-xs uppercase tracking-wide text-muted-foreground">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Article</th>

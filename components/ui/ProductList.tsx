@@ -4,7 +4,6 @@ import React, { useMemo, useState, useEffect, useRef } from "react";
 import ProductCard from "../atoms/ProductCard";
 import ComboBox from "../atoms/ComboBox";
 import Button from "../atoms/Button";
-import Chip from "../atoms/Chip";
 import { createClient } from "@/lib/supabase/client";
 import type { Affiliate } from "@/lib/types";
 import {
@@ -13,8 +12,7 @@ import {
   Search,
   ShieldCheck,
   SlidersHorizontal,
-  Sparkles,
-} from "lucide-react";
+} from "@/lib/icons";
 
 /* ---------------- TYPES ---------------- */
 

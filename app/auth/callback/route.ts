@@ -26,9 +26,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  console.log("OAuth success - user ID:", user.id);
+  const { data: profile } = await supabase
+    .from("users")
+    .select("is_admin")
+    .eq("id", user.id)
+    .single();
 
-  const redirectPath = "/dashboard";
+  const redirectPath = profile?.is_admin ? "/admin" : "/dashboard";
 
   const finalUrl = new URL(redirectPath, request.url);
 

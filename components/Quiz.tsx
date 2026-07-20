@@ -5,10 +5,16 @@ import { createClient } from "@/lib/supabase/client";
 import { Button, RadioButton, Progress } from "@/lib/client-imports";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { useHybridQuizTimer } from "@/lib/hooks/useHybridQuizTimer";
-import { CorrectAnswer, IncorrectAnswer } from "@/lib/icons";
+import {
+  ArrowRight,
+  Check,
+  Clock3,
+  CorrectAnswer,
+  IncorrectAnswer,
+  Lightbulb,
+  LoaderCircle,
+} from "@/lib/icons";
 import Image from "next/image";
-import { ArrowRight, Check, Clock3, Lightbulb, LoaderCircle } from "lucide-react";
 
 type Question = {
   option_images: (string | null)[];
@@ -52,6 +58,7 @@ interface QuizProps {
 type QuizWindow = Window &
   typeof globalThis & {
     setQuizPaused?: (paused: boolean) => void;
+    submitQuiz?: (timedOut?: boolean) => Promise<void>;
   };
 
 export default function Quiz({ sessionId }: QuizProps) {
@@ -68,17 +75,10 @@ export default function Quiz({ sessionId }: QuizProps) {
   const [loading, setLoading] = useState(true);
   const [isSavingAnswer, setIsSavingAnswer] = useState(false);
   const [isSubmittingQuiz, setIsSubmittingQuiz] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   const questionStartTimeRef = useRef<number>(Date.now());
   const hasSubmittedRef = useRef(false);
-
-  const { isPaused, setIsPaused } = useHybridQuizTimer({
-    sessionId,
-    onExpire: async () => {
-      toast.error("Time's up! Submitting quiz...");
-      await submitQuiz(true);
-    },
-  });
 
   const currentQuestion = quizData?.questions[currentIndex];
   const isLastQuestion = currentIndex === (quizData?.questions.length ?? 1) - 1;
@@ -315,10 +315,12 @@ export default function Quiz({ sessionId }: QuizProps) {
     (window as QuizWindow).setQuizPaused = (paused: boolean) => {
       setIsPaused(paused);
     };
+    (window as QuizWindow).submitQuiz = submitQuiz;
     return () => {
       delete (window as QuizWindow).setQuizPaused;
+      delete (window as QuizWindow).submitQuiz;
     };
-  }, [setIsPaused]);
+  }, [submitQuiz]);
 
   if (loading) {
     return (

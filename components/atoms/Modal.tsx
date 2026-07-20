@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useId, useRef } from "react";
 import { Close } from "@/lib/icons";
 
 interface ModalProps {
@@ -38,6 +38,8 @@ export default function Modal({
   panelClassName = "",
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  const descriptionId = useId();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -56,11 +58,47 @@ export default function Modal({
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         onClose();
+        return;
+      }
+
+      if (event.key === "Tab" && modalRef.current) {
+        const focusable = Array.from(
+          modalRef.current.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          ),
+        );
+        if (focusable.length === 0) {
+          event.preventDefault();
+          modalRef.current.focus();
+          return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
       }
     };
 
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const focusFrame = requestAnimationFrame(() => {
+      const firstFocusable = modalRef.current?.querySelector<HTMLElement>(
+        'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href]',
+      );
+      (firstFocusable ?? modalRef.current)?.focus();
+    });
+
     window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
+    return () => {
+      cancelAnimationFrame(focusFrame);
+      window.removeEventListener("keydown", handleEsc);
+      previouslyFocused?.focus();
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
@@ -78,18 +116,23 @@ export default function Modal({
     >
       <div
         ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? titleId : undefined}
+        aria-describedby={description ? descriptionId : undefined}
+        tabIndex={-1}
         className={`flex max-h-[100dvh] w-full flex-col overflow-hidden rounded-none border border-border bg-background shadow-2xl sm:max-h-[calc(100dvh-2rem)] sm:rounded-2xl ${sizeClasses[size]} ${panelClassName}`}
       >
         {(title || showCloseButton) && (
           <div className="flex shrink-0 items-start justify-between border-b border-border px-4 py-4 sm:px-6 sm:py-5">
             <div className="min-w-0">
               {typeof title === "string" ? (
-                <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+                <h2 id={titleId} className="text-lg font-semibold text-foreground">{title}</h2>
               ) : (
-                title
+                <div id={titleId}>{title}</div>
               )}
               {description ? (
-                <div className="mt-1 text-sm text-muted-foreground">{description}</div>
+                <div id={descriptionId} className="mt-1 text-sm text-muted-foreground">{description}</div>
               ) : null}
             </div>
             {showCloseButton ? (

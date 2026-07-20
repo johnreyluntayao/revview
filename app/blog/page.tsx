@@ -23,7 +23,7 @@ export default async function BlogPage() {
   return (
     <>
       <NavBar State="Default" title="RevView Learning Hub" />
-      <main className="min-h-screen overflow-x-hidden bg-slate-50 pt-16 lg:pt-20">
+      <main className="min-h-screen overflow-x-hidden bg-background pt-16 lg:pt-20">
         <section className="relative overflow-hidden bg-linear-to-br from-primary950 via-primary800 to-purple900 px-4 py-12 text-white sm:py-14 md:px-6 md:py-20 lg:px-8 lg:py-24">
           <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-cyan400/15 blur-3xl" />
           <div className="absolute -bottom-28 left-1/4 h-72 w-72 rounded-full bg-purple400/20 blur-3xl" />
@@ -45,7 +45,7 @@ export default async function BlogPage() {
             {posts.length ? (
               <BlogExplorer posts={posts} />
             ) : (
-              <div className="rounded-2xl border border-dashed border-border bg-white px-5 py-14 text-center shadow-sm sm:px-6 sm:py-20">
+              <div className="rounded-2xl border border-dashed border-border bg-card px-5 py-14 text-center shadow-sm sm:px-6 sm:py-20">
                 <h2 className="text-xl font-bold text-foreground md:text-2xl">Guides are coming soon</h2>
                 <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-muted-foreground md:text-base">
                   We are preparing useful Civil Service Exam resources. Check back soon for the first RevView guide.

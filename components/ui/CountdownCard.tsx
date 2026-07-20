@@ -1,21 +1,30 @@
-'use client'
-import React, { useState, useEffect } from 'react';
+"use client";
+
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  CSC_EXAM_SCHEDULE_URL,
+  getNextCscExamDate,
+} from "@/lib/csc-exam-schedule";
 
 interface CountdownCardProps {
   title?: string;
-  targetDate?: string;   
+  targetDate?: string;
   message?: string;
   subMessage?: string;
   className?: string;
 }
 
 const CountdownCard: React.FC<CountdownCardProps> = ({
-  title = "Exam Countdown",
-  targetDate = "August 15, 2026",
+  title = "CSE-PPT Exam",
+  targetDate,
   message = "Don't wait, start preparing today!",
   subMessage = "Every question you practice brings you closer to success.",
   className = "",
 }) => {
+  const examDate = useMemo(
+    () => (targetDate ? new Date(targetDate) : getNextCscExamDate()),
+    [targetDate],
+  );
   const [timeLeft, setTimeLeft] = useState({
     days: "00",
     hours: "00",
@@ -25,15 +34,14 @@ const CountdownCard: React.FC<CountdownCardProps> = ({
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const target = new Date(targetDate);
       const now = new Date();
 
-      if (now >= target) {
+      if (now >= examDate) {
         setTimeLeft({ days: "00", hours: "00", minutes: "00", seconds: "00" });
         return;
       }
 
-      const diff = target.getTime() - now.getTime();
+      const diff = examDate.getTime() - now.getTime();
 
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
       const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -41,10 +49,10 @@ const CountdownCard: React.FC<CountdownCardProps> = ({
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
       setTimeLeft({
-        days: days.toString().padStart(2, '0'),
-        hours: hours.toString().padStart(2, '0'),
-        minutes: minutes.toString().padStart(2, '0'),
-        seconds: seconds.toString().padStart(2, '0'),
+        days: days.toString().padStart(2, "0"),
+        hours: hours.toString().padStart(2, "0"),
+        minutes: minutes.toString().padStart(2, "0"),
+        seconds: seconds.toString().padStart(2, "0"),
       });
     };
 
@@ -53,7 +61,7 @@ const CountdownCard: React.FC<CountdownCardProps> = ({
     const timer = setInterval(calculateTimeLeft, 1000);
 
     return () => clearInterval(timer);
-  }, [targetDate]);
+  }, [examDate]);
 
   return (
     <div className={`w-fit h-fit flex flex-col gap-6 md:gap-8 rounded-2xl bg-linear-to-r from-countdown1/50 via-countdown2/50 to-countdown3/60 border-2 border-primary/30 p-4 md:p-6 lg:p-8 text-center ${className}`}>
@@ -67,12 +75,24 @@ const CountdownCard: React.FC<CountdownCardProps> = ({
           {title}
         </h1>
         <p className="text-[10px] md:text-xs lg:text-sm text-primary100">
-          {new Date(targetDate).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+          {examDate.toLocaleDateString("en-PH", {
+            timeZone: "Asia/Manila",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
           })}
+          {" · 6:30 AM PHT"}
         </p>
+        {!targetDate && (
+          <a
+            href={CSC_EXAM_SCHEDULE_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 text-[10px] font-semibold text-primary200 underline decoration-primary300/60 underline-offset-4 transition-colors hover:text-white md:text-xs"
+          >
+            View the official CSC schedule
+          </a>
+        )}
       </div>
 
       {/* Countdown Boxes */}
@@ -82,9 +102,9 @@ const CountdownCard: React.FC<CountdownCardProps> = ({
           { value: timeLeft.hours, label: "HOURS" },
           { value: timeLeft.minutes, label: "MINUTES" },
           { value: timeLeft.seconds, label: "SECONDS" },
-        ].map((item, index) => (
+        ].map((item) => (
           <div
-            key={index}
+            key={item.label}
             className="bg-linear-to-r from-primary600/80 to-primary700/80 rounded-lg gap-1 md:gap-1.5 lg:gap-2 p-4 md:p-5 lg:p-6 transition-all duration-300 justify-center items-center flex flex-col w-full h-auto"
           >
             <div className="text-2xl md:text-3xl lg:text-4xl tabular-nums text-white">

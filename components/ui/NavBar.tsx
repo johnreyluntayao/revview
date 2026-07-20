@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
-import { CountDownTimer, Button, PauseModal } from "@/lib/client-imports";
+import { Button, PauseModal } from "@/lib/client-imports";
 import { Pause } from "@/lib/icons";
 import {
   ProgressTracking,
@@ -19,6 +19,7 @@ import {
   Affiliate,
   Blog,
   Home,
+  StudyTime,
 } from "@/lib/icons";
 import { toast } from "sonner";
 import { useHybridQuizTimer } from "@/lib/hooks/useHybridQuizTimer";
@@ -61,6 +62,7 @@ interface NavbarProps {
 type QuizWindow = Window &
   typeof globalThis & {
     setQuizPaused?: (paused: boolean) => void;
+    submitQuiz?: (timedOut?: boolean) => Promise<void>;
   };
 
 export default function Navbar({ State, title, sessionId }: NavbarProps) {
@@ -86,11 +88,14 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
   // ✅ HYBRID TIMER
   const {
     timeLeft: remainingSeconds,
-    isPaused,
     setIsPaused,
     refetch,
   } = useHybridQuizTimer({
     sessionId: sessionId || "",
+    onExpire: () => {
+      toast.error("Time's up! Submitting your quiz…");
+      void (window as QuizWindow).submitQuiz?.(true);
+    },
   });
 
   useEffect(() => {
@@ -454,10 +459,19 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
           <div className="relative z-10 flex items-center gap-2 md:gap-3 lg:gap-4">
             {State === "OnQuiz" && remainingSeconds !== null ? (
               <>
-                <CountDownTimer
-                  initialSeconds={remainingSeconds}
-                  isPaused={isPaused}
-                />
+                <div
+                  className={`inline-flex min-w-22 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold tabular-nums transition-colors md:min-w-25 md:text-sm ${
+                    remainingSeconds <= 10
+                      ? "animate-pulse bg-destructive/15 text-destructive"
+                      : remainingSeconds <= 60
+                        ? "bg-warning/15 text-warning"
+                        : "bg-primary/10 text-primary"
+                  }`}
+                  aria-label={`${Math.floor(remainingSeconds / 60)} minutes and ${remainingSeconds % 60} seconds remaining`}
+                >
+                  <StudyTime className="size-4" aria-hidden="true" />
+                  <span>{Math.floor(remainingSeconds / 60).toString().padStart(2, "0")}:{(remainingSeconds % 60).toString().padStart(2, "0")}</span>
+                </div>
                 <Button
                   leftIcon={<Pause className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6"/>}
                   textColor="text-foreground/85"

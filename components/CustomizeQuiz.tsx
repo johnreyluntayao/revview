@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { DifficultyLevel, QuizCategory } from "@/lib/types";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { ClipboardCheck, Sparkles } from "lucide-react";
+import { ClipboardCheck, Sparkles } from "@/lib/icons";
 
 type QuestionRecord = { id: string };
 

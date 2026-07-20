@@ -15,6 +15,7 @@ import {
 } from "@/lib/icons";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { normalizeHttpUrl, normalizeImageUrl } from "@/lib/safe-url";
 
 interface AffiliateItem {
   id: string;
@@ -90,8 +91,8 @@ const AffiliateManagement = () => {
         description: item.description ?? "",
         category: item.category ?? "",
         price: Number(item.price),
-        imageUrl: item.img_url ?? "",
-        affiliateLink: item.affiliate_link,
+        imageUrl: item.img_url ? normalizeImageUrl(item.img_url) ?? "" : "",
+        affiliateLink: normalizeHttpUrl(item.affiliate_link) ?? "",
         status: item.is_active ? "Active" : "Inactive",
       }));
 
@@ -252,6 +253,20 @@ const AffiliateManagement = () => {
       toast.error("Title and affiliate link are required.");
       return;
     }
+
+    const safeAffiliateLink = normalizeHttpUrl(payload.affiliateLink);
+    const safeImageUrl = payload.imageUrl ? normalizeImageUrl(payload.imageUrl) : "";
+    if (!safeAffiliateLink) {
+      toast.error("Enter a valid HTTP or HTTPS affiliate link.");
+      return;
+    }
+    if (payload.imageUrl && !safeImageUrl) {
+      toast.error("Image URLs must use HTTPS.");
+      return;
+    }
+
+    payload.affiliateLink = safeAffiliateLink;
+    payload.imageUrl = safeImageUrl || "";
 
     if (editingItem) {
       const { error } = await supabase
@@ -569,16 +584,18 @@ const AffiliateManagement = () => {
                             >
                               <Edit className="size-4" />
                             </button>
-                            <a
-                              href={item.affiliateLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={(event) => event.stopPropagation()}
-                              className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary transition hover:bg-primary/15"
-                              aria-label={`Open affiliate link for ${item.title}`}
-                            >
-                              <Redirect className="size-4" />
-                            </a>
+                            {item.affiliateLink ? (
+                              <a
+                                href={item.affiliateLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(event) => event.stopPropagation()}
+                                className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary transition hover:bg-primary/15"
+                                aria-label={`Open affiliate link for ${item.title}`}
+                              >
+                                <Redirect className="size-4" />
+                              </a>
+                            ) : null}
                             <button
                               type="button"
                               onClick={(event) => {
@@ -605,7 +622,7 @@ const AffiliateManagement = () => {
 
             <div className="mt-4 hidden overflow-hidden rounded-xl border border-border md:block">
               <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse bg-white text-sm">
+                <table className="min-w-full border-collapse bg-card text-sm">
                   <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
                     <tr>
                       {bulkMode && <th className="w-10 px-3 py-3"></th>}
@@ -699,8 +716,9 @@ const AffiliateManagement = () => {
                               <Button
                                 onClick={(event) => {
                                   event.stopPropagation();
-                                  window.open(item.affiliateLink, "_blank");
+                                  window.open(item.affiliateLink, "_blank", "noopener,noreferrer");
                                 }}
+                                isDisabled={!item.affiliateLink}
                                 leftIcon={<Redirect size={14} />}
                                 backgroundColor="bg-primary/20"
                                 textColor="text-primary"
@@ -752,7 +770,7 @@ const AffiliateManagement = () => {
               text="Cancel"
               onClick={closeModal}
               textColor="text-foreground"
-              backgroundColor="bg-white"
+              backgroundColor="bg-card"
               borderColor="border-foreground/50"
               className="w-full sm:w-auto"
             />

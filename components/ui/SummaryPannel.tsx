@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { ArrowLeft, BookOpen, Clock3, Gauge, ListChecks, Play } from "lucide-react";
+import {
+  ArrowLeft,
+  BookOpen,
+  Clock3,
+  Gauge,
+  ListChecks,
+  Play,
+} from "@/lib/icons";
 import { QuizCategory } from "@/lib/types";
 import { Button } from "@/lib/client-imports";
 

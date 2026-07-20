@@ -20,7 +20,7 @@ export default function Login() {
 
     const supabase = createClient();
 
-    const { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
+    const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -80,7 +80,7 @@ export default function Login() {
     <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 flex flex-col w-full px-4 md:px-6 lg:px-8 py-20 lg:py-24">
       {/* Form Card */}
       <div className="flex-1 flex items-center justify-center">
-        <div className="w-full max-w-md bg-white rounded-xl shadow-xl border border-border p-4 md:p-6 lg:p-8">
+        <div className="w-full max-w-md bg-card rounded-xl shadow-xl border border-border p-4 md:p-6 lg:p-8">
           <div className="text-center mb-4 md:mb-6 lg:mb-8">
             <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-foreground mb-1 md:mb-1.5 lg:mb-2">Welcome Back</h1>
             <p className="text-xs md:text-sm lg:text-base text-muted-foreground">Sign in to continue to your dashboard</p>
@@ -89,7 +89,7 @@ export default function Login() {
           <Button
             onClick={handleGoogleLogin}
             isDisabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 border-2 border-border bg-white hover:bg-muted mb-6"
+            className="w-full flex items-center justify-center gap-3 border-2 border-border bg-card hover:bg-muted mb-6"
             leftIcon={
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -119,7 +119,7 @@ export default function Login() {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-[10px] md:text-xs lg:text-sm">
-              <span className="px-1 md:px-1.5 lg:px-2 bg-white text-muted-foreground">Or continue with email</span>
+              <span className="px-1 md:px-1.5 lg:px-2 bg-card text-muted-foreground">Or continue with email</span>
             </div>
           </div>
 

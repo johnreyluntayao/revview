@@ -45,7 +45,6 @@ export { default as InputField } from "@/components/atoms/InputField";
 export { default as Card } from "@/components/atoms/Card";
 export { default as Chip } from "@/components/atoms/Chip";
 export { default as ComboBox } from "@/components/atoms/ComboBox";
-export { default as CountDownTimer } from "@/components/atoms/CountDownTimer";
 export { default as Progress } from "@/components/atoms/Progress";
 export { default as RadioButton } from "@/components/atoms/RadioButton";
 export { default as List } from "@/components/atoms/List";

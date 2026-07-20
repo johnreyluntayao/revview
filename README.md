@@ -1,4 +1,6 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RevView
+
+RevView is a responsive Civil Service Exam preparation platform built with Next.js, Supabase, TypeScript, and Tailwind CSS.
 
 ## Getting Started
 
@@ -6,19 +8,19 @@ First, run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create `.env.local` with the required public Supabase URL and anonymous key before starting the application. Never commit that file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Validation
+
+```bash
+npm run lint
+npx tsc --noEmit --incremental false
+npm run build
+```
 
 ## Learn More
 

@@ -1,13 +1,7 @@
-import { AdminAffiliate } from "@/lib/client-imports" 
-import { NavBar } from '@/lib/client-imports'
+import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/auth-guards";
 
-const page = () => {
-  return (
-    <main>
-        <NavBar State="LoggedIn" />
-        <AdminAffiliate />
-    </main>
-  )
+export default async function LegacyBoostPage() {
+  await requireAdmin();
+  redirect("/affiliate");
 }
-
-export default page

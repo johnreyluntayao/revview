@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
         hostname: "*.supabase.co",     
         pathname: "/storage/v1/object/public/**", 
       },
+      {
+        protocol: "https",
+        hostname: "**",
+      },
     ],
   },
   async headers() {
@@ -41,7 +45,6 @@ const nextConfig: NextConfig = {
       "/quiz-selection/:path*",
       "/results-history/:path*",
       "/signup",
-      "/test",
       "/user-account/:path*",
     ];
 

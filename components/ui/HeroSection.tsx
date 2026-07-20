@@ -4,6 +4,7 @@ import { motion, easeOut } from "framer-motion";
 import { Button, Chip } from "@/lib/client-imports";
 import CountdownCard from "./CountdownCard";
 import { BeginQuiz, Sparkles } from "@/lib/icons";
+import { useRouter } from "next/navigation";
 
 const container = {
   hidden: {},
@@ -52,6 +53,20 @@ const slideRight = {
 };
 
 const HeroSection = () => {
+  const router = useRouter();
+
+  const handleGetStarted = () => {
+    router.push("/quiz-selection");
+  };
+
+  const handleLearnMore = () => {
+    const section = document.getElementById("why-revview");
+    if (!section) return;
+
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.history.replaceState(null, "", "#why-revview");
+  };
+
   return (
     <section id="home" className="scroll-mt-16 lg:scroll-mt-20">
       <div
@@ -115,20 +130,24 @@ const HeroSection = () => {
             variants={fadeUp}
             className="flex flex-col md:flex-row gap-2 md:gap-3 lg:gap-4 items-center justify-center lg:justify-start mt-6 md:mt-8 lg:mt-12"
           >
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+            <motion.div className="w-full md:w-auto" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
               <Button
                 text="Get Started Free"
                 backgroundColor="bg-primary"
                 textColor="text-white"
                 rightIcon={<BeginQuiz />}
+                onClick={handleGetStarted}
+                className="w-full md:w-auto"
               />
             </motion.div>
 
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+            <motion.div className="w-full md:w-auto" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
               <Button
                 text="Learn More"
-                borderColor="border border-primary"
+                borderColor="border-primary"
                 textColor="text-white"
+                onClick={handleLearnMore}
+                className="w-full md:w-auto"
               />
             </motion.div>
           </motion.div>
@@ -182,8 +201,7 @@ const HeroSection = () => {
           className="flex items-center justify-center"
         >
           <CountdownCard
-            targetDate="August 15, 2026"
-            message="Exam Day is Approaching!"
+            message="Exam day is approaching!"
           />
         </motion.div>
       </div>
