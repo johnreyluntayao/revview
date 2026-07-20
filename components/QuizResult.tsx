@@ -185,15 +185,13 @@ const QuizResult = ({ sessionId }: QuizResultProps) => {
         <Card variant="overview" title="Difficulty" value={difficulty || "N/A"} />
       </div>
 
-      <div className="rounded-xl border border-border p-4 md:p-6 lg:p-8 bg-white">
+      <div className="rounded-xl border border-border bg-card p-4 md:p-6 lg:p-8">
         
         <h2 className="text-base md:text-lg lg:text-xl font-bold mb-4 md:mb-5 lg:mb-6 text-foreground">
           Answer Review
         </h2>
         <QuizAccordion questions={questions} answers={answers} />
       </div>
-
-      {/* <AdsSection variant="inline"  keyId="29453454"/> */}
     </div>
   );
 };

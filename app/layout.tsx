@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { Toaster } from 'sonner';
@@ -8,16 +7,9 @@ import { Analytics } from "@vercel/analytics/next"
 import { AuthProvider } from "@/components/auth/AuthProvider";
 
 const siteUrl = new URL("https://revview.online");
-const siteTitle = "RevView | Civil Service Exam Reviewer & Practice Tests";
+const siteTitle = "RevView: Free Civil Service Exam Reviewer Philippines";
 const siteDescription =
-  "Practice smarter for the Civil Service Exam with RevView's quizzes, progress tracking, explanations, and curated review resources.";
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
-});
+  "Prepare for the Philippine Civil Service Exam with free CSE-PPT practice quizzes, answer explanations, progress tracking, and Professional and Subprofessional review resources.";
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
@@ -29,12 +21,21 @@ export const metadata: Metadata = {
   description: siteDescription,
   keywords: [
     "RevView",
+    "RevView Online",
+    "Civil Service Exam reviewer Philippines",
+    "free Civil Service Exam reviewer",
+    "Philippine Civil Service Exam reviewer",
+    "Civil Service Exam 2026 reviewer",
+    "CSC exam reviewer",
     "Civil Service Exam reviewer",
     "CSE reviewer",
-    "civil service practice test",
-    "exam preparation",
-    "online review platform",
-    "practice quizzes",
+    "CSE-PPT reviewer",
+    "CSE Professional reviewer",
+    "CSE Subprofessional reviewer",
+    "Civil Service Exam practice test",
+    "Civil Service Exam mock exam",
+    "Civil Service Exam practice questions",
+    "online CSE reviewer",
   ],
   authors: [{ name: "RevView" }],
   creator: "RevView",
@@ -44,10 +45,11 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   icons: {
-    icon: "/Icon.svg",
+    icon: [{ url: "/Icon.svg", type: "image/svg+xml", sizes: "any" }],
     shortcut: "/Icon.svg",
     apple: "/Icon.svg",
   },
+  manifest: "/manifest.webmanifest",
   openGraph: {
     type: "website",
     locale: "en_PH",
@@ -100,7 +102,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`
-          ${inter.variable}
           antialiased
           min-h-screen
           bg-background
@@ -119,19 +120,28 @@ export default function RootLayout({
                   "@type": "Organization",
                   "@id": "https://revview.online/#organization",
                   name: "RevView",
+                  alternateName: "RevView Online",
                   url: "https://revview.online",
-                  logo: "https://revview.online/Long-logo.svg",
+                  description: siteDescription,
+                  logo: {
+                    "@type": "ImageObject",
+                    url: "https://revview.online/Icon.svg",
+                    contentUrl: "https://revview.online/Icon.svg",
+                    width: 336,
+                    height: 336,
+                  },
                 },
                 {
                   "@type": "WebSite",
                   "@id": "https://revview.online/#website",
                   name: "RevView",
+                  alternateName: ["RevView Online", "RevView CSE Reviewer"],
                   url: "https://revview.online",
                   description: siteDescription,
                   publisher: {
                     "@id": "https://revview.online/#organization",
                   },
-                  inLanguage: "en",
+                  inLanguage: "en-PH",
                 },
               ],
             }),

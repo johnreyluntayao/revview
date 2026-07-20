@@ -50,7 +50,7 @@ export default function SignUp() {
         email: email.trim(),
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             name: name.trim(),
             username: username.trim(),
@@ -71,7 +71,7 @@ export default function SignUp() {
       } else {
         router.push("/dashboard");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError("An unexpected error occurred. Please try again.");
       console.error(err);
     } finally {

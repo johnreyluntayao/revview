@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import { Upload } from "@/lib/icons";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 
 interface InsertImageProps {
   label?: string;
@@ -26,50 +27,65 @@ const InsertImage: React.FC<InsertImageProps> = ({
   variant = "default",
   isDisabled = false,
 }) => {
-  const supabase = createClient();
+  const [supabase] = useState(() => createClient());
 
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const inputId = useId();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    return () => {
+      if (preview?.startsWith("blob:")) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
 
   const uploadFile = async (file: File) => {
     setUploading(true);
 
-    const ext = file.name.split(".").pop();
+    const extensionByType: Record<string, string> = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/webp": "webp",
+      "image/gif": "gif",
+    };
+    const ext = extensionByType[file.type];
     const filename = `${Date.now()}-${Math.random()}.${ext}`;
     const path = `${folder}/${filename}`;
 
-    const { error } = await supabase.storage
-      .from("revview-files")
-      .upload(path, file);
+    try {
+      const { error } = await supabase.storage
+        .from("revview-files")
+        .upload(path, file);
 
-    if (error) {
-      console.error(error);
-      alert("Upload failed");
+      if (error) throw error;
+
+      const { data } = supabase.storage
+        .from("revview-files")
+        .getPublicUrl(path);
+
+      onChange(data.publicUrl);
+      setPreview(data.publicUrl);
+    } catch (error: unknown) {
+      console.error("Image upload failed:", error);
+      setPreview(null);
+      toast.error("Image upload failed. Please try again.");
+    } finally {
       setUploading(false);
-      return;
     }
-
-    const { data } = supabase.storage
-      .from("revview-files")
-      .getPublicUrl(path);
-
-    onChange(data.publicUrl);
-    setPreview(data.publicUrl);
-
-    setUploading(false);
   };
 
   const validateFile = (file: File) => {
-    if (!file.type.startsWith("image/")) {
-      alert("Only images allowed");
+    const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+    if (!allowedTypes.has(file.type)) {
+      toast.error("Choose a JPG, PNG, WebP, or GIF image.");
       return false;
     }
 
     if (file.size > maxSizeMB * 1024 * 1024) {
-      alert(`Max ${maxSizeMB}MB`);
+      toast.error(`Images must be ${maxSizeMB} MB or smaller.`);
       return false;
     }
 
@@ -134,6 +150,7 @@ const InsertImage: React.FC<InsertImageProps> = ({
     <div className="space-y-2">
       {label && (
         <label
+          htmlFor={inputId}
           className={`text-[10px] md:text-xs lg:text-sm font-medium ${
             isDisabled ? "text-muted-foreground" : ""
           }`}
@@ -143,7 +160,18 @@ const InsertImage: React.FC<InsertImageProps> = ({
       )}
 
       <div
+        role="button"
+        tabIndex={isDisabled ? -1 : 0}
+        aria-disabled={isDisabled}
+        aria-busy={uploading}
+        aria-label={label || placeholder}
         onClick={handleClick}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleClick();
+          }
+        }}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -166,6 +194,7 @@ const InsertImage: React.FC<InsertImageProps> = ({
         `}
       >
         <input
+          id={inputId}
           ref={fileInputRef}
           type="file"
           accept="image/*"
@@ -179,7 +208,7 @@ const InsertImage: React.FC<InsertImageProps> = ({
           <div className="relative group">
             <Image
               src={displayedPreview}
-              alt="preview"
+              alt="Uploaded image preview"
               width={640}
               height={360}
               unoptimized
@@ -191,7 +220,9 @@ const InsertImage: React.FC<InsertImageProps> = ({
 
             {!isDisabled && (
               <button
+                type="button"
                 onClick={handleRemove}
+                aria-label="Remove uploaded image"
                 className="
                   absolute top-2 right-2 
                   bg-black/70 text-white text-xs px-2 py-1 rounded

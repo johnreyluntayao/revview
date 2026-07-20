@@ -2,17 +2,17 @@ import type { Metadata } from "next";
 import { Homepage, Footer, NavBar } from "@/lib/client-imports";
 
 export const metadata: Metadata = {
-  title: "Civil Service Exam Reviewer & Practice Tests",
+  title: "Free Civil Service Exam Reviewer Philippines",
   description:
-    "Prepare for the Civil Service Exam with RevView's focused practice quizzes, progress tracking, explanations, coverage sections, and curated study products.",
+    "Use RevView's free Philippine Civil Service Exam reviewer for CSE-PPT Professional and Subprofessional practice quizzes, explanations, and progress tracking.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     url: "/",
-    title: "RevView | Civil Service Exam Reviewer & Practice Tests",
+    title: "Free Civil Service Exam Reviewer Philippines | RevView",
     description:
-      "Practice smarter for the Civil Service Exam with quizzes, explanations, progress insights, and curated review resources.",
+      "Practice for the Philippine CSE-PPT with free quizzes, answer explanations, performance insights, and Professional and Subprofessional review coverage.",
   },
 };
 

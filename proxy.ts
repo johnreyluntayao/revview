@@ -2,83 +2,81 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+const adminRoutes = [
+  "/admin",
+  "/feedbacks",
+  "/manage-questions",
+  "/manage-blogs",
+  "/admin-account",
+  "/affiliate",
+  "/boost",
+];
+
+const learnerRoutes = [
+  "/dashboard",
+  "/quiz-result",
+  "/user-account",
+  "/quiz-selection",
+  "/results-history",
+  "/quiz",
+];
+
+const matchesRoute = (pathname: string, routes: string[]) =>
+  routes.some((route) => pathname === route || pathname.startsWith(`${route}/`));
+
 export async function proxy(request: NextRequest) {
-    const supabase = createServerClient(
+  let supabaseResponse = NextResponse.next({ request });
+
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
+        getAll: () => request.cookies.getAll(),
         setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              request.cookies.set({ name, value, ...options });
-              const response = NextResponse.next();
-              response.cookies.set({ name, value, ...options });
-              return response;
-            });
-          } catch {
-            // Ignore — common in proxy when called from Server Components
-          }
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          supabaseResponse = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options),
+          );
         },
       },
-    }
+    },
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
-
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const pathname = request.nextUrl.pathname;
 
-  // ── 1. Unauthenticated users ───────────────────────────────────────
+  const redirectWithCookies = (url: URL) => {
+    const headers = new Headers(supabaseResponse.headers);
+    headers.set("Location", url.toString());
+    return new NextResponse(null, { status: 307, headers });
+  };
+
   if (!user) {
-    if (
-      pathname.startsWith("/dashboard") ||
-      pathname.startsWith("/admin")    ||
-      pathname.startsWith("/feedbacks") ||
-      pathname.startsWith("/quiz-result") ||
-      pathname.startsWith("/manage-questions") ||
-      pathname.startsWith("/manage-blogs") ||
-      pathname.startsWith("/user-account") ||
-      pathname.startsWith("/admin-account") || 
-      pathname.startsWith("/quiz-result") ||
-      pathname.startsWith("/quiz-selection") ||
-      pathname.startsWith("/results-history") ||
-      pathname.startsWith("/quiz") ||
-      pathname.startsWith("/affiliate")
-    ) {
-      const redirectUrl = new URL("/login", request.url);
-      redirectUrl.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(redirectUrl);
-    }
-    return NextResponse.next();
+    const redirectUrl = new URL("/login", request.url);
+    redirectUrl.searchParams.set("redirect", pathname);
+    return redirectWithCookies(redirectUrl);
   }
 
-  // ── 2. Fetch admin status once ─────────────────────────────────────
   const { data: profile } = await supabase
     .from("users")
     .select("is_admin")
     .eq("id", user.id)
     .single();
+  const isAdmin = profile?.is_admin === true;
 
-  const isAdmin = !!profile?.is_admin;
-
-  // ── 3. Role-based route enforcement ────────────────────────────────
-  const adminRoutes = ["/admin", "/feedbacks", "/manage-questions", "/manage-blogs", "/admin-account", "/affiliate"];
-  const userRoutes = ["/dashboard", "/quiz-result", "/user-account", "/quiz-result", "/quiz-selection", "/results-history", "/quiz"];
-
-  if (isAdmin) {
-    if (userRoutes.some(p => pathname === p || pathname.startsWith(p + "/"))) {
-      return NextResponse.redirect(new URL("/admin", request.url));
-    }
-  } else {
-    if (adminRoutes.some(p => pathname === p || pathname.startsWith(p + "/"))) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
+  if (isAdmin && matchesRoute(pathname, learnerRoutes)) {
+    return redirectWithCookies(new URL("/admin", request.url));
   }
 
-  return NextResponse.next();
+  if (!isAdmin && matchesRoute(pathname, adminRoutes)) {
+    return redirectWithCookies(new URL("/dashboard", request.url));
+  }
+
+  return supabaseResponse;
 }
 
 export const config = {
@@ -91,10 +89,10 @@ export const config = {
     "/manage-blogs/:path*",
     "/user-account/:path*",
     "/admin-account/:path*",
-    "/quiz-result/:path*",
     "/quiz-selection/:path*",
     "/results-history/:path*",
     "/quiz/:path*",
     "/affiliate/:path*",
+    "/boost/:path*",
   ],
 };

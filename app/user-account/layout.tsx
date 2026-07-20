@@ -1,5 +1,7 @@
 import LearnerShell from "@/components/ui/LearnerShell";
+import { requireUser } from "@/lib/auth-guards";
 
-export default function UserAccountLayout({ children }: { children: React.ReactNode }) {
+export default async function UserAccountLayout({ children }: { children: React.ReactNode }) {
+  await requireUser();
   return <LearnerShell>{children}</LearnerShell>;
 }

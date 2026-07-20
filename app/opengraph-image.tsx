@@ -55,7 +55,7 @@ export default function Image() {
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           <div
             style={{
-              width: "fit-content",
+              alignSelf: "flex-start",
               borderRadius: 999,
               padding: "12px 20px",
               background: "rgba(255, 255, 255, 0.14)",

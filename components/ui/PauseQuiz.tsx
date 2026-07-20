@@ -1,4 +1,5 @@
-import { Pause, CorrectAnswer as ResumeQuiz, RetakeQuiz, Home } from '@/lib/icons';
+import { Pause, CorrectAnswer as ResumeQuiz, RetakeQuiz, Home } from "@/lib/icons";
+import Modal from "@/components/atoms/Modal";
 
 interface PauseModalProps {
   isOpen: boolean;
@@ -7,72 +8,38 @@ interface PauseModalProps {
   onExit: () => void;
 }
 
-export default function PauseModal({
-  isOpen,
-  onClose,
-  onRestart,
-  onExit,
-}: PauseModalProps) {
-  if (!isOpen) return null;
-
+export default function PauseModal({ isOpen, onClose, onRestart, onExit }: PauseModalProps) {
   return (
-    <div
-      className="fixed inset-0 bg-foreground/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-      onClick={onClose}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Quiz paused"
+      description="Your timer is paused while this window is open."
+      size="md"
+      closeOnBackdrop={false}
+      contentClassName="p-4 sm:p-6"
     >
-      <div
-        className="bg-background rounded-2xl shadow-2xl p-6 md:p-8 max-w-md w-full border border-border animate-in fade-in zoom-in-95"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="text-center mb-6">
-          <div className="w-16 h-16 mx-auto mb-4 bg-yellow-500/10 rounded-full flex items-center justify-center">
-            <Pause className="w-8 h-8 text-yellow-600" />
-          </div>
-          <h2 className="text-2xl font-bold mb-2">Quiz Paused</h2>
-          <p className="text-muted-foreground">
-            Your timer is paused. You can resume or exit to dashboard.
-          </p>
+      <div className="mb-5 text-center">
+        <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-warning/10 text-warning">
+          <Pause className="size-7" />
         </div>
-
-        <div className="space-y-3">
-          <button
-            onClick={onClose}
-            className="w-full flex items-center gap-3 p-4 bg-green-500/10 hover:bg-green-500/20 text-green-700 rounded-xl transition"
-          >
-            <ResumeQuiz className="w-6 h-6" />
-            <div className="text-left">
-              <div className="font-semibold">Resume Quiz</div>
-              <div className="text-sm opacity-80">Continue where you left off</div>
-            </div>
-          </button>
-
-          <button
-            onClick={onRestart}
-            className="w-full flex items-center gap-3 p-4 bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 rounded-xl transition"
-          >
-            <RetakeQuiz className="w-6 h-6" />
-            <div className="text-left">
-              <div className="font-semibold">Restart Quiz</div>
-              <div className="text-sm opacity-80">Start over with new questions</div>
-            </div>
-          </button>
-
-          <button
-            onClick={onExit}
-            className="w-full flex items-center gap-3 p-4 bg-red-500/10 hover:bg-red-500/20 text-red-700 rounded-xl transition"
-          >
-            <Home className="w-6 h-6" />
-            <div className="text-left">
-              <div className="font-semibold">Exit to Dashboard</div>
-              <div className="text-sm opacity-80">Progress will NOT be saved</div>
-            </div>
-          </button>
-        </div>
-
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          Timer remains paused while this window is open
-        </p>
+        <p className="mt-3 text-sm text-muted-foreground">Resume where you left off, restart with a new setup, or exit the session.</p>
       </div>
-    </div>
+
+      <div className="space-y-2.5">
+        <button type="button" onClick={onClose} className="flex w-full items-center gap-3 rounded-xl border border-success/20 bg-success/8 p-3.5 text-success transition hover:bg-success/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-success">
+          <ResumeQuiz className="size-5 shrink-0" />
+          <span className="text-left"><span className="block text-sm font-semibold">Resume quiz</span><span className="block text-xs opacity-80">Continue from the current question</span></span>
+        </button>
+        <button type="button" onClick={onRestart} className="flex w-full items-center gap-3 rounded-xl border border-primary/20 bg-primary/8 p-3.5 text-primary transition hover:bg-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+          <RetakeQuiz className="size-5 shrink-0" />
+          <span className="text-left"><span className="block text-sm font-semibold">Restart quiz</span><span className="block text-xs opacity-80">Return to quiz selection</span></span>
+        </button>
+        <button type="button" onClick={onExit} className="flex w-full items-center gap-3 rounded-xl border border-destructive/20 bg-destructive/8 p-3.5 text-destructive transition hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive">
+          <Home className="size-5 shrink-0" />
+          <span className="text-left"><span className="block text-sm font-semibold">Exit to dashboard</span><span className="block text-xs opacity-80">This quiz session will be discarded</span></span>
+        </button>
+      </div>
+    </Modal>
   );
 }

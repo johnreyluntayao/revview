@@ -7,7 +7,7 @@ import React, {
   useState,
   type KeyboardEvent,
 } from "react";
-import { Check, ChevronDown, Search } from "lucide-react";
+import { Check, ChevronDown, Search } from "@/lib/icons";
 
 type Size = "sm" | "md" | "lg";
 
@@ -175,6 +175,13 @@ export default function ComboBox({
           disabled={disabled}
           aria-expanded={isOpen}
           aria-haspopup="listbox"
+          role="combobox"
+          aria-autocomplete={isSearchable ? "list" : "none"}
+          aria-activedescendant={
+            isOpen && filteredOptions[highlightedIndex]
+              ? `${listboxId}-option-${highlightedIndex}`
+              : undefined
+          }
           aria-controls={listboxId}
           aria-labelledby={label ? labelId : undefined}
           aria-label={label ? undefined : placeholder}
@@ -210,6 +217,15 @@ export default function ComboBox({
                   <input
                     ref={searchInputRef}
                     type="search"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded={isOpen}
+                    aria-controls={listboxId}
+                    aria-activedescendant={
+                      filteredOptions[highlightedIndex]
+                        ? `${listboxId}-option-${highlightedIndex}`
+                        : undefined
+                    }
                     value={search}
                     onChange={(event) => {
                       setSearch(event.target.value);
@@ -241,6 +257,7 @@ export default function ComboBox({
                   return (
                     <div
                       key={option.value}
+                      id={`${listboxId}-option-${index}`}
                       role="option"
                       aria-selected={isSelected}
                       onMouseDown={(event) => event.preventDefault()}

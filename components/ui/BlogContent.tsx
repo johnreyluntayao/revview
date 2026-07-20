@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { isSafeContentLink } from "@/lib/safe-url";
 
 function renderInline(text: string): ReactNode[] {
   const pattern = /(\[[^\]]+\]\([^)]+\)|\*\*[^*]+\*\*|`[^`]+`)/g;
@@ -20,6 +21,7 @@ function renderInline(text: string): ReactNode[] {
     const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
     if (linkMatch) {
       const [, label, href] = linkMatch;
+      if (!isSafeContentLink(href)) return label;
       const external = /^https?:\/\//.test(href);
       return (
         <Link

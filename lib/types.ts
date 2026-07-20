@@ -1,6 +1,7 @@
-import { ReactNode } from "react";
+import type { InputHTMLAttributes, ReactNode } from "react";
 
-export interface InputFieldProps {
+export interface InputFieldProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange" | "size" | "type"> {
   label?: ReactNode;
   placeholder?: string;
   type?: "text" | "password" | "email" | "username" | "number" | "textarea";
@@ -13,9 +14,7 @@ export interface InputFieldProps {
   icon?: React.ReactNode;
   showPasswordToggle?: boolean;
   className?: string;
-  register?: any;
   state?: "editable" | "readonly" | "disabled"; // ← NEW
-  [key: string]: any;
 }
 
 export interface ButtonProps {
