@@ -4,15 +4,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   Add,
+  Analytical,
   Delete,
   Edit,
+  General,
   Image as ImageIcon,
+  Numerical,
   Questions as QuestionsIcon,
   Search,
   Sparkles,
-  Success,
   ToDelete,
-  TotalTests,
+  Verbal,
 } from "@/lib/icons";
 import {
   Button,
@@ -137,6 +139,35 @@ const getJoinedCategoryName = (
   const category = Array.isArray(categories) ? categories[0] : categories;
   return category?.name || "Unknown";
 };
+
+const questionCategoryStats = [
+  {
+    label: "Numerical Ability",
+    aliases: ["numerical ability", "numerical"],
+    Icon: Numerical,
+    iconClassName: "bg-primary/10 text-primary",
+  },
+  {
+    label: "Analytical Ability",
+    aliases: ["analytical ability", "analytical"],
+    Icon: Analytical,
+    iconClassName: "bg-secondary/10 text-secondary",
+  },
+  {
+    label: "Verbal Ability",
+    aliases: ["verbal ability", "verbal"],
+    Icon: Verbal,
+    iconClassName: "bg-success/10 text-success",
+  },
+  {
+    label: "General Information",
+    aliases: ["general information", "general"],
+    Icon: General,
+    iconClassName: "bg-warning/10 text-warning",
+  },
+] as const;
+
+const normalizeCategoryName = (name: string) => name.trim().toLowerCase();
 
 function QuestionEditorModal({
   isOpen,
@@ -634,6 +665,11 @@ export default function ManageQuestions() {
   // Pagination states
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [totalQuestionCount, setTotalQuestionCount] = useState(0);
+  const [categoryQuestionCounts, setCategoryQuestionCounts] = useState<
+    Record<string, number>
+  >({});
+  const [summaryLoading, setSummaryLoading] = useState(true);
   const pageSize = 10; // Change this if you want more/fewer items per page
 
   const [addEditOpen, setAddEditOpen] = useState(false);
@@ -667,6 +703,45 @@ export default function ManageQuestions() {
     }
     loadCategories();
   }, [supabase]);
+
+  const fetchQuestionSummary = useCallback(async () => {
+    if (!categories.length) return;
+
+    setSummaryLoading(true);
+
+    const [{ count: total, error: totalError }, ...categoryResults] =
+      await Promise.all([
+        supabase.from("questions").select("id", { count: "exact", head: true }),
+        ...categories.map((category) =>
+          supabase
+            .from("questions")
+            .select("id", { count: "exact", head: true })
+            .eq("category_id", category.id),
+        ),
+      ]);
+
+    if (totalError || categoryResults.some((result) => result.error)) {
+      console.error(
+        "Failed to load question summary",
+        totalError || categoryResults,
+      );
+      setSummaryLoading(false);
+      return;
+    }
+
+    setTotalQuestionCount(total || 0);
+    setCategoryQuestionCounts(
+      categories.reduce<Record<string, number>>((counts, category, index) => {
+        counts[category.id] = categoryResults[index]?.count || 0;
+        return counts;
+      }, {}),
+    );
+    setSummaryLoading(false);
+  }, [categories, supabase]);
+
+  useEffect(() => {
+    void fetchQuestionSummary();
+  }, [fetchQuestionSummary]);
 
   const fetchQuestions = useCallback(async () => {
     setLoading(true);
@@ -822,7 +897,8 @@ export default function ManageQuestions() {
       toast.success(`${selectedIds.length} question(s) moved`);
       setSelectedIds([]);
       setBulkMoveCategoryId("");
-      fetchQuestions();
+      void fetchQuestions();
+      void fetchQuestionSummary();
     } catch (err) {
       console.error(err);
       toast.error("Failed to move selected questions");
@@ -855,7 +931,8 @@ export default function ManageQuestions() {
       if (error) throw error;
 
       toast.success("Deletion undone");
-      fetchQuestions();
+      void fetchQuestions();
+      void fetchQuestionSummary();
     } catch (err) {
       console.error(err);
       toast.error("Failed to undo delete");
@@ -965,7 +1042,8 @@ export default function ManageQuestions() {
       );
 
       setSelectedIds([]);
-      fetchQuestions();
+      void fetchQuestions();
+      void fetchQuestionSummary();
     } catch (err) {
       console.error(err);
       toast.error(
@@ -1055,7 +1133,8 @@ export default function ManageQuestions() {
         toast.success("Question added");
       }
 
-      fetchQuestions();
+      void fetchQuestions();
+      void fetchQuestionSummary();
       setAddEditOpen(false);
     } catch (err) {
       console.error(err);
@@ -1136,34 +1215,37 @@ export default function ManageQuestions() {
           </div>
         </header>
 
-        <section aria-label="Question summary" className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <section aria-label="Question summary" className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 md:grid-cols-3 xl:grid-cols-5">
           <article className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm md:p-5">
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="text-xs font-medium text-muted-foreground md:text-sm">Matching questions</p>
-                <p className="mt-2 text-2xl font-bold tracking-tight text-foreground">{loading ? "—" : totalCount}</p>
+                <p className="text-xs font-medium text-muted-foreground md:text-sm">Total Questions</p>
+                <p className="mt-2 text-2xl font-bold tracking-tight text-foreground">{summaryLoading ? "—" : totalQuestionCount}</p>
               </div>
               <div className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><QuestionsIcon className="size-5" /></div>
             </div>
           </article>
-          <article className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm md:p-5">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground md:text-sm">Categories</p>
-                <p className="mt-2 text-2xl font-bold tracking-tight text-foreground">{categories.length}</p>
-              </div>
-              <div className="flex size-10 items-center justify-center rounded-xl bg-secondary/10 text-secondary"><TotalTests className="size-5" /></div>
-            </div>
-          </article>
-          <article className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm md:p-5">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground md:text-sm">Current page</p>
-                <p className="mt-2 text-2xl font-bold tracking-tight text-foreground">{page}<span className="text-sm font-medium text-muted-foreground"> / {Math.max(totalPages, 1)}</span></p>
-              </div>
-              <div className="flex size-10 items-center justify-center rounded-xl bg-success/10 text-success"><Success className="size-5" /></div>
-            </div>
-          </article>
+          {questionCategoryStats.map(({ label, aliases, Icon, iconClassName }) => {
+            const category = categories.find(({ name }) =>
+              aliases.some((alias) => alias === normalizeCategoryName(name)),
+            );
+
+            return (
+              <article key={label} className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm md:p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground md:text-sm">{label}</p>
+                    <p className="mt-2 text-2xl font-bold tracking-tight text-foreground">
+                      {summaryLoading ? "—" : category ? categoryQuestionCounts[category.id] || 0 : 0}
+                    </p>
+                  </div>
+                  <div className={`flex size-10 items-center justify-center rounded-xl ${iconClassName}`}>
+                    <Icon className="size-5" />
+                  </div>
+                </div>
+              </article>
+            );
+          })}
         </section>
 
         <section className="grid grid-cols-1 items-end gap-3 rounded-2xl border border-border/80 bg-card p-4 shadow-sm md:grid-cols-2 md:p-5 lg:grid-cols-4 lg:p-6">
