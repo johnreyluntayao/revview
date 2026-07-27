@@ -426,39 +426,57 @@ function QuestionEditorModal({
         }
         contentClassName="bg-muted/15"
       >
-        <div className="space-y-4 p-4 sm:p-5 md:space-y-5 md:p-6">
+        <div className="space-y-5 p-4 sm:p-5 md:space-y-6 md:p-6">
           <section className="rounded-2xl border border-border/80 bg-background p-4 shadow-sm md:p-5">
-            <div className="mb-4 flex items-center gap-3">
-              <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">1</span>
-              <div>
-                <h3 className="text-sm font-semibold text-foreground md:text-base">Question prompt</h3>
-                <p className="text-xs text-muted-foreground">Enter the prompt and include an image only when useful.</p>
+            <div className="mb-5 flex items-start gap-3">
+              <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">1</span>
+              <div className="min-w-0">
+                <h3 className="text-sm font-semibold text-foreground md:text-base">Select category</h3>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">Choose where this question belongs before you add the prompt and choices.</p>
               </div>
             </div>
-            <div className="space-y-4">
-            <InputField
-              label="Question text *"
-              type="textarea"
-              placeholder="Write the complete question..."
-              value={questionText}
-              onChange={(e) => setQuestionText(e.target.value)}
-            />
-            <InsertImage
-              label="Question Image"
-              value={questionImage}
-              onChange={setQuestionImage}
-              folder="img_question"
-            />
+            <div className="space-y-3">
+              <ComboBox
+                label="Category *"
+                options={loadingCats ? [{ value: "", label: "Loading..." }] : categories.map((categoryOption) => ({ value: categoryOption.id, label: categoryOption.name }))}
+                value={category}
+                onChange={setCategory}
+              />
             </div>
           </section>
 
           <section className="rounded-2xl border border-border/80 bg-background p-4 shadow-sm md:p-5">
-            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-3">
-                <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">2</span>
-                <div>
+            <div className="mb-5 flex items-start gap-3">
+              <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">2</span>
+              <div className="min-w-0">
+                <h3 className="text-sm font-semibold text-foreground md:text-base">Question prompt</h3>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">Enter the prompt and include an image only when useful.</p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <InputField
+                label="Question text *"
+                type="textarea"
+                placeholder="Write the complete question..."
+                value={questionText}
+                onChange={(e) => setQuestionText(e.target.value)}
+              />
+              <InsertImage
+                label="Question Image"
+                value={questionImage}
+                onChange={setQuestionImage}
+                folder="img_question"
+              />
+            </div>
+          </section>
+
+          <section className="rounded-2xl border border-border/80 bg-background p-4 shadow-sm md:p-5">
+            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-start gap-3">
+                <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">3</span>
+                <div className="min-w-0">
                   <h3 className="text-sm font-semibold text-foreground md:text-base">Answer choices</h3>
-                  <p className="text-xs text-muted-foreground">Use one consistent format for every option.</p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">Use one consistent format for every option.</p>
                 </div>
               </div>
               <div className="flex rounded-lg bg-muted p-1">
@@ -525,51 +543,45 @@ function QuestionEditorModal({
           </section>
 
           <section className="rounded-2xl border border-border/80 bg-background p-4 shadow-sm md:p-5">
-            <div className="mb-4 flex items-center gap-3">
-              <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">3</span>
-              <div>
-                <h3 className="text-sm font-semibold text-foreground md:text-base">Answer and category</h3>
-                <p className="text-xs text-muted-foreground">Choose the correct choice and where this question belongs.</p>
+            <div className="mb-5 flex items-start gap-3">
+              <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">4</span>
+              <div className="min-w-0">
+                <h3 className="text-sm font-semibold text-foreground md:text-base">Correct answer</h3>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">Choose the correct choice for this question.</p>
               </div>
             </div>
-            <div className="grid gap-4 md:grid-cols-2">
-            <ComboBox
-              label="Correct answer *"
-              options={["A", "B", "C", "D", "E"]}
-              value={correctAnswer}
-              onChange={setCorrectAnswer}
-            />
-            <ComboBox
-              label="Category *"
-              options={loadingCats ? [{ value: "", label: "Loading..." }] : categories.map((categoryOption) => ({ value: categoryOption.id, label: categoryOption.name }))}
-              value={category}
-              onChange={setCategory}
-            />
+            <div className="max-w-full">
+              <ComboBox
+                label="Correct answer *"
+                options={["A", "B", "C", "D", "E"]}
+                value={correctAnswer}
+                onChange={setCorrectAnswer}
+              />
             </div>
           </section>
 
           <section className="rounded-2xl border border-border/80 bg-background p-4 shadow-sm md:p-5">
-            <div className="mb-4 flex items-center gap-3">
-              <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">4</span>
-              <div>
+            <div className="mb-5 flex items-start gap-3">
+              <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary text-xs font-bold text-primary-foreground">5</span>
+              <div className="min-w-0">
                 <h3 className="text-sm font-semibold text-foreground md:text-base">Explanation</h3>
-                <p className="text-xs text-muted-foreground">Help learners understand why the selected answer is correct.</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">Help learners understand why the selected answer is correct.</p>
               </div>
             </div>
             <div className="space-y-4">
-            <InputField
-              label="Explanation *"
-              type="textarea"
-              placeholder="Explain the correct answer..."
-              value={explanationText}
-              onChange={(event) => setExplanationText(event.target.value)}
-            />
-            <InsertImage
-              label="Explanation Image"
-              value={explanationImage}
-              onChange={setExplanationImage}
-              folder="img_explanation"
-            />
+              <InputField
+                label="Explanation *"
+                type="textarea"
+                placeholder="Explain the correct answer..."
+                value={explanationText}
+                onChange={(event) => setExplanationText(event.target.value)}
+              />
+              <InsertImage
+                label="Explanation Image"
+                value={explanationImage}
+                onChange={setExplanationImage}
+                folder="img_explanation"
+              />
             </div>
           </section>
         </div>
