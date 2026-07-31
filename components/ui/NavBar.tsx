@@ -534,6 +534,8 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                 <div className="relative flex items-center gap-3">
                   <Link
                     href={dashboardHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="px-4 py-2 bg-primary text-primary-foreground font-medium rounded-lg shadow-sm hover:bg-primary/90 active:bg-primary/95 transition text-xs md:text-sm lg:text-base"
                   >
                     Dashboard
