@@ -26,6 +26,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
+  const isGoogleUser = user.identities?.some((identity) => identity.provider === "google");
+
+  if (isGoogleUser) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
   const { data: profile } = await supabase
     .from("users")
     .select("is_admin")
@@ -34,7 +40,5 @@ export async function GET(request: NextRequest) {
 
   const redirectPath = profile?.is_admin ? "/admin" : "/dashboard";
 
-  const finalUrl = new URL(redirectPath, request.url);
-
-  return NextResponse.redirect(finalUrl);
+  return NextResponse.redirect(new URL(redirectPath, request.url));
 }
