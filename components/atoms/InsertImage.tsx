@@ -92,16 +92,19 @@ const InsertImage: React.FC<InsertImageProps> = ({
     return true;
   };
 
-  const handleFiles = async (files: FileList | null) => {
-    if (!files?.length || isDisabled) return;
+  const handleFile = async (file: File | undefined) => {
+    if (!file || isDisabled) return;
 
-    const file = files[0];
     if (!validateFile(file)) return;
 
     const localPreview = URL.createObjectURL(file);
     setPreview(localPreview);
 
     await uploadFile(file);
+  };
+
+  const handleFiles = async (files: FileList | null) => {
+    await handleFile(files?.[0]);
   };
 
   const clearImage = () => {
@@ -143,6 +146,19 @@ const InsertImage: React.FC<InsertImageProps> = ({
     await handleFiles(e.dataTransfer.files);
   };
 
+  const handlePaste = async (e: React.ClipboardEvent<HTMLDivElement>) => {
+    if (isDisabled) return;
+
+    const imageFile = Array.from(e.clipboardData.files).find((file) =>
+      file.type.startsWith("image/"),
+    );
+
+    if (!imageFile) return;
+
+    e.preventDefault();
+    await handleFile(imageFile);
+  };
+
   const isCompact = variant === "compact";
   const displayedPreview = preview ?? (value || null);
 
@@ -176,6 +192,7 @@ const InsertImage: React.FC<InsertImageProps> = ({
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
+        onPaste={handlePaste}
         className={`
           relative border rounded-xl transition-all overflow-hidden
           ${isCompact ? "p-3" : "p-5"}
@@ -252,11 +269,9 @@ const InsertImage: React.FC<InsertImageProps> = ({
               {uploading ? "Uploading..." : placeholder}
             </p>
 
-            {!isCompact && (
-              <p className="text-[10px] md:text-xs lg:text-sm text-muted-foreground">
-                PNG, JPG up to {maxSizeMB}MB
-              </p>
-            )}
+            <p className="text-[10px] md:text-xs lg:text-sm text-muted-foreground">
+              {isCompact ? "Click here, then press Ctrl+V to paste an image" : `PNG, JPG up to ${maxSizeMB}MB · Click here, then press Ctrl+V to paste an image`}
+            </p>
           </div>
         )}
       </div>
