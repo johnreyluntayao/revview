@@ -8,7 +8,7 @@ import { toast } from "sonner";
 type Question = {
   id: string;
   text: string;
-  options: string[];
+  options: (string | null | undefined)[];
   option_images?: string[] | null;  
   correctAnswer: string;
   explanation: string;
