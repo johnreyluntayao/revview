@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button, RadioButton, Progress } from "@/lib/client-imports";
 import { toast } from "sonner";
@@ -17,10 +17,10 @@ import {
 import Image from "next/image";
 
 type Question = {
-  option_images: (string | null)[];
+  option_images?: (string | null)[];
   id: string;
   text: string;
-  options: string[];
+  options: (string | null | undefined)[];
   correct_answer: "A" | "B" | "C" | "D" | "E";
   explanation: string;
   img_url?: string | null;
@@ -50,6 +50,28 @@ type QuizData = {
   questions: Question[];
   answers: QuizAnswer[] | null;
 };
+
+type AvailableOption = {
+  value: "A" | "B" | "C" | "D" | "E";
+  text: string;
+  image: string | null;
+};
+
+const answerValues = ["A", "B", "C", "D", "E"] as const;
+
+function getAvailableOptions(question: Question): AvailableOption[] {
+  return question.options.flatMap((option, index) => {
+    if (index >= answerValues.length || typeof option !== "string" || !option.trim()) {
+      return [];
+    }
+
+    return [{
+      value: answerValues[index],
+      text: option,
+      image: question.option_images?.[index] ?? null,
+    }];
+  });
+}
 
 interface QuizProps {
   sessionId: string;
@@ -81,6 +103,10 @@ export default function Quiz({ sessionId }: QuizProps) {
   const hasSubmittedRef = useRef(false);
 
   const currentQuestion = quizData?.questions[currentIndex];
+  const currentOptions = useMemo(
+    () => (currentQuestion ? getAvailableOptions(currentQuestion) : []),
+    [currentQuestion],
+  );
   const isLastQuestion = currentIndex === (quizData?.questions.length ?? 1) - 1;
   const answeredCount = Object.values(userAnswers).filter(
     (value) => value !== null,
@@ -105,8 +131,10 @@ export default function Quiz({ sessionId }: QuizProps) {
         selectedValue = String.fromCharCode(64 + num);
       }
 
-      const optionIndex = selectedValue ? selectedValue.charCodeAt(0) - 65 : -1;
-      if (selectedValue && optionIndex < (currentQuestion?.options.length ?? 0)) {
+      if (
+        selectedValue &&
+        currentOptions.some((option) => option.value === selectedValue)
+      ) {
         setSelectedOption(selectedValue);
       }
     };
@@ -116,7 +144,7 @@ export default function Quiz({ sessionId }: QuizProps) {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [answerSubmitted, currentQuestion?.options.length, isPaused, isSavingAnswer]);
+  }, [answerSubmitted, currentOptions, isPaused, isSavingAnswer]);
 
   useEffect(() => {
     async function fetchQuizData() {
@@ -169,7 +197,7 @@ export default function Quiz({ sessionId }: QuizProps) {
     const selectedValue =
       typeof value === "number" ? String.fromCharCode(64 + value) : value;
 
-    if (["A", "B", "C", "D", "E"].includes(selectedValue)) {
+    if (currentOptions.some((option) => option.value === selectedValue)) {
       setSelectedOption(selectedValue);
     }
   };
@@ -352,7 +380,7 @@ export default function Quiz({ sessionId }: QuizProps) {
   const confirmedAnswer = userAnswers[currentQuestion.id] ?? null;
   const isCorrect = confirmedAnswer === currentQuestion.correct_answer;
 
-  const optionImage = currentQuestion.option_images?.some(Boolean);
+  const optionImage = currentOptions.some((option) => option.image);
 
   return (
     <div className="min-h-screen bg-linear-to-b from-primary/5 via-background to-background px-4 pb-10 pt-32 sm:px-6 md:pt-28 lg:px-8">
@@ -404,8 +432,7 @@ export default function Quiz({ sessionId }: QuizProps) {
               : "grid grid-cols-1 gap-3"
           } p-5 sm:p-7 lg:p-8`}
         >
-          {currentQuestion.options.map((optionText, idx) => {
-            const value = String.fromCharCode(65 + idx);
+          {currentOptions.map(({ value, text: optionText, image }) => {
             const isSelected = selectedOption === value;
             const isConfirmed = confirmedAnswer === value;
 
@@ -433,17 +460,14 @@ export default function Quiz({ sessionId }: QuizProps) {
               }
             }
 
-            const individualOptionImage =
-              currentQuestion.option_images?.[idx] || null;
-
             return (
                 <RadioButton
-                  key={idx}
-                  variant={individualOptionImage ? "image" : "choice"}
+                  key={value}
+                  variant={image ? "image" : "choice"}
                   value={value}
                   label={optionText}
                   image={
-                    individualOptionImage || undefined
+                    image || undefined
                   }
                   isSelected={isSelected || isConfirmed || isCorrectAnswer}
                   onSelect={handleChoice}
@@ -451,7 +475,7 @@ export default function Quiz({ sessionId }: QuizProps) {
                   indicator={indicator}
                   selectedColor={selectedColor}
                   rightIcon={rightIcon}
-                  className={individualOptionImage ? "!p-3" : "!min-h-14 !p-3 sm:!p-4"}
+                  className={image ? "!p-3" : "!min-h-14 !p-3 sm:!p-4"}
                 />
             );
           })}

@@ -26,7 +26,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  const isGoogleUser = user.identities?.some((identity) => identity.provider === "google");
+  const isGoogleUser =
+    user.app_metadata.provider === "google" ||
+    user.identities?.some((identity) => identity.provider === "google");
 
   if (isGoogleUser) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
