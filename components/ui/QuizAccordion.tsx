@@ -8,7 +8,7 @@ import Image from "next/image";
 interface Question {
   id: string | number;
   text: string;
-  options: string[];
+  options: (string | null | undefined)[];
   option_images?: string[] | null;    
   correctAnswer: string;
   explanation: string;
@@ -114,7 +114,11 @@ export default function QuizAccordion({
                         All Options:
                       </p>
                       <div className="space-y-1 md:space-y-2 lg:space-y-3">
-                        {question.options.map((option, optIdx) => {
+                        {question.options.flatMap((option, optIdx) => {
+                          if (typeof option !== "string" || !option.trim()) {
+                            return [];
+                          }
+
                           const letter = optionLetters[optIdx] ?? String(optIdx + 1);
                           const isCorrect = letter === question.correctAnswer;
                           const isSelected = letter === answer?.selectedOption;
@@ -123,7 +127,7 @@ export default function QuizAccordion({
 
                           return (
                             <div
-                              key={optIdx}
+                              key={letter}
                               className={`p-2 md:p-3 lg:p-4 rounded-lg border transition-colors ${
                                 isCorrect && isSelected
                                   ? "border-success/50 bg-success/5"
