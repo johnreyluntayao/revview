@@ -10,7 +10,7 @@ interface InsertImageProps {
   label?: string;
   value: string;
   onChange: (url: string) => void;
-  folder?: "img_question" | "img_options" | "img_explanation" | "blog_covers";
+  folder?: "img_question" | "img_options" | "img_explanation" | "blog_covers" | "affiliate_products";
   placeholder?: string;
   maxSizeMB?: number;
   variant?: "default" | "compact";
@@ -41,6 +41,13 @@ const InsertImage: React.FC<InsertImageProps> = ({
       if (preview?.startsWith("blob:")) URL.revokeObjectURL(preview);
     };
   }, [preview]);
+
+  useEffect(() => {
+    // Keep the preview aligned when callers switch from an uploaded image to an external URL.
+    if (!uploading && !preview?.startsWith("blob:") && preview !== (value || null)) {
+      setPreview(value || null);
+    }
+  }, [preview, uploading, value]);
 
   const uploadFile = async (file: File) => {
     setUploading(true);

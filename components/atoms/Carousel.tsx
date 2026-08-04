@@ -44,7 +44,6 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const totalCards = cards.length;
-  const extendedCards = [...cards, ...cards, ...cards];
   const cardsWithColor = useMemo(
     () =>
       cards.map((card, index) => ({
@@ -54,21 +53,19 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
     [cards],
   );
 
-  const slideToCenter = useCallback((targetIndex: number) => {
+  const slideToItem = useCallback((targetIndex: number) => {
     if (!carouselRef.current || totalCards === 0) return;
 
     const normalizedIndex = ((targetIndex % totalCards) + totalCards) % totalCards;
-    const cardElements = carouselRef.current.children;
-    const targetElement = cardElements[normalizedIndex + totalCards] as HTMLElement;
+    const carousel = carouselRef.current;
+    const cardElements = carousel.children;
+    const targetElement = cardElements[normalizedIndex] as HTMLElement;
 
     if (targetElement) {
-      const carouselWidth = carouselRef.current.clientWidth;
-      const cardWidth = targetElement.offsetWidth;
-      const cardLeft = targetElement.offsetLeft;
+      const scrollPadding = Number.parseFloat(window.getComputedStyle(carousel).scrollPaddingLeft) || 0;
+      const scrollPosition = Math.max(0, targetElement.offsetLeft - scrollPadding);
 
-      const scrollPosition = cardLeft - (carouselWidth / 2) + (cardWidth / 2);
-
-      carouselRef.current.scrollTo({
+      carousel.scrollTo({
         left: scrollPosition,
         behavior: 'smooth',
       });
@@ -78,41 +75,40 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
   }, [totalCards]);
 
   const goToPrevious = useCallback(
-    () => slideToCenter((currentIndex - 1 + totalCards) % totalCards),
-    [currentIndex, slideToCenter, totalCards],
+    () => slideToItem((currentIndex - 1 + totalCards) % totalCards),
+    [currentIndex, slideToItem, totalCards],
   );
   const goToNext = useCallback(
-    () => slideToCenter((currentIndex + 1) % totalCards),
-    [currentIndex, slideToCenter, totalCards],
+    () => slideToItem((currentIndex + 1) % totalCards),
+    [currentIndex, slideToItem, totalCards],
   );
 
-  const autoCenterClosestCard = useCallback(() => {
+  const syncClosestItem = useCallback(() => {
     if (!carouselRef.current) return;
 
     const carousel = carouselRef.current;
-    const scrollLeft = carousel.scrollLeft;
-    const centerOffset = carousel.clientWidth / 2;
+    const scrollPadding = Number.parseFloat(window.getComputedStyle(carousel).scrollPaddingLeft) || 0;
+    const viewportStart = carousel.scrollLeft + scrollPadding;
 
     let closestIndex = 0;
     let minDistance = Infinity;
 
     Array.from(carousel.children).forEach((child, idx) => {
       const card = child as HTMLElement;
-      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-      const distance = Math.abs(cardCenter - (scrollLeft + centerOffset));
+      const distance = Math.abs(card.offsetLeft - viewportStart);
 
       if (distance < minDistance) {
         minDistance = distance;
-        closestIndex = idx % totalCards;
+        closestIndex = idx;
       }
     });
 
     if (Math.abs(minDistance) > 5) {
-      slideToCenter(closestIndex);
+      slideToItem(closestIndex);
     } else {
       setCurrentIndex(closestIndex);
     }
-  }, [slideToCenter, totalCards]);
+  }, [slideToItem]);
 
   useEffect(() => {
     if (isPaused) return;
@@ -126,11 +122,11 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      slideToCenter(0);
+      slideToItem(0);
     }, 150);
 
     return () => clearTimeout(timer);
-  }, [slideToCenter]);
+  }, [slideToItem]);
 
   useEffect(() => {
     const carousel = carouselRef.current;
@@ -142,7 +138,7 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
       }
 
       scrollTimeoutRef.current = setTimeout(() => {
-        autoCenterClosestCard();
+        syncClosestItem();
       }, 150);
     };
 
@@ -154,7 +150,7 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
         clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, [autoCenterClosestCard]);
+  }, [syncClosestItem]);
 
   if (cardsWithColor.length === 0) {
     return <div className="relative w-full overflow-hidden h-150" />;
@@ -167,19 +163,17 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        <div className="hidden md:block absolute left-0 top-0 bottom-0 w-30 lg:w-40 z-20 pointer-events-none bg-linear-to-r from-primary50/95 via-primary50/80 to-transparent" />
         <button
           onClick={goToPrevious}
-          className="hidden md:block absolute left-4 md:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-30 p-3 lg:p-4 bg-primary hover:bg-background hover:text-primary border border-primary rounded-full transition-all duration-300 text-white hover:scale-110 active:scale-95"
+          className="hidden md:flex absolute left-5 lg:left-8 top-1/2 -translate-y-1/2 z-30 items-center justify-center p-3 lg:p-4 bg-primary hover:bg-background hover:text-primary border border-primary rounded-full transition-all duration-300 text-white hover:scale-110 active:scale-95"
           aria-label="Previous"
         >
           <ArrowLeft className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={2.5} />
         </button>
 
-        <div className="hidden md:block absolute right-0 top-0 bottom-0 w-30 lg:w-40 z-20 pointer-events-none bg-linear-to-l from-primary50/95 via-primary50/80 to-transparent" />
         <button
           onClick={goToNext}
-          className="hidden md:block absolute right-4 md:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-30 p-3 lg:p-4 bg-primary hover:bg-background hover:text-primary border border-primary rounded-full transition-all duration-300 text-white hover:scale-110 active:scale-95"
+          className="hidden md:flex absolute right-5 lg:right-8 top-1/2 -translate-y-1/2 z-30 items-center justify-center p-3 lg:p-4 bg-primary hover:bg-background hover:text-primary border border-primary rounded-full transition-all duration-300 text-white hover:scale-110 active:scale-95"
           aria-label="Next"
         >
           <ArrowRight className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={2.5} />
@@ -187,25 +181,17 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
 
         <div
           ref={carouselRef}
-          className="flex gap-2 md:gap-3 lg:gap-4 overflow-x-auto scrollbar-hide scroll-smooth py-12"
+          className="flex snap-x snap-mandatory gap-4 md:gap-5 lg:gap-6 overflow-x-auto scrollbar-hide scroll-smooth px-4 py-7 md:px-20 md:py-10 lg:px-24 lg:py-12 scroll-px-4 md:scroll-px-20 lg:scroll-px-24"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {extendedCards.map((card, idx) => {
-            const realIndex = idx % totalCards;
-            const currentCard = cardsWithColor[realIndex];
-            const isCenter = realIndex === currentIndex;
-
+          {cardsWithColor.map((card) => {
             return (
               <div
-                key={`${card.id}-${idx}`}
-                className={`shrink-0 transition-all duration-700 ease-out
-                  ${isCenter 
-                    ? 'scale-110 -translate-y-4 z-20' 
-                    : 'scale-90 opacity-75 hover:opacity-90 hover:scale-[0.95]'
-                  }`}
+                key={card.id}
+                className="shrink-0 snap-start basis-full md:basis-[calc((100%_-_1.25rem)/2)] lg:basis-[calc((100%_-_3rem)/3)]"
               >
                 <div
-                  className="relative w-70 md:w-90 lg:w-120 h-90 md:h-110 lg:h-140 rounded-xl overflow-hidden shadow-xl group/card cursor-pointer"
+                  className="relative aspect-[4/5] w-full overflow-hidden rounded-xl shadow-xl group/card cursor-pointer"
                   onClick={() => router.push('/products')}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
@@ -220,18 +206,18 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
                     src={card.img_url ? normalizeImageUrl(card.img_url) ?? '/Icon.svg' : '/Icon.svg'}
                     alt={card.title}
                     fill
-                    sizes="(max-width: 768px) 17.5rem, (max-width: 1024px) 22.5rem, 30rem"
+                    sizes="(max-width: 767px) 100vw, (max-width: 1023px) 50vw, 33vw"
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover/card:scale-110"
                   />
 
-                  <div className={`absolute inset-0 bg-linear-to-b ${currentCard.color} opacity-65`} />
+                  <div className={`absolute inset-0 bg-linear-to-b ${card.color} opacity-20`} />
 
                   <div className="absolute bottom-0 left-0 right-0 p-4 md:p-5 lg:p-6 bg-linear-to-t from-foreground/90 via-foreground/70 to-transparent">
                     <div className="uppercase text-primary-foreground tracking-[2px] text-[10px] md:text-xs font-semibold mb-0.5 md:mb-0.75 lg:mb-1 opacity-75">
                       {card.category || "Uncategorized"}
                     </div>
                     
-                    <h3 className={`text-2xl md:text-3xl lg:text-4xl font-bold text-primary-foreground leading-none mb-1 md:mb-1.5 lg:mb-2 transition-all ${isCenter ? '' : 'text-white/90'}`}>
+                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary-foreground leading-none mb-1 md:mb-1.5 lg:mb-2">
                       {card.title}
                     </h3>
                     
