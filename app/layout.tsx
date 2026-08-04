@@ -6,7 +6,9 @@ import { Analytics } from "@vercel/analytics/next"
 
 import { AuthProvider } from "@/components/auth/AuthProvider";
 
-const siteUrl = new URL("https://revview.online");
+// Keep generated canonicals, metadata, and structured data aligned with the
+// production hostname configured in Vercel. The apex domain redirects here.
+const siteUrl = new URL("https://www.revview.online");
 const siteTitle = "RevView: Free Civil Service Exam Reviewer Philippines";
 const siteDescription =
   "Prepare for the Philippine Civil Service Exam with free CSE-PPT practice quizzes, answer explanations, progress tracking, and Professional and Subprofessional review resources.";
@@ -118,28 +120,28 @@ export default function RootLayout({
               "@graph": [
                 {
                   "@type": "Organization",
-                  "@id": "https://revview.online/#organization",
+                  "@id": "https://www.revview.online/#organization",
                   name: "RevView",
                   alternateName: "RevView Online",
-                  url: "https://revview.online",
+                  url: "https://www.revview.online",
                   description: siteDescription,
                   logo: {
                     "@type": "ImageObject",
-                    url: "https://revview.online/Icon.svg",
-                    contentUrl: "https://revview.online/Icon.svg",
+                    url: "https://www.revview.online/Icon.svg",
+                    contentUrl: "https://www.revview.online/Icon.svg",
                     width: 336,
                     height: 336,
                   },
                 },
                 {
                   "@type": "WebSite",
-                  "@id": "https://revview.online/#website",
+                  "@id": "https://www.revview.online/#website",
                   name: "RevView",
                   alternateName: ["RevView Online", "RevView CSE Reviewer"],
-                  url: "https://revview.online",
+                  url: "https://www.revview.online",
                   description: siteDescription,
                   publisher: {
-                    "@id": "https://revview.online/#organization",
+                    "@id": "https://www.revview.online/#organization",
                   },
                   inLanguage: "en-PH",
                 },

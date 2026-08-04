@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 
-const baseUrl = "https://revview.online";
+const baseUrl = "https://www.revview.online";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const lastModified = new Date("2026-07-20");
+  // Updated when the canonical hostname and public route set last changed.
+  const lastModified = new Date("2026-08-04");
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Homepage, Footer, NavBar } from "@/lib/client-imports";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Free Civil Service Exam Reviewer Philippines",
@@ -16,7 +17,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
+interface HomePageProps {
+  searchParams: Promise<{ code?: string }>;
+}
+
+export default async function Home({ searchParams }: HomePageProps) {
+  const { code } = await searchParams;
+
+  // Supabase sends the authorization code to the Site URL when the callback
+  // URL is not yet allow-listed. Forward it so the server can exchange it for
+  // a session and finish the normal dashboard redirect instead of exposing it
+  // on the homepage URL.
+  if (code) {
+    redirect(`/auth/callback?code=${encodeURIComponent(code)}`);
+  }
+
   return (
     <div className="w-full">
       <NavBar State="Home" />
