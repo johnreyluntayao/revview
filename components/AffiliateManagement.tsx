@@ -43,17 +43,19 @@ interface AffiliateFormData {
   title: string;
   description: string;
   category: string;
-  price: number;
+  price: string;
   uploadedImageUrl: string;
   imageUrl: string;
   affiliateLink: string;
 }
 
+type AffiliateSaveData = Omit<AffiliateFormData, "price"> & { price: number };
+
 const defaultFormData: AffiliateFormData = {
   title: "",
   description: "",
   category: "",
-  price: 0,
+  price: "",
   uploadedImageUrl: "",
   imageUrl: "",
   affiliateLink: "",
@@ -139,7 +141,7 @@ const AffiliateManagement = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const handleAddItem = async (data: AffiliateFormData) => {
+  const handleAddItem = async (data: AffiliateSaveData) => {
     const { error } = await supabase.from("affiliate").insert({
       title: data.title,
       description: data.description,
@@ -231,7 +233,7 @@ const AffiliateManagement = () => {
       title: item.title,
       description: item.description,
       category: item.category,
-      price: item.price,
+      price: String(item.price),
       // The database has one image field. Treat an existing value as the selected image
       // so it remains visible and can be removed or replaced during editing.
       uploadedImageUrl: item.imageUrl,
@@ -852,9 +854,14 @@ const AffiliateManagement = () => {
               type="number"
               placeholder="0"
               value={formData.price}
-              onChange={(event) =>
-                setFormData((prev) => ({ ...prev, price: Number(event.target.value) || 0 }))
-              }
+              min={0}
+              step="1"
+              onChange={(event) => {
+                const value = event.target.value;
+                if (/^\d*$/.test(value)) {
+                  setFormData((prev) => ({ ...prev, price: value }));
+                }
+              }}
             />
           </div>
 
