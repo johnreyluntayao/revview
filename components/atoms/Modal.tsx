@@ -38,8 +38,13 @@ export default function Modal({
   panelClassName = "",
 }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
   const titleId = useId();
   const descriptionId = useId();
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -57,7 +62,7 @@ export default function Modal({
 
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        onClose();
+        onCloseRef.current();
         return;
       }
 
@@ -87,10 +92,17 @@ export default function Modal({
 
     const previouslyFocused = document.activeElement as HTMLElement | null;
     const focusFrame = requestAnimationFrame(() => {
-      const firstFocusable = modalRef.current?.querySelector<HTMLElement>(
-        'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href]',
+      const modal = modalRef.current;
+      // Do not steal focus after a parent re-render while the user is editing a field.
+      if (!modal || modal.contains(document.activeElement)) return;
+
+      const firstFormControl = modal.querySelector<HTMLElement>(
+        'input:not([disabled]), textarea:not([disabled]), select:not([disabled])',
       );
-      (firstFocusable ?? modalRef.current)?.focus();
+      const firstFocusable = modal.querySelector<HTMLElement>(
+        'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
+      );
+      (firstFormControl ?? firstFocusable ?? modal).focus();
     });
 
     window.addEventListener("keydown", handleEsc);
@@ -99,7 +111,7 @@ export default function Modal({
       window.removeEventListener("keydown", handleEsc);
       previouslyFocused?.focus();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
