@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Button, Chip, InputField, Modal } from "@/lib/client-imports";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Button, Chip, InputField, InsertImage, Modal } from "@/lib/client-imports";
 import {
   Add,
   Affiliate,
@@ -44,6 +44,7 @@ interface AffiliateFormData {
   description: string;
   category: string;
   price: number;
+  uploadedImageUrl: string;
   imageUrl: string;
   affiliateLink: string;
 }
@@ -53,6 +54,7 @@ const defaultFormData: AffiliateFormData = {
   description: "",
   category: "",
   price: 0,
+  uploadedImageUrl: "",
   imageUrl: "",
   affiliateLink: "",
 };
@@ -64,6 +66,9 @@ const AffiliateManagement = () => {
   const [formData, setFormData] = useState<AffiliateFormData>(defaultFormData);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<AffiliateItem | null>(null);
+  const [imageInputMode, setImageInputMode] = useState<"upload" | "url">("upload");
+  const [isSaving, setIsSaving] = useState(false);
+  const isSavingRef = useRef(false);
 
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -147,11 +152,11 @@ const AffiliateManagement = () => {
 
     if (error) {
       toast.error("Failed to add item");
-      return;
+      return false;
     }
 
     toast.success("Item added!");
-    await fetchItems();
+    return true;
   };
 
   const openDeletePopup = (id: string) => {
@@ -216,6 +221,7 @@ const AffiliateManagement = () => {
   const handleOpenAddModal = () => {
     setEditingItem(null);
     setFormData(defaultFormData);
+    setImageInputMode("upload");
     setIsModalOpen(true);
   };
 
@@ -226,9 +232,13 @@ const AffiliateManagement = () => {
       description: item.description,
       category: item.category,
       price: item.price,
-      imageUrl: item.imageUrl,
+      // The database has one image field. Treat an existing value as the selected image
+      // so it remains visible and can be removed or replaced during editing.
+      uploadedImageUrl: item.imageUrl,
+      imageUrl: "",
       affiliateLink: item.affiliateLink,
     });
+    setImageInputMode("upload");
     setIsModalOpen(true);
   };
 
@@ -236,15 +246,20 @@ const AffiliateManagement = () => {
     setIsModalOpen(false);
     setEditingItem(null);
     setFormData(defaultFormData);
+    setImageInputMode("upload");
   };
 
   const handleSaveItem = async () => {
+    // A ref closes the small gap before React can re-render the disabled button.
+    if (isSavingRef.current) return;
+
+    const selectedImageUrl = formData.uploadedImageUrl.trim() || formData.imageUrl.trim();
     const payload = {
       ...formData,
       title: formData.title.trim(),
       description: formData.description.trim(),
       category: formData.category.trim(),
-      imageUrl: formData.imageUrl.trim(),
+      imageUrl: selectedImageUrl,
       affiliateLink: formData.affiliateLink.trim(),
       price: Number(formData.price) || 0,
     };
@@ -268,31 +283,45 @@ const AffiliateManagement = () => {
     payload.affiliateLink = safeAffiliateLink;
     payload.imageUrl = safeImageUrl || "";
 
-    if (editingItem) {
-      const { error } = await supabase
-        .from("affiliate")
-        .update({
-          title: payload.title,
-          description: payload.description,
-          category: payload.category,
-          price: payload.price,
-          img_url: payload.imageUrl,
-          affiliate_link: payload.affiliateLink,
-        })
-        .eq("id", editingItem.id);
+    isSavingRef.current = true;
+    setIsSaving(true);
 
-      if (error) {
-        toast.error("Failed to update item");
-        return;
+    try {
+      let saved = false;
+
+      if (editingItem) {
+        const { error } = await supabase
+          .from("affiliate")
+          .update({
+            title: payload.title,
+            description: payload.description,
+            category: payload.category,
+            price: payload.price,
+            img_url: payload.imageUrl,
+            affiliate_link: payload.affiliateLink,
+          })
+          .eq("id", editingItem.id);
+
+        if (error) {
+          toast.error("Failed to update item");
+          return;
+        }
+
+        toast.success("Item updated!");
+        saved = true;
+      } else {
+        saved = await handleAddItem(payload);
       }
 
-      toast.success("Item updated!");
-    } else {
-      await handleAddItem(payload);
+      if (saved) {
+        closeModal();
+        // Fetch once after a successful write. setItems replaces the list; it never appends.
+        await fetchItems();
+      }
+    } finally {
+      isSavingRef.current = false;
+      setIsSaving(false);
     }
-
-    closeModal();
-    await fetchItems();
   };
 
   const toggleSelectItem = (id: string) => {
@@ -621,16 +650,16 @@ const AffiliateManagement = () => {
             </div>
 
             <div className="mt-4 hidden overflow-hidden rounded-xl border border-border md:block">
-              <div className="overflow-x-auto">
-                <table className="min-w-full border-collapse bg-card text-sm">
+              <div className="w-full overflow-x-auto">
+                <table className="w-full table-fixed border-collapse bg-card text-sm">
                   <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
                     <tr>
                       {bulkMode && <th className="w-10 px-3 py-3"></th>}
-                      <th className="px-4 py-3">Title</th>
-                      <th className="hidden px-4 py-3 md:table-cell">Category</th>
-                      <th className="hidden px-4 py-3 lg:table-cell">Price</th>
-                      <th className="hidden px-4 py-3 md:table-cell text-center">Status</th>
-                      <th className="px-4 py-3 text-center">Actions</th>
+                      <th className="px-3 py-3 md:px-4">Title</th>
+                      <th className="hidden w-26 px-1 py-3 md:table-cell md:px-2">Category</th>
+                      <th className="hidden w-24 px-3 py-3 lg:table-cell">Price</th>
+                      <th className="hidden w-20 px-1 py-3 text-center md:table-cell md:px-2">Status</th>
+                      <th className="w-28 whitespace-nowrap px-1 py-3 text-center md:px-2">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100">
@@ -658,33 +687,31 @@ const AffiliateManagement = () => {
                             </td>
                           )}
 
-                          <td className="px-4 py-4">
-                            <div className="flex items-start gap-3">
-                              <div>
-                                <div className="font-semibold text-foreground">{item.title}</div>
+                          <td className="min-w-0 px-3 py-4 md:px-4">
+                            <div className="min-w-0">
+                              <div className="truncate font-semibold text-foreground" title={item.title}>{item.title}</div>
                                 <div className="mt-1 text-xs text-slate-500 md:hidden">
                                   {item.category} • ₱ {item.price.toLocaleString()}
                                 </div>
-                                <div className="mt-2 text-xs text-slate-500">
+                                <div className="mt-2 w-full truncate text-xs text-slate-500" title={item.description || "No description provided."}>
                                   {item.description || "No description provided."}
                                 </div>
-                              </div>
                             </div>
                           </td>
 
-                          <td className="hidden px-4 py-4 md:table-cell">
-                            <Chip text={item.category || "Uncategorized"} className={getCategoryClasses(item.category)} />
+                          <td className="hidden px-1 py-4 align-middle md:table-cell md:px-2">
+                            <Chip text={item.category || "Uncategorized"} className={`${getCategoryClasses(item.category)} whitespace-nowrap break-normal`} />
                           </td>
 
-                          <td className="hidden px-4 py-4 font-semibold text-foreground lg:table-cell">
+                          <td className="hidden whitespace-nowrap px-3 py-4 font-semibold text-foreground lg:table-cell">
                             ₱ {item.price.toLocaleString()}
                           </td>
 
-                          <td className="hidden px-4 py-4 md:table-cell">
-                            <div className="flex items-center">
+                          <td className="hidden px-1 py-4 align-middle md:table-cell md:px-2">
+                            <div className="flex items-center justify-center gap-1 whitespace-nowrap">
                               <Chip
                                 text={item.status}
-                                className={item.status === "Active" ? "bg-success text-white" : "bg-slate-300 text-slate-700"}
+                                className={`${item.status === "Active" ? "bg-success text-white" : "bg-slate-300 text-slate-700"} whitespace-nowrap break-normal`}
                                 onClick={() => toggleStatus(item)}
                               />
                               <Button
@@ -696,13 +723,13 @@ const AffiliateManagement = () => {
                                 size="sm"
                                 backgroundColor="bg-transparent"
                                 textColor="text-slate-600"
-                                className="hidden md:flex"
+                                className="hidden shrink-0 lg:flex"
                               />
                             </div>
                           </td>
 
-                          <td className="px-4 py-4">
-                            <div className="flex justify-end gap-1">
+                          <td className="whitespace-nowrap px-1 py-4 align-middle md:px-2">
+                            <div className="flex flex-nowrap justify-end gap-1">
                               <Button
                                 onClick={(event) => {
                                   event.stopPropagation();
@@ -712,6 +739,7 @@ const AffiliateManagement = () => {
                                 backgroundColor="bg-primary/20"
                                 textColor="text-primary"
                                 size="sm"
+                                className="shrink-0"
                               />
                               <Button
                                 onClick={(event) => {
@@ -723,6 +751,7 @@ const AffiliateManagement = () => {
                                 backgroundColor="bg-primary/20"
                                 textColor="text-primary"
                                 size="sm"
+                                className="shrink-0"
                               />
                               <Button
                                 onClick={(event) => {
@@ -733,6 +762,7 @@ const AffiliateManagement = () => {
                                 backgroundColor="bg-destructive/20"
                                 textColor="text-destructive"
                                 size="sm"
+                                className="shrink-0"
                               />
                             </div>
                           </td>
@@ -769,14 +799,16 @@ const AffiliateManagement = () => {
             <Button
               text="Cancel"
               onClick={closeModal}
+              isDisabled={isSaving}
               textColor="text-foreground"
               backgroundColor="bg-card"
               borderColor="border-foreground/50"
               className="w-full sm:w-auto"
             />
             <Button
-              text={editingItem ? "Update Item" : "Add Item"}
+              text={isSaving ? "Saving..." : editingItem ? "Update Item" : "Add Item"}
               onClick={handleSaveItem}
+              isDisabled={isSaving}
               textColor="text-white"
               backgroundColor="bg-primary"
               className="w-full sm:w-auto"
@@ -806,7 +838,7 @@ const AffiliateManagement = () => {
               <select
                 value={formData.category}
                 onChange={(event) => setFormData((prev) => ({ ...prev, category: event.target.value }))}
-                className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                className="mt-1 w-full rounded-lg border border-border px-4 py-2.5 text-base outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
               >
                 <option value="">Choose option...</option>
                 <option value="Book">Book</option>
@@ -826,13 +858,57 @@ const AffiliateManagement = () => {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <InputField
-              label="Image URL"
-              placeholder="https://..."
-              value={formData.imageUrl}
-              onChange={(event) => setFormData((prev) => ({ ...prev, imageUrl: event.target.value }))}
-            />
+          <div className="space-y-4">
+            <div className="inline-flex rounded-lg border border-border bg-muted/30 p-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setImageInputMode("upload");
+                  setFormData((prev) => ({ ...prev, imageUrl: "" }));
+                }}
+                className={`rounded-md px-3 py-2 text-sm font-medium transition ${
+                  imageInputMode === "upload"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                aria-pressed={imageInputMode === "upload"}
+              >
+                Upload image
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setImageInputMode("url");
+                  setFormData((prev) => ({ ...prev, uploadedImageUrl: "" }));
+                }}
+                className={`rounded-md px-3 py-2 text-sm font-medium transition ${
+                  imageInputMode === "url"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                aria-pressed={imageInputMode === "url"}
+              >
+                Image link
+              </button>
+            </div>
+
+            {imageInputMode === "upload" ? (
+              <InsertImage
+                label="Product image"
+                folder="affiliate_products"
+                value={formData.uploadedImageUrl}
+                onChange={(uploadedImageUrl) => setFormData((prev) => ({ ...prev, uploadedImageUrl }))}
+                placeholder="Paste an image with Ctrl+V, or click to upload"
+                isDisabled={isSaving}
+              />
+            ) : (
+              <InputField
+                label="Image URL"
+                placeholder="https://..."
+                value={formData.imageUrl}
+                onChange={(event) => setFormData((prev) => ({ ...prev, imageUrl: event.target.value }))}
+              />
+            )}
 
             <InputField
               label="Affiliate Link *"
