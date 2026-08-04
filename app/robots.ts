@@ -26,7 +26,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: "https://revview.online/sitemap.xml",
-    host: "https://revview.online",
+    sitemap: "https://www.revview.online/sitemap.xml",
+    host: "https://www.revview.online",
   };
 }

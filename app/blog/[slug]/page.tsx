@@ -14,7 +14,7 @@ import {
 } from "@/lib/blog";
 import { getPublishedBlogPost, getPublishedBlogPosts } from "@/lib/blog-server";
 
-const baseUrl = "https://revview.online";
+const baseUrl = "https://www.revview.online";
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
