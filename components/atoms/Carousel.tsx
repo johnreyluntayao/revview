@@ -217,11 +217,11 @@ export default function Carousel({ cards }: { cards: Affiliate[]}) {
                       {card.category || "Uncategorized"}
                     </div>
                     
-                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary-foreground leading-none mb-1 md:mb-1.5 lg:mb-2">
+                    <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary-foreground leading-none mb-1 md:mb-1.5 lg:mb-2 line-clamp-2">
                       {card.title}
                     </h3>
                     
-                    <p className="text-xs md:text-sm lg:text-base text-primary-foreground/90 leading-tight mb-4 md:mb-5 lg:mb-6">
+                    <p className="text-xs md:text-sm lg:text-base text-primary-foreground/90 leading-tight mb-4 md:mb-5 lg:mb-6 line-clamp-2">
                       {card.description}
                     </p>
 
