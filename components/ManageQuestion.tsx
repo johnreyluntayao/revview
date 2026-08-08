@@ -628,7 +628,7 @@ function QuestionEditorModal({
           </div>
           <div className="rounded-xl border border-border/80 bg-background p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Existing question</p>
-            <p className="mt-2 text-sm font-medium leading-relaxed text-foreground">{duplicateMatch?.text || "No question text available."}</p>
+            <p className="mt-2 whitespace-pre-wrap text-sm font-medium leading-relaxed text-foreground">{duplicateMatch?.text || "No question text available."}</p>
           </div>
           <div className="rounded-xl border border-border/80 bg-muted/20 p-4">
             <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Existing choices</p>
@@ -1358,7 +1358,7 @@ export default function ManageQuestions() {
                             aria-label={`Select ${question.text || "question"}`}
                           />
                         )}
-                        <h2 className="line-clamp-3 text-sm font-semibold leading-relaxed text-foreground">
+                        <h2 className="line-clamp-3 whitespace-pre-wrap text-sm font-semibold leading-relaxed text-foreground">
                           {question.text || "Image-only question"}
                         </h2>
                       </div>
@@ -1460,7 +1460,7 @@ export default function ManageQuestions() {
 
                     {/* Question */}
                     <div className="flex items-center gap-2 whitespace-normal wrap-break-word px-4 py-3 text-xs md:text-sm lg:text-base">
-                      <span className="line-clamp-2 leading-snug">
+                      <span className="line-clamp-2 whitespace-pre-wrap leading-snug">
                         {q.text || "Image only"}
                       </span>
                       {(q.img_url || q.explanation_img_url) && (

@@ -409,7 +409,7 @@ export default function Quiz({ sessionId }: QuizProps) {
               <span className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">{currentIndex + 1}</span>
               Select the best answer
             </div>
-            <h1 className="text-lg font-bold leading-relaxed text-foreground sm:text-xl lg:text-2xl">
+            <h1 className="whitespace-pre-wrap text-lg font-bold leading-relaxed text-foreground sm:text-xl lg:text-2xl">
               {currentQuestion.text}
             </h1>
           {currentQuestion.img_url && (

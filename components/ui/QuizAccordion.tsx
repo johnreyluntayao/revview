@@ -72,7 +72,7 @@ export default function QuizAccordion({
                     <p className="font-semibold text-foreground mb-0.5 md:mb-1 lg:mb-1.5">
                   Question {idx + 1}
                 </p>
-                <p className="text-foreground">{question.text}</p>
+                <p className="whitespace-pre-wrap text-foreground">{question.text}</p>
                   </div>
                    {question.img_url && (
                   <div className="">
