@@ -36,9 +36,11 @@ export default async function QuizPage({ params }: { params: Promise<{ sessionId
     redirect("/dashboard?message=quiz_already_completed");
   }
 
-  const categoryName = session.categories?.name 
-    ? session.categories.name 
-    : "All Categories";
+  const categoryName = session.session_mode === "full_exam"
+    ? "Civil Service Full Exam"
+    : session.categories?.name
+      ? session.categories.name
+      : "All Categories";
 
   return (
     <main className="min-h-screen bg-background">
@@ -47,7 +49,7 @@ export default async function QuizPage({ params }: { params: Promise<{ sessionId
         sessionId={sessionId} 
         title={categoryName} 
       />
-      <Quiz sessionId={sessionId} />
+      <Quiz sessionId={sessionId} navigationTitle={categoryName} />
     </main>
   );
 }

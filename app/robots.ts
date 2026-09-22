@@ -22,6 +22,7 @@ export default function robots(): MetadataRoute.Robots {
           "/quiz-selection",
           "/results-history",
           "/signup",
+          "/study",
           "/user-account",
         ],
       },

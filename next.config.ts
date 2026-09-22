@@ -45,6 +45,7 @@ const nextConfig: NextConfig = {
       "/quiz-selection/:path*",
       "/results-history/:path*",
       "/signup",
+      "/study/:path*",
       "/user-account/:path*",
     ];
 
