@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import {
   AccountSettings,
   AverageScore,
+  LibraryBig,
   Close,
   Logout,
   ProgressTracking,
@@ -33,6 +34,7 @@ interface SidebarProps {
 const defaultItems: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: ProgressTracking, section: "main", exact: true },
   { href: "/quiz-selection", label: "Start review", icon: StartQuiz, section: "main" },
+  { href: "/study", label: "Study library", icon: LibraryBig, section: "main", exact: true },
   { href: "/results-history", label: "Results history", icon: AverageScore, section: "main", exact: true },
   { href: "/user-account", label: "Account settings", icon: AccountSettings, section: "account", exact: true },
 ];

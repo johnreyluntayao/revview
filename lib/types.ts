@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
 
 export interface InputFieldProps
   extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange" | "size" | "type"> {
@@ -17,7 +17,7 @@ export interface InputFieldProps
   state?: "editable" | "readonly" | "disabled"; // ← NEW
 }
 
-export interface ButtonProps {
+export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "className" | "disabled" | "onClick" | "type"> {
   textColor?: string;
   backgroundColor?: string;
   borderColor?: string;

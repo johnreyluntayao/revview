@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { ScoreCard, Card, QuizAccordion } from "@/lib/client-imports";
+import { ScoreCard, QuizAccordion } from "@/lib/client-imports";
+import { AllCategories, Gauge } from "@/lib/icons";
 import { toast } from "sonner";
 
 type Question = {
@@ -169,7 +170,8 @@ const QuizResult = ({ sessionId }: QuizResultProps) => {
   }
 
   return (
-    <div className="min-h-screen space-y-4 bg-linear-to-br from-primary/5 to-secondary/5 px-4 pb-10 pt-28 md:space-y-6 md:px-6 md:pt-24 lg:space-y-8 lg:px-40 lg:pt-28">
+    <div className="min-h-screen bg-linear-to-b from-primary/5 via-background to-secondary/5 px-4 pb-10 pt-28 sm:px-6 md:pt-24 lg:px-8 lg:pt-28">
+      <div className="mx-auto max-w-6xl space-y-5 sm:space-y-6">
       <div>
         <ScoreCard
           score={score}
@@ -180,9 +182,15 @@ const QuizResult = ({ sessionId }: QuizResultProps) => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 md:gap-3 lg:gap-4">
-        <Card variant="overview" title="Category" value={category || "N/A"} />
-        <Card variant="overview" title="Difficulty" value={difficulty || "N/A"} />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <section className="flex items-center gap-3 rounded-2xl border border-primary/15 bg-card p-4 shadow-sm sm:p-5">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"><AllCategories className="size-5" /></span>
+          <div className="min-w-0"><p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Quiz scope</p><p className="mt-1 truncate text-base font-bold text-foreground sm:text-lg">{category || "N/A"}</p></div>
+        </section>
+        <section className="flex items-center gap-3 rounded-2xl border border-secondary/20 bg-card p-4 shadow-sm sm:p-5">
+          <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-secondary/10 text-secondary"><Gauge className="size-5" /></span>
+          <div className="min-w-0"><p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Difficulty</p><p className="mt-1 truncate text-base font-bold text-foreground sm:text-lg">{difficulty || "N/A"}</p></div>
+        </section>
       </div>
 
       <div className="rounded-xl border border-border bg-card p-4 md:p-6 lg:p-8">
@@ -191,6 +199,7 @@ const QuizResult = ({ sessionId }: QuizResultProps) => {
           Answer Review
         </h2>
         <QuizAccordion questions={questions} answers={answers} />
+      </div>
       </div>
     </div>
   );

@@ -362,7 +362,7 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
             : "border-b border-border/80 bg-background/90 shadow-sm backdrop-blur-xl"
         }`}
       >
-        <div className="relative mx-auto flex min-h-16 max-w-screen-3xl flex-wrap items-center justify-between gap-y-1 px-4 py-2 md:flex-nowrap md:px-6 lg:min-h-20 lg:px-8">
+        <div className={`relative mx-auto flex min-h-16 max-w-screen-3xl flex-wrap items-center justify-between gap-x-2 gap-y-1 px-4 py-2 md:flex-nowrap md:px-6 lg:min-h-20 lg:px-8 ${State === "OnQuiz" ? "sm:gap-x-3" : ""}`}>
           {/* Logo + Brand */}
           <Link
             href={`${State === "OnQuiz" ? "" : "/"}`}
@@ -456,11 +456,11 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
           )}
 
           {/* RIGHT SIDE */}
-          <div className="relative z-10 flex items-center gap-2 md:gap-3 lg:gap-4">
+          <div className="relative z-10 flex shrink-0 items-center gap-1.5 sm:gap-2 md:gap-3 lg:gap-4">
             {State === "OnQuiz" && remainingSeconds !== null ? (
               <>
                 <div
-                  className={`inline-flex min-w-22 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold tabular-nums transition-colors md:min-w-25 md:text-sm ${
+                  className={`inline-flex min-w-0 items-center justify-center gap-1 rounded-full px-2.5 py-2 text-xs font-semibold tabular-nums transition-colors sm:min-w-25 sm:gap-1.5 sm:px-3 sm:text-sm ${
                     remainingSeconds <= 10
                       ? "animate-pulse bg-destructive/15 text-destructive"
                       : remainingSeconds <= 60
@@ -469,14 +469,18 @@ export default function Navbar({ State, title, sessionId }: NavbarProps) {
                   }`}
                   aria-label={`${Math.floor(remainingSeconds / 60)} minutes and ${remainingSeconds % 60} seconds remaining`}
                 >
-                  <StudyTime className="size-4" aria-hidden="true" />
+                  <StudyTime className="size-3.5 shrink-0 sm:size-4" aria-hidden="true" />
                   <span>{Math.floor(remainingSeconds / 60).toString().padStart(2, "0")}:{(remainingSeconds % 60).toString().padStart(2, "0")}</span>
                 </div>
                 <Button
-                  leftIcon={<Pause className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6"/>}
+                  leftIcon={<Pause className="size-4 sm:size-5" />}
                   textColor="text-foreground/85"
                   backgroundColor="bg-muted-foreground/25"
                   onClick={handlePauseClick}
+                  isRounded
+                  aria-label="Pause quiz"
+                  title="Pause quiz"
+                  className="size-10 !p-0 sm:size-11"
                 />
               </>
             ) : State === "LoggedIn" ? (

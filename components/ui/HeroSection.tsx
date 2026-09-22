@@ -172,7 +172,7 @@ const HeroSection = () => {
               className="flex-1 px-0 lg:px-3 py-0 border-l-none lg:border-l-4 border-purple300 space-y-2 md:space-y-2.5 lg:space-y-3"
             >
               <p className="text-2xl md:text-3xl lg:text-4xl font-bold text-purple300">
-                100+
+                480+
               </p>
               <p className="block text-[10px] md:text-xs lg:text-sm text-white/80">
                 Practice Questions
