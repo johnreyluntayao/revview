@@ -24,6 +24,7 @@ type Question = {
   correct_answer: "A" | "B" | "C" | "D" | "E";
   explanation: string;
   img_url?: string | null;
+  category_id: string;
 };
 
 type QuizSession = {
@@ -37,6 +38,7 @@ type QuizSession = {
   is_paused: boolean;
   paused_at: string | null;
   total_paused_seconds: number;
+  session_mode?: "practice" | "full_exam";
 };
 
 type QuizAnswer = {
@@ -75,6 +77,7 @@ function getAvailableOptions(question: Question): AvailableOption[] {
 
 interface QuizProps {
   sessionId: string;
+  navigationTitle?: string;
 }
 
 type QuizWindow = Window &
@@ -83,7 +86,7 @@ type QuizWindow = Window &
     submitQuiz?: (timedOut?: boolean) => Promise<void>;
   };
 
-export default function Quiz({ sessionId }: QuizProps) {
+export default function Quiz({ sessionId, navigationTitle }: QuizProps) {
   const [supabase] = useState(() => createClient());
   const router = useRouter();
 
@@ -92,6 +95,7 @@ export default function Quiz({ sessionId }: QuizProps) {
   const [userAnswers, setUserAnswers] = useState<Record<string, string | null>>(
     {},
   );
+  const [answerResults, setAnswerResults] = useState<Record<string, boolean>>({});
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [answerSubmitted, setAnswerSubmitted] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -111,6 +115,17 @@ export default function Quiz({ sessionId }: QuizProps) {
   const answeredCount = Object.values(userAnswers).filter(
     (value) => value !== null,
   ).length;
+  const questionNavigationTitle = quizData?.session.session_mode === "full_exam"
+    ? "Full exam navigation"
+    : quizData?.session.category_id
+      ? navigationTitle || "Question navigation"
+      : "Random questions from all categories";
+  const fullExamSections = [
+    { label: "Verbal Ability", start: 0, end: 50 },
+    { label: "Analytical Ability", start: 50, end: 90 },
+    { label: "Numerical Ability", start: 90, end: 130 },
+    { label: "General Information", start: 130, end: 150 },
+  ];
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -164,16 +179,21 @@ export default function Quiz({ sessionId }: QuizProps) {
         setQuizData({ ...typedData, answers: safeAnswers });
 
         const answeredMap: Record<string, string | null> = {};
+        const resultMap: Record<string, boolean> = {};
         safeAnswers.forEach((a) => {
           answeredMap[a.question_id] = a.selected_option;
+          resultMap[a.question_id] = a.is_correct;
         });
         setUserAnswers(answeredMap);
+        setAnswerResults(resultMap);
 
         const answeredSet = new Set(Object.keys(answeredMap));
         const nextUnansweredIndex = typedData.questions.findIndex(
           (q) => !answeredSet.has(q.id),
         );
-        setCurrentIndex(nextUnansweredIndex >= 0 ? nextUnansweredIndex : 0);
+        const initialIndex = nextUnansweredIndex >= 0 ? nextUnansweredIndex : 0;
+        setCurrentIndex(initialIndex);
+        setAnswerSubmitted(Boolean(answeredMap[typedData.questions[initialIndex]?.id]));
 
         setIsPaused(typedData.session.is_paused || false);
 
@@ -228,6 +248,7 @@ export default function Quiz({ sessionId }: QuizProps) {
         ...prev,
         [currentQuestion.id]: selectedOption,
       }));
+      setAnswerResults((prev) => ({ ...prev, [currentQuestion.id]: isCorrect }));
       setAnswerSubmitted(true);
     } catch (err) {
       console.error("Failed to save answer:", err);
@@ -239,11 +260,22 @@ export default function Quiz({ sessionId }: QuizProps) {
 
   const goToNextQuestion = () => {
     if (currentIndex < (quizData?.questions.length ?? 0) - 1) {
-      setCurrentIndex((prev) => prev + 1);
+      const nextIndex = currentIndex + 1;
+      const nextQuestion = quizData?.questions[nextIndex];
+      setCurrentIndex(nextIndex);
       setSelectedOption(null);
-      setAnswerSubmitted(false);
+      setAnswerSubmitted(Boolean(nextQuestion && userAnswers[nextQuestion.id]));
       questionStartTimeRef.current = Date.now();
     }
+  };
+
+  const goToQuestion = (index: number) => {
+    if (!quizData || index < 0 || index >= quizData.questions.length) return;
+    const question = quizData.questions[index];
+    setCurrentIndex(index);
+    setSelectedOption(null);
+    setAnswerSubmitted(Boolean(userAnswers[question.id]));
+    questionStartTimeRef.current = Date.now();
   };
 
   const submitQuiz = useCallback(
@@ -381,10 +413,49 @@ export default function Quiz({ sessionId }: QuizProps) {
   const isCorrect = confirmedAnswer === currentQuestion.correct_answer;
 
   const optionImage = currentOptions.some((option) => option.image);
+  const getNavigationStatus = (question: Question) => {
+    if (!userAnswers[question.id]) return "unanswered";
+    return answerResults[question.id] ? "correct" : "incorrect";
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-b from-primary/5 via-background to-background px-4 pb-10 pt-32 sm:px-6 md:pt-28 lg:px-8">
-      <div className="mx-auto w-full max-w-5xl">
+      <div className="mx-auto grid w-full max-w-7xl gap-4 xl:grid-cols-[15.5rem_minmax(0,1fr)] xl:gap-6">
+        <aside className="order-2 h-fit rounded-2xl border border-border/70 bg-card p-3.5 shadow-sm sm:p-4 xl:order-1 xl:sticky xl:top-24">
+          <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">{questionNavigationTitle}</p>
+              <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground">
+                <span className="inline-flex items-center gap-1"><i className="size-1.5 rounded-full bg-success" /> Correct</span>
+                <span className="inline-flex items-center gap-1"><i className="size-1.5 rounded-full bg-destructive" /> Incorrect</span>
+                <span>Unanswered</span>
+              </div>
+            </div>
+            <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">{answeredCount}/{quizData.session.total_questions}</span>
+          </div>
+          <div className="max-h-60 overflow-y-auto overscroll-contain pr-1 sm:max-h-72 xl:max-h-[calc(100vh-11rem)]">
+            {quizData.session.session_mode === "full_exam" ? fullExamSections.map((section) => (
+              <div key={section.label} className="mb-4 last:mb-0">
+                <p className="mb-2 text-xs font-semibold text-muted-foreground">{section.label} {section.start + 1}–{section.end}</p>
+                <div className="grid grid-cols-8 gap-1.5 sm:grid-cols-10 xl:grid-cols-5">
+                  {quizData.questions.slice(section.start, section.end).map((question, offset) => {
+                    const index = section.start + offset;
+                    const status = getNavigationStatus(question);
+                    return <button key={question.id} type="button" onClick={() => goToQuestion(index)} aria-label={`Go to question ${index + 1}${status === "correct" ? ", correct" : status === "incorrect" ? ", incorrect" : ", unanswered"}`} className={`flex aspect-square items-center justify-center rounded-lg text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary ${index === currentIndex ? "ring-2 ring-inset ring-primary" : ""} ${status === "correct" ? "bg-success text-white hover:bg-success/90" : status === "incorrect" ? "bg-destructive text-white hover:bg-destructive/90" : "bg-muted text-foreground hover:bg-primary/10 hover:text-primary"}`}>{index + 1}</button>;
+                  })}
+                </div>
+              </div>
+            )) : (
+              <div className="grid grid-cols-8 gap-1.5 sm:grid-cols-10 xl:grid-cols-5">
+                {quizData.questions.map((question, index) => {
+                  const status = getNavigationStatus(question);
+                  return <button key={question.id} type="button" onClick={() => goToQuestion(index)} aria-label={`Go to question ${index + 1}${status === "correct" ? ", correct" : status === "incorrect" ? ", incorrect" : ", unanswered"}`} className={`flex aspect-square items-center justify-center rounded-lg text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary ${index === currentIndex ? "ring-2 ring-inset ring-primary" : ""} ${status === "correct" ? "bg-success text-white hover:bg-success/90" : status === "incorrect" ? "bg-destructive text-white hover:bg-destructive/90" : "bg-muted text-foreground hover:bg-primary/10 hover:text-primary"}`}>{index + 1}</button>;
+                })}
+              </div>
+            )}
+          </div>
+        </aside>
+        <div className="order-1 min-w-0 xl:order-2">
         <div className="mb-4 rounded-2xl border border-border/70 bg-card p-4 shadow-sm sm:mb-5 sm:p-5">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div>
@@ -545,6 +616,7 @@ export default function Quiz({ sessionId }: QuizProps) {
             />
           )}
           </div>
+        </div>
         </div>
       </div>
     </div>
