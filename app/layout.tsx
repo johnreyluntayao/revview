@@ -110,6 +110,22 @@ export default function RootLayout({
           text-foreground
         `}
       >
+
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-2VBY0GK6YL"
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){window.dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-2VBY0GK6YL');
+          `}
+        </Script>
+
         <Script
           id="revview-structured-data"
           type="application/ld+json"
@@ -149,6 +165,7 @@ export default function RootLayout({
             }),
           }}
         />
+
         <AuthProvider>
           {children}
           <Analytics/>
